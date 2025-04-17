@@ -67,7 +67,8 @@
               "buildTarget": "frontend:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "frontend:build:development",
+              "port": 12345
             }
           },
           "defaultConfiguration": "development"
