@@ -25,7 +25,7 @@ public class DepartmentMapper {
 
     public DepartmentDto toDepartmentDto(Department department) {
         return DepartmentDto.builder()
-                .id(String.valueOf(department.getId()))
+                .id(department.getId())
                 .name(department.getName())
                 .createdBy(department.getCreatedBy())
                 .createdDate(department.getCreatedDate())
