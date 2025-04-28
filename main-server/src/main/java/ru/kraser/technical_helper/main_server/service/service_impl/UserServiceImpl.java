@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
@@ -19,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private final DepartmentRepository departmentRepository;
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public String createUser(CreateUserDto createUserDto) {
         Department department = departmentRepository.findByIdAndEnabledTrue(createUserDto.departmentId())
                 .orElseThrow(() -> new NotFoundException("Отдел, в котором находится сотрудник - " +
