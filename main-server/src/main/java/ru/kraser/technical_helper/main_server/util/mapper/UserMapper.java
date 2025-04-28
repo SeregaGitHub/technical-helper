@@ -2,33 +2,31 @@ package ru.kraser.technical_helper.main_server.util.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.NewUser;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @UtilityClass
 public class UserMapper {
-    public NewUser toNewUser(CreateUserDto createUserDto) {
+    public User toUser(CreateUserDto createUserDto, Department department) {
+        User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        UUID uuid = UUID.randomUUID();
 
-        return NewUser.builder()
-                .id(uuid.toString())
-                .username(createUserDto.username())
-                .password(createUserDto.password())
-                .departmentId(createUserDto.departmentId())
-                .role(createUserDto.role())
-                .enabled(true)
-                // TODO - change to the current user
-                .createdBy("some_id")
-                .createdDate(now)
-                // TODO - change to the current user
-                .lastUpdatedBy("some_id")
-                .lastUpdatedDate(now)
-                .build();
+        user.setUsername(createUserDto.username());
+        user.setPassword(createUserDto.password());
+        user.setEnabled(true);
+        user.setDepartment(department);
+        user.setRole(createUserDto.role());
+        // TODO - change to the current user
+        user.setCreatedBy("some_id");
+        user.setCreatedDate(now);
+        // TODO - change to the current user
+        user.setLastUpdatedBy("some_id");
+        user.setLastUpdatedDate(now);
+
+        return user;
     }
 
     public UserDto toUserDto (User user) {

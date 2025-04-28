@@ -1,9 +1,11 @@
 package ru.kraser.technical_helper.main_server.service;
 
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
-import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.main_server.model.Department;
 
 public interface DepartmentService {
 
-    DepartmentDto createDepartment(CreateDepartmentDto createDepartmentDto);
+    String createDepartment(CreateDepartmentDto createDepartmentDto);
+
+    Department getDepartment(String departmentId);
 }

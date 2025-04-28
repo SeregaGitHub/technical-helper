@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
-import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
@@ -17,9 +16,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public DepartmentDto createDepartment(CreateDepartmentDto createDepartmentDto) {
-        //TODO - add try/catch
-        Department department = departmentRepository.save(DepartmentMapper.toDepartment(createDepartmentDto));
-        return DepartmentMapper.toDepartmentDto(department);
+    public String createDepartment(CreateDepartmentDto createDepartmentDto) {
+        //TODO - add exception
+        try {
+            departmentRepository.save(DepartmentMapper.toDepartment(createDepartmentDto));
+        } catch (Exception e) {
+            System.out.println("==========================================");
+            System.out.println(e.getMessage());
+            System.out.println("==========================================");
+        }
+        return "Отдел \"" + createDepartmentDto.name() + "\" - был успешно создан";
+    }
+
+    @Override
+    public Department getDepartment(String departmentId) {
+        //TODO - add exception
+        return departmentRepository.findByIdAndEnabledTrue(departmentId)
+                .orElseThrow(() -> new RuntimeException("Not Found !!!"));
     }
 }
