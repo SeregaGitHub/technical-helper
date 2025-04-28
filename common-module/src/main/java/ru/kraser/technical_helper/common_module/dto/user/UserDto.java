@@ -17,5 +17,6 @@ public record UserDto(String id,
                       LocalDateTime createdDate,
                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                       String lastUpdatedBy,
-                      LocalDateTime lastUpdatedDate) {
+                      LocalDateTime lastUpdatedDate
+) {
 }

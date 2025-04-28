@@ -13,5 +13,6 @@ public record DepartmentDto(String id,
                             LocalDateTime createdDate,
                             String lastUpdatedBy,
                             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                            LocalDateTime lastUpdatedDate) {
+                            LocalDateTime lastUpdatedDate
+) {
 }

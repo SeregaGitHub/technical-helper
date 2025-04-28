@@ -15,5 +15,6 @@ public record CreateUserDto (
         @NotBlank(message = "Пользователь должен быть сотрудником отдела.")
         String departmentId,
         @NotNull(message = "Пользователь должен иметь свою роль.")
-        Role role) {
+        Role role
+) {
 }

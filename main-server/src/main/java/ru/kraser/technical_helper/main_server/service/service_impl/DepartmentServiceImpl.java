@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
-import ru.kraser.technical_helper.main_server.model.Department;
+import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
@@ -17,21 +17,19 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public String createDepartment(CreateDepartmentDto createDepartmentDto) {
-        //TODO - add exception
         try {
-            departmentRepository.save(DepartmentMapper.toDepartment(createDepartmentDto));
+            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
         } catch (Exception e) {
-            System.out.println("==========================================");
-            System.out.println(e.getMessage());
-            System.out.println("==========================================");
+            throw new AlreadyExistsException("Отдел: " + createDepartmentDto.name() + ", - уже существует." +
+                    " Используйте другое имя !!!");
         }
-        return "Отдел \"" + createDepartmentDto.name() + "\" - был успешно создан";
+        return "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
     }
 
-    @Override
+    /*@Override
     public Department getDepartment(String departmentId) {
-        //TODO - add exception
         return departmentRepository.findByIdAndEnabledTrue(departmentId)
-                .orElseThrow(() -> new RuntimeException("Not Found !!!"));
-    }
+                .orElseThrow(() -> new NotFoundException("Отдел, в котором числится сотрудник - " +
+                        "больше не существует !!!"));
+    }*/
 }

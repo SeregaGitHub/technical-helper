@@ -24,6 +24,6 @@ public class DepartmentController {
     /*@GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Department findDepartmentById(@RequestHeader ("X-TH-Department-Id") String departmentId) {
-        return departmentService.findDepartmentById(departmentId);
+        return departmentService.getDepartment(departmentId);
     }*/
 }

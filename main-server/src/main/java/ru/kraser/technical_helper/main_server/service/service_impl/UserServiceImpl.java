@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
@@ -19,15 +21,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String createUser(CreateUserDto createUserDto) {
-        // TODO - add exception
-        Department department = departmentRepository.findByIdAndEnabledTrue(createUserDto.departmentId()).get();
+        Department department = departmentRepository.findByIdAndEnabledTrue(createUserDto.departmentId())
+                .orElseThrow(() -> new NotFoundException("Отдел, в котором находится сотрудник - " +
+                        "не существует. Используйте другой отдел !!!"));
         try {
-            userRepository.save(UserMapper.toUser(createUserDto, department));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
         } catch (Exception e) {
-            System.out.println("==========================================");
-            System.out.println(e.getMessage());
-            System.out.println("==========================================");
+            throw new AlreadyExistsException("Сотрудник: " + createUserDto.username() + ", - уже существует." +
+                    " Используйте другое имя !!!");
         }
-        return "Пользователь \"" + createUserDto.username() + "\" - был успешно создан";
+        return "Сотрудник: " + createUserDto.username() + ", - был успешно создан.";
     }
 }
