@@ -20,9 +20,21 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
 
     @Modifying
     @Query(
-            value = "update department " +
-                    "set enabled = false " +
-                    "where id = ?1", nativeQuery = true
+            value = """
+                        UPDATE Department
+                        SET enabled = false
+                        WHERE id = :departmentId
+                        """
     )
     void deleteDepartment(String departmentId);
+
+    @Query(
+            value = """
+                        SELECT * FROM department
+                        WHERE id = ?1
+                        AND enabled = true
+                        FOR SHARE;
+                        """, nativeQuery = true
+    )
+    Optional<Department> getDepartmentForUserService(String departmentId);
 }
