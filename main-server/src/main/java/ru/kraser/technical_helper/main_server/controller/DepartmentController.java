@@ -26,4 +26,10 @@ public class DepartmentController {
     public Department findDepartmentById(@RequestHeader ("X-TH-Department-Id") String departmentId) {
         return departmentService.getDepartment(departmentId);
     }*/
+
+    @PatchMapping(path = "/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId) {
+        return departmentService.deleteDepartment(departmentId);
+    }
 }

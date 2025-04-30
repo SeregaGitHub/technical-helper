@@ -1,6 +1,8 @@
 package ru.kraser.technical_helper.main_server.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.main_server.model.Department;
 
@@ -15,4 +17,12 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                     "where d.id = ?1 and d.enabled = true"
     )*/
     Optional<Department> findByIdAndEnabledTrue(String departmentId);
+
+    @Modifying
+    @Query(
+            value = "update department " +
+                    "set enabled = false " +
+                    "where id = ?1", nativeQuery = true
+    )
+    void deleteDepartment(String departmentId);
 }

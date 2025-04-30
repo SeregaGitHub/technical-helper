@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
@@ -26,10 +27,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         return "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
     }
 
-    /*@Override
-    public Department getDepartment(String departmentId) {
-        return departmentRepository.findByIdAndEnabledTrue(departmentId)
-                .orElseThrow(() -> new NotFoundException("Отдел, в котором числится сотрудник - " +
-                        "больше не существует !!!"));
-    }*/
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public String deleteDepartment(String departmentId) {
+        departmentRepository.deleteDepartment(departmentId);
+        return "Отдел - был успешно удалён.";
+    }
+
 }
