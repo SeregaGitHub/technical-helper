@@ -9,6 +9,8 @@ import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
@@ -24,6 +26,25 @@ public class DepartmentServiceImpl implements DepartmentService {
                     " Используйте другое имя !!!");
         }
         return "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
+    }
+
+    @Override
+    @Transactional
+    public String updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+        try {
+            // TODO - change to the current user
+            departmentRepository.updateDepartment(
+                    departmentId, departmentDto.name(), "some_new_id", now);
+        } catch (Exception e) {
+            if (e.getMessage().contains("uk_department_name")) {
+                throw new AlreadyExistsException("Отдел: " + departmentDto.name() + ", - уже существует." +
+                        " Используйте другое имя !!!");
+            } else {
+                throw new RuntimeException("SERVER_ERROR. Попробуйте позже !!!");
+            }
+        }
+        return "Отделу успешно присвоено имя - " + departmentDto.name() + ".";
     }
 
     @Override

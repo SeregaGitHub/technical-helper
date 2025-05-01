@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class DepartmentMapper {
     public Department toDepartment(CreateDepartmentDto createDepartmentDto) {
-        LocalDateTime localDateTime = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now().withNano(0);
         Department department = new Department();
 
         department.setName(createDepartmentDto.name());
         department.setEnabled(true);
         // TODO - change to the current user
         department.setCreatedBy("some_id");
-        department.setCreatedDate(localDateTime);
+        department.setCreatedDate(now);
         // TODO - change to the current user
         department.setLastUpdatedBy("some_id");
-        department.setLastUpdatedDate(localDateTime);
+        department.setLastUpdatedDate(now);
         return department;
     }
 

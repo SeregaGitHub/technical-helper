@@ -21,6 +21,13 @@ public class DepartmentController {
         return departmentService.createDepartment(createDepartmentDto);
     }
 
+    @PatchMapping
+    @ResponseStatus(HttpStatus.OK)
+    public String updateDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId,
+                                   @RequestBody CreateDepartmentDto departmentDto) {
+        return departmentService.updateDepartment(departmentId, departmentDto);
+    }
+
     /*@GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Department findDepartmentById(@RequestHeader ("X-TH-Department-Id") String departmentId) {

@@ -9,5 +9,7 @@ public interface DepartmentService {
 
     String deleteDepartment(String departmentId);
 
+    String updateDepartment(String departmentId, CreateDepartmentDto departmentDto);
+
     //Department getDepartment(String departmentId);
 }
