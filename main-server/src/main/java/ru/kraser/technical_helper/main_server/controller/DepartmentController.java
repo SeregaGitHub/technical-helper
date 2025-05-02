@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
+
+import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.ADMIN_URL;
 import static ru.kraser.technical_helper.common_module.util.Constant.BASE_URL;
@@ -26,6 +29,12 @@ public class DepartmentController {
     public String updateDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
+    }
+
+    @GetMapping(path = "/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DepartmentDto> getAllDepartments() {
+        return departmentService.getAllDepartments();
     }
 
     /*@GetMapping

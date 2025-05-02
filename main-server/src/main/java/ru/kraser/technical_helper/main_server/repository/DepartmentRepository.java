@@ -4,19 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.model.Department;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, String> {
-    /*@Query(
-            value = "select new ru.th.technical_helper.common_module.dto.department.DepartmentDto" +
-                    "(d.id, d.name) " +
-                    "from Department as d " +
-                    "where d.id = ?1 and d.enabled = true"
-    )*/
+
     @Modifying
     @Query(
             value = """
@@ -33,6 +30,16 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                                         String departmentName,
                                         String lastUpdatedBy,
                                         LocalDateTime lastUpdatedDate);
+    @Query(
+            value = """
+                        SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
+                        (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
+                        FROM Department as d
+                        WHERE d.enabled = true
+                        ORDER BY name
+                        """
+    )
+    List<DepartmentDto> getAllDepartments();
 
     Optional<Department> findByIdAndEnabledTrue(String departmentId);
 
