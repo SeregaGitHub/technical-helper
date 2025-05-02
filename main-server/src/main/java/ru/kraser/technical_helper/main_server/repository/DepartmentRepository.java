@@ -17,27 +17,28 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     @Modifying
     @Query(
             value = """
-                        UPDATE Department
-                        SET
-                        name = :departmentName,
-                        lastUpdatedBy = :lastUpdatedBy,
-                        lastUpdatedDate = :lastUpdatedDate
-                        WHERE id = :departmentId
-                        AND enabled = true
-                        """
+                    UPDATE Department
+                    SET
+                    name = :departmentName,
+                    lastUpdatedBy = :lastUpdatedBy,
+                    lastUpdatedDate = :lastUpdatedDate
+                    WHERE id = :departmentId
+                    AND enabled = true
+                    """
     )
     void updateDepartment(String departmentId,
-                                        String departmentName,
-                                        String lastUpdatedBy,
-                                        LocalDateTime lastUpdatedDate);
+                          String departmentName,
+                          String lastUpdatedBy,
+                          LocalDateTime lastUpdatedDate);
+
     @Query(
             value = """
-                        SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
-                        (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
-                        FROM Department as d
-                        WHERE d.enabled = true
-                        ORDER BY name
-                        """
+                    SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
+                    (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
+                    FROM Department as d
+                    WHERE d.enabled = true
+                    ORDER BY name
+                    """
     )
     List<DepartmentDto> getAllDepartments();
 
@@ -46,20 +47,20 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     @Modifying
     @Query(
             value = """
-                        UPDATE Department
-                        SET enabled = false
-                        WHERE id = :departmentId
-                        """
+                    UPDATE Department
+                    SET enabled = false
+                    WHERE id = :departmentId
+                    """
     )
     void deleteDepartment(String departmentId);
 
     @Query(
             value = """
-                        SELECT * FROM department
-                        WHERE id = ?1
-                        AND enabled = true
-                        FOR SHARE;
-                        """, nativeQuery = true
+                    SELECT * FROM department
+                    WHERE id = ?1
+                    AND enabled = true
+                    FOR SHARE;
+                    """, nativeQuery = true
     )
     Optional<Department> getDepartmentForUserService(String departmentId);
 }

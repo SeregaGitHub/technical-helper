@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowException;
@@ -46,6 +48,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<DepartmentDto> getAllDepartments() {
         return departmentRepository.getAllDepartments();
+    }
+
+    @Override
+    public DepartmentDto getDepartment(String departmentId) {
+        Department department = departmentRepository.findByIdAndEnabledTrue(departmentId).orElseThrow(
+                () -> new NotFoundException("Этого отдела не существует !!!")
+        );
+        return DepartmentMapper.toDepartmentDto(department);
     }
 
     @Override

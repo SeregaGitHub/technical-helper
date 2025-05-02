@@ -37,11 +37,11 @@ public class DepartmentController {
         return departmentService.getAllDepartments();
     }
 
-    /*@GetMapping
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Department findDepartmentById(@RequestHeader ("X-TH-Department-Id") String departmentId) {
+    public DepartmentDto getDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId) {
         return departmentService.getDepartment(departmentId);
-    }*/
+    }
 
     @PatchMapping(path = "/delete")
     @ResponseStatus(HttpStatus.OK)

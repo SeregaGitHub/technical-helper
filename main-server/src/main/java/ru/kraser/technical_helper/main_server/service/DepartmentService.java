@@ -13,7 +13,7 @@ public interface DepartmentService {
 
     List<DepartmentDto> getAllDepartments();
 
-    String deleteDepartment(String departmentId);
+    DepartmentDto getDepartment(String departmentId);
 
-    //Department getDepartment(String departmentId);
+    String deleteDepartment(String departmentId);
 }
