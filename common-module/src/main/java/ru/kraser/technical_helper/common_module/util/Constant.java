@@ -6,4 +6,6 @@ import lombok.experimental.UtilityClass;
 public class Constant {
     public static final String BASE_URL = "/api/v1";
     public static final String ADMIN_URL = "/admin";
+
+    public static final String SERVER_ERROR = "SERVER_ERROR. Попробуйте позже !!!";
 }
