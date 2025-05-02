@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Builder
 public record ApiError(
     String message,
-    HttpStatus status,
+    int status,
+    HttpStatus error,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime timestamp
 ) {

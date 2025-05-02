@@ -19,7 +19,8 @@ public class MainServerErrorHandler {
     public ResponseEntity<?> handleServerError(ServerException exception) {
         ApiError error = ApiError.builder()
                 .message(exception.getMessage())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -30,7 +31,8 @@ public class MainServerErrorHandler {
     public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException exception) {
         ApiError error = ApiError.builder()
                 .message(exception.getMessage())
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .error(HttpStatus.UNPROCESSABLE_ENTITY)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
@@ -41,7 +43,8 @@ public class MainServerErrorHandler {
     public ResponseEntity<?> handleNotFound(NotFoundException exception) {
         ApiError error = ApiError.builder()
                 .message(exception.getMessage())
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
