@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.main_server.util.mapper;
 import lombok.experimental.UtilityClass;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
 
@@ -11,6 +12,10 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class UserMapper {
     public User toUser(CreateUserDto createUserDto, Department department) {
+        if (!department.isEnabled()) {
+            throw new NotFoundException("fk_users_department");
+        }
+
         User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
@@ -33,7 +38,7 @@ public class UserMapper {
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .departmentDto(DepartmentMapper.toDepartmentDto(user.getDepartment()))
+                .departmentDto(DepartmentMapper.toDepartmentShotDto(user.getDepartment()))
                 .role(user.getRole())
                 .createdBy(user.getCreatedBy())
                 .createdDate(user.getCreatedDate())
