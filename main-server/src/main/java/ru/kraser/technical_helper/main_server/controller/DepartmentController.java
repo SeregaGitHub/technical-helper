@@ -9,8 +9,7 @@ import ru.kraser.technical_helper.main_server.service.DepartmentService;
 
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.ADMIN_URL;
-import static ru.kraser.technical_helper.common_module.util.Constant.BASE_URL;
+import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + "/department")
@@ -26,7 +25,7 @@ public class DepartmentController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId,
+    public String updateDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
     }
@@ -39,13 +38,13 @@ public class DepartmentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId) {
+    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
         return departmentService.getDepartment(departmentId);
     }
 
     @PatchMapping(path = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader ("X-TH-Department-Id") String departmentId) {
+    public String deleteDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }
 }

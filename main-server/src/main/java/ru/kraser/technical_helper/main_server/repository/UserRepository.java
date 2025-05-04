@@ -10,6 +10,7 @@ import ru.kraser.technical_helper.main_server.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
@@ -58,4 +59,16 @@ public interface UserRepository extends JpaRepository<User, String> {
                     """
     )
     List<UserDto> getAllUsers();
+
+    Optional<User> findByIdAndEnabledTrue(String userId);
+
+    @Modifying
+    @Query(
+            value = """
+                    UPDATE User
+                    SET enabled = false
+                    WHERE id = :userId
+                    """
+    )
+    int deleteUser(String userId);
 }

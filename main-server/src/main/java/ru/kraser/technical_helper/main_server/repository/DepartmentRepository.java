@@ -54,7 +54,7 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     )
     void deleteDepartment(String departmentId);
 
-    @Query(
+    /*@Query(
             value = """
                     SELECT * FROM department
                     WHERE id = ?1
@@ -62,5 +62,5 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                     FOR SHARE;
                     """, nativeQuery = true
     )
-    Optional<Department> getDepartmentForUserService(String departmentId);
+    Optional<Department> getDepartmentForUserService(String departmentId);*/
 }

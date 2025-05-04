@@ -9,6 +9,7 @@ import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
+import ru.kraser.technical_helper.main_server.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 import ru.kraser.technical_helper.main_server.service.UserService;
@@ -76,9 +77,24 @@ public class UserServiceImpl implements UserService {
         return userRepository.getAllUsers();
     }
 
-    /*@Override
+    @Override
+    @Transactional(readOnly = true)
     public UserDto getUser(String userId) {
-        //UserDto userDto = (UserDto) entityManager.createQuery()
-        return new UserDto();
-    }*/
+        User user = userRepository.findByIdAndEnabledTrue(userId).orElseThrow(
+                () -> new NotFoundException("Данного пользователя не существует !!!")
+        );
+        return UserMapper.toUserDto(user);
+    }
+
+    @Override
+    @Transactional
+    public String deleteUser(String userId) {
+        int response;
+        response = userRepository.deleteUser(userId);
+
+        if (response != 1) {
+            throw new NotFoundException(USER_NOT_EXIST);
+        }
+        return "Пользователь - был успешно удалён.";
+    }
 }
