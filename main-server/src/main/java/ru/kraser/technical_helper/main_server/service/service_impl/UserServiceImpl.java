@@ -3,9 +3,11 @@ package ru.kraser.technical_helper.main_server.service.service_impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
@@ -15,6 +17,8 @@ import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +56,18 @@ public class UserServiceImpl implements UserService {
             ThrowException.userUpdateHandler(e.getMessage(), updateUserDto.username());
         }
         return "Сотрудник: " + updateUserDto.username() + " - успешно изменен.";
+    }
+
+    @Override
+    @Transactional
+    public String changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
+        int response;
+        response = userRepository.changeUserPassword(userId, passwordDto.newPassword());
+
+        if (response != 1) {
+            throw new NotFoundException(USER_NOT_EXIST);
+        }
+        return "Пароль - был успешно изменён.";
     }
 
     @Override

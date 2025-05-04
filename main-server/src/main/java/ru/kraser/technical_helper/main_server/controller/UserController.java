@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.main_server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
@@ -30,6 +31,13 @@ public class UserController {
     public String updateUser(@RequestHeader ("X-TH-User-Id") String userId,
                              @RequestBody UpdateUserDto updateUserDto) {
         return userService.updateUser(userId, updateUserDto);
+    }
+
+    @PatchMapping(path = "/password")
+    @ResponseStatus(HttpStatus.OK)
+    public String changeUserPassword(@RequestHeader ("X-TH-User-Id") String userId,
+                                     @RequestBody ChangeUserPasswordDto passwordDto) {
+        return userService.changeUserPassword(userId, passwordDto);
     }
 
     @GetMapping(path = "/all")

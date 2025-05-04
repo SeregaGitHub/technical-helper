@@ -35,6 +35,18 @@ public interface UserRepository extends JpaRepository<User, String> {
                     String lastUpdatedBy,
                     LocalDateTime lastUpdatedDate);
 
+    @Modifying
+    @Query(
+            value = """
+                    UPDATE User
+                    SET
+                    password = :newPassword
+                    WHERE id = :userId
+                    AND enabled = true
+                    """
+    )
+    int changeUserPassword(String userId, String newPassword);
+
     @Query(
             value = """
                     SELECT new ru.kraser.technical_helper.common_module.dto.user.UserDto
