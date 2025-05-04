@@ -37,6 +37,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         try {
             // TODO - change to the current user
+            // TODO - try return something
             departmentRepository.updateDepartment(
                     departmentId, departmentDto.name(), "some_new_id", now);
         } catch (Exception e) {
@@ -46,11 +47,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DepartmentDto> getAllDepartments() {
         return departmentRepository.getAllDepartments();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DepartmentDto getDepartment(String departmentId) {
         Department department = departmentRepository.findByIdAndEnabledTrue(departmentId).orElseThrow(
                 () -> new NotFoundException("Этого отдела не существует !!!")
