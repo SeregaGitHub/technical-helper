@@ -53,14 +53,4 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                     """
     )
     int deleteDepartment(String departmentId);
-
-    /*@Query(
-            value = """
-                    SELECT * FROM department
-                    WHERE id = ?1
-                    AND enabled = true
-                    FOR SHARE;
-                    """, nativeQuery = true
-    )
-    Optional<Department> getDepartmentForUserService(String departmentId);*/
 }
