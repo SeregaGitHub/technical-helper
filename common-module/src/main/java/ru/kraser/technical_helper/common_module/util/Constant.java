@@ -11,5 +11,6 @@ public class Constant {
     public static final String DEPARTMENT_HEADER = "X-TH-Department-Id";
 
     public static final String SERVER_ERROR = "Ошибка на сервере. Попробуйте позже !!!";
+    public static final String DEPARTMENT_NOT_EXIST = "Данного отдела не существует !!!";
     public static final String USER_NOT_EXIST = "Данный пользователь не существует !!!";
 }

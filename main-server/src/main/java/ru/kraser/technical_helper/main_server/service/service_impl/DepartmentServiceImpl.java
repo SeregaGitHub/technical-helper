@@ -15,6 +15,8 @@ import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
+
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
@@ -26,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         try {
             departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
         } catch (Exception e) {
-            ThrowException.departmentUkHandler(e.getMessage(), createDepartmentDto.name());
+            ThrowException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }
         return "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
     }
@@ -35,13 +37,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional
     public String updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
+        int response;
         try {
             // TODO - change to the current user
-            // TODO - try return something
-            departmentRepository.updateDepartment(
+            response = departmentRepository.updateDepartment(
                     departmentId, departmentDto.name(), "some_new_id", now);
+            ThrowException.isExist(response, "отдел");
         } catch (Exception e) {
-            ThrowException.departmentUkHandler(e.getMessage(), departmentDto.name());
+            ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
         }
         return "Отделу успешно присвоено имя - " + departmentDto.name() + ".";
     }
@@ -56,7 +59,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(readOnly = true)
     public DepartmentDto getDepartment(String departmentId) {
         Department department = departmentRepository.findByIdAndEnabledTrue(departmentId).orElseThrow(
-                () -> new NotFoundException("Этого отдела не существует !!!")
+                () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
         );
         return DepartmentMapper.toDepartmentDto(department);
     }
@@ -64,7 +67,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public String deleteDepartment(String departmentId) {
-        departmentRepository.deleteDepartment(departmentId);
+        int response;
+        response = departmentRepository.deleteDepartment(departmentId);
+
+        if (response != 1) {
+            throw new NotFoundException(DEPARTMENT_NOT_EXIST);
+        }
         return "Отдел - был успешно удалён.";
     }
 

@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         try {
             userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
         } catch (Exception e) {
-            ThrowException.userUpdateHandler(e.getMessage(), createUserDto.username());
+            ThrowException.userHandler(e.getMessage(), createUserDto.username());
         }
         return "Сотрудник: " + createUserDto.username() + ", - был успешно создан.";
     }
@@ -44,17 +44,18 @@ public class UserServiceImpl implements UserService {
     public String updateUser(String userId, UpdateUserDto updateUserDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         // TODO - change to the current user
-        // TODO - try return something
+        int response;
         try {
-            userRepository.updateUser(
+            response = userRepository.updateUser(
                     userId,
                     updateUserDto.username(),
                     updateUserDto.departmentId(),
                     updateUserDto.role(),
                     "some_new_id",
                     now);
+            ThrowException.isExist(response, "пользователь");
         } catch (Exception e) {
-            ThrowException.userUpdateHandler(e.getMessage(), updateUserDto.username());
+            ThrowException.userHandler(e.getMessage(), updateUserDto.username());
         }
         return "Сотрудник: " + updateUserDto.username() + " - успешно изменен.";
     }

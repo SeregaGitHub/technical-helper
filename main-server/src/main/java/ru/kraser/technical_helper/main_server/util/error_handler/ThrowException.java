@@ -10,16 +10,18 @@ import static ru.kraser.technical_helper.common_module.util.Constant.SERVER_ERRO
 @UtilityClass
 public class ThrowException {
 
-    public void departmentUkHandler(String message, String name) {
+    public void departmentHandler(String message, String name) {
         if (message.contains("uk_department_name")) {
             throw new AlreadyExistsException("Отдел: " + name + ", - уже существует." +
                     " Используйте другое имя !!!");
+        } else if (message.contains("не существует")) {
+            throw new NotFoundException(message);
         } else {
             throw new ServerException(SERVER_ERROR);
         }
     }
 
-    public void userUpdateHandler(String message, String name) {
+    public void userHandler(String message, String name) {
         if (message.contains("uk_users_username")) {
             throw new AlreadyExistsException("Сотрудник: " + name + ", - уже существует." +
                     " Используйте другое имя !!!");
@@ -27,8 +29,16 @@ public class ThrowException {
             throw new NotFoundException("Отдел в котором находится сотрудник не существует !!!");
         } else if (message.contains("ch_users_role")) {
             throw new NotFoundException("Роль, присвоенная сотруднику - не существует !!!");
+        } else if (message.contains("не существует")) {
+            throw new NotFoundException(message);
         } else {
             throw new ServerException(SERVER_ERROR);
+        }
+    }
+
+    public void isExist(int response, String entity) {
+        if (response != 1) {
+            throw new NotFoundException("Данный " + entity + " не существует !!!");
         }
     }
 }

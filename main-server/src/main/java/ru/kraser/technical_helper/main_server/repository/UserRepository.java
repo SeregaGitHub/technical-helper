@@ -29,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, String> {
                     AND enabled = true
                     """
     )
-    void updateUser(String userId,
+    int updateUser(String userId,
                     String username,
                     String departmentId,
                     Role role,

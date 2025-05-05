@@ -26,7 +26,7 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                     AND enabled = true
                     """
     )
-    void updateDepartment(String departmentId,
+    int updateDepartment(String departmentId,
                           String departmentName,
                           String lastUpdatedBy,
                           LocalDateTime lastUpdatedDate);
@@ -52,7 +52,7 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
                     WHERE id = :departmentId
                     """
     )
-    void deleteDepartment(String departmentId);
+    int deleteDepartment(String departmentId);
 
     /*@Query(
             value = """
