@@ -21,8 +21,6 @@
 		<module>main-server</module>
 		<module>gateway</module>
 		<module>common-module</module>
-		<module>gateway</module>
-		<module>common-module</module>
 	</modules>
 
 	<properties>
