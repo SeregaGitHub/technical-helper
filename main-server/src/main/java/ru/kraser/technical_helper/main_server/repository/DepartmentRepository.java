@@ -50,9 +50,12 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     @Query(
             value = """
                     UPDATE Department
-                    SET enabled = false
+                    SET
+                    enabled = false,
+                    lastUpdatedBy = :currentUserId,
+                    lastUpdatedDate = :lastUpdatedDate
                     WHERE id = :departmentId
                     """
     )
-    int deleteDepartment(String departmentId);
+    int deleteDepartment(String departmentId, String currentUserId, LocalDateTime lastUpdatedDate);
 }

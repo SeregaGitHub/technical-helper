@@ -45,12 +45,14 @@ public interface UserRepository extends JpaRepository<User, String> {
             value = """
                     UPDATE User
                     SET
-                    password = :newPassword
+                    password = :newPassword,
+                    lastUpdatedBy = :currentUserId,
+                    lastUpdatedDate = :lastUpdatedDate
                     WHERE id = :userId
                     AND enabled = true
                     """
     )
-    int changeUserPassword(String userId, String newPassword);
+    int changeUserPassword(String userId, String newPassword, String currentUserId, LocalDateTime lastUpdatedDate);
 
     @Query(
             value = """
@@ -70,9 +72,12 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query(
             value = """
                     UPDATE User
-                    SET enabled = false
+                    SET
+                    enabled = false,
+                    lastUpdatedBy = :currentUserId,
+                    lastUpdatedDate = :lastUpdatedDate
                     WHERE id = :userId
                     """
     )
-    int deleteUser(String userId);
+    int deleteUser(String userId, String currentUserId, LocalDateTime lastUpdatedDate);
 }

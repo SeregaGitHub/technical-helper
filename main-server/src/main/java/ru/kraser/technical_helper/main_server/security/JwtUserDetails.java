@@ -18,6 +18,10 @@ public class JwtUserDetails implements UserDetails {
         this.user = user;
     }
 
+    public String getUserId() {
+        return user.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> list = new ArrayList<>();

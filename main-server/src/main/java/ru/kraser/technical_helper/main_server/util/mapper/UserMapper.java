@@ -7,6 +7,7 @@ import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
+import ru.kraser.technical_helper.main_server.security.SecurityUtil;
 
 import java.time.LocalDateTime;
 
@@ -19,17 +20,16 @@ public class UserMapper {
 
         User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
+        String currentUserId = SecurityUtil.getCurrentUserId();
 
         user.setUsername(createUserDto.username());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
         user.setEnabled(true);
         user.setDepartment(department);
         user.setRole(createUserDto.role());
-        // TODO - change to the current user
-        user.setCreatedBy("some_id");
+        user.setCreatedBy(currentUserId);
         user.setCreatedDate(now);
-        // TODO - change to the current user
-        user.setLastUpdatedBy("some_id");
+        user.setLastUpdatedBy(currentUserId);
         user.setLastUpdatedDate(now);
 
         return user;
