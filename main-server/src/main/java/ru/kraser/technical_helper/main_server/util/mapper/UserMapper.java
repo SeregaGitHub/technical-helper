@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.main_server.util.mapper;
 
 import lombok.experimental.UtilityClass;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 
 @UtilityClass
 public class UserMapper {
-    public User toUser(CreateUserDto createUserDto, Department department) {
+    public User toUser(CreateUserDto createUserDto, Department department, PasswordEncoder passwordEncoder) {
         if (!department.isEnabled()) {
             throw new NotFoundException("fk_users_department");
         }
@@ -20,7 +21,7 @@ public class UserMapper {
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
         user.setUsername(createUserDto.username());
-        user.setPassword(createUserDto.password());
+        user.setPassword(passwordEncoder.encode(createUserDto.password()));
         user.setEnabled(true);
         user.setDepartment(department);
         user.setRole(createUserDto.role());

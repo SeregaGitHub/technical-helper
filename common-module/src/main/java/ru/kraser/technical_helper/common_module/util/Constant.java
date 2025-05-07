@@ -5,10 +5,15 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constant {
     public static final String BASE_URL = "/api/v1";
+    public static final String AUTH_URL = "/auth";
     public static final String ADMIN_URL = "/admin";
+    public static final String TECHNICIAN_URL = "/technician";
+    public static final String EMPLOYEE_URL = "/employee";
 
     public static final String USER_HEADER = "X-TH-User-Id";
     public static final String DEPARTMENT_HEADER = "X-TH-Department-Id";
+
+    public static final String AUTHORIZATION = "Authorization";
 
     public static final String SERVER_ERROR = "Ошибка на сервере. Попробуйте позже !!!";
     public static final String DEPARTMENT_NOT_EXIST = "Данного отдела не существует !!!";

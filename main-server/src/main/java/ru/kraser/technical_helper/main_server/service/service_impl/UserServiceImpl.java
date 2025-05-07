@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
@@ -26,13 +27,14 @@ import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EX
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public String createUser(CreateUserDto createUserDto) {
         Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
         try {
-            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
         } catch (Exception e) {
             ThrowException.userHandler(e.getMessage(), createUserDto.username());
         }
@@ -64,7 +66,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
         int response;
-        response = userRepository.changeUserPassword(userId, passwordDto.newPassword());
+        response = userRepository.changeUserPassword(userId, passwordEncoder.encode(passwordDto.newPassword()));
 
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);
