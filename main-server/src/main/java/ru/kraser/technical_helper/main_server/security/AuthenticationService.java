@@ -23,7 +23,7 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(
+        var user = userRepository.findUserByUsernameAndEnabledTrue(request.getUsername()).orElseThrow(
                 () -> new NotFoundException("Пользователь с логином - " + request.getUsername() + ", не был найден.")
         );
         var jwtToken = jwtService.generateToken(new JwtUserDetails(user));

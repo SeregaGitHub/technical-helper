@@ -26,7 +26,7 @@ public class SecurityAppConfiguration {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                User user = userRepository.findUserByUsername(username).orElseThrow(
+                User user = userRepository.findUserByUsernameAndEnabledTrue(username).orElseThrow(
                         () -> new NotFoundException("Пользователь с логином - " + username + ", не был найден.")
                 );
                 return new JwtUserDetails(user);
