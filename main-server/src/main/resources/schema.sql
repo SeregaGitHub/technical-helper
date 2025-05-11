@@ -3,6 +3,19 @@
 --DROP TABLE IF EXISTS department;
 --------------------- only for develop mode
 
+ALTER TABLE IF EXISTS users
+	DROP CONSTRAINT IF EXISTS fk_user_created_by;
+
+ALTER TABLE IF EXISTS users
+	DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
+
+ALTER TABLE IF EXISTS department
+	DROP CONSTRAINT IF EXISTS fk_department_created_by;
+
+ALTER TABLE IF EXISTS department
+	DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
+
+
 CREATE TABLE IF NOT EXISTS department (
   id                varchar(36) NOT NULL,
   name              varchar(64) NOT NULL,
@@ -33,6 +46,7 @@ CREATE TABLE IF NOT EXISTS users (
         REFERENCES department (id)
 );
 
+
 ALTER TABLE department
 	ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
 		REFERENCES users (id);
@@ -49,6 +63,57 @@ ALTER TABLE users
 	ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
 		REFERENCES users (id);
 
+
+CREATE OR REPLACE PROCEDURE set_current_id(
+	IN dep_id varchar, IN adm_id varchar,
+	IN dep_created_by varchar, IN adm_created_by varchar,
+	IN dep_last_updated_by varchar, IN adm_last_updated_by varchar,
+	IN temporary_admin_id varchar
+)
+LANGUAGE plpgsql
+AS
+'
+BEGIN
+
+	IF dep_created_by = temporary_admin_id THEN
+		UPDATE department
+		SET created_by = adm_id
+		WHERE id = dep_id;
+	END IF;
+	IF dep_last_updated_by = temporary_admin_id THEN
+		UPDATE department
+		SET last_updated_by = adm_id
+		WHERE id = dep_id;
+	END IF;
+	IF adm_created_by = temporary_admin_id THEN
+		UPDATE users
+		SET created_by = adm_id
+		WHERE id = adm_id;
+	END IF;
+
+	UPDATE users
+	SET last_updated_by = adm_id
+	WHERE id = adm_id;
+
+	ALTER TABLE department
+		ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
+			REFERENCES users (id);
+
+	ALTER TABLE department
+		ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
+			REFERENCES users (id);
+
+	ALTER TABLE users
+		ADD CONSTRAINT fk_user_created_by FOREIGN KEY (created_by)
+			REFERENCES users (id);
+
+	ALTER TABLE users
+		ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
+			REFERENCES users (id);
+
+END; '
+;
+
 CREATE OR REPLACE FUNCTION delete_all_users_from_department() RETURNS trigger AS '
 	BEGIN
 			UPDATE users
@@ -57,6 +122,7 @@ CREATE OR REPLACE FUNCTION delete_all_users_from_department() RETURNS trigger AS
 		RETURN OLD;
 	END;
 ' LANGUAGE plpgsql;
+
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 

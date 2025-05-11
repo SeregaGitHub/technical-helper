@@ -107,13 +107,14 @@ public class MainServer implements CommandLineRunner {
                     admin = userRepository.save(admin);
                 }
 
-                clst = conn.prepareCall("CALL set_current_id(?, ?, ?, ?, ?, ?)");
+                clst = conn.prepareCall("CALL set_current_id(?, ?, ?, ?, ?, ?, ?)");
                 clst.setString(1, adminDepartment.getId());
                 clst.setString(2, admin.getId());
                 clst.setString(3, adminDepartment.getCreatedBy());
                 clst.setString(4, admin.getCreatedBy());
                 clst.setString(5, adminDepartment.getLastUpdatedBy());
                 clst.setString(6, admin.getLastUpdatedBy());
+                clst.setString(7, temporaryAdminId);
                 clst.execute();
 
             } catch (SQLException e) {
