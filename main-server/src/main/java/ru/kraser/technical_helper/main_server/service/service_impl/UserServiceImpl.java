@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
@@ -12,6 +13,7 @@ import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
+import ru.kraser.technical_helper.main_server.security.SecurityUtil;
 import ru.kraser.technical_helper.main_server.service.UserService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowException;
 import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
@@ -26,13 +28,14 @@ import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EX
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public String createUser(CreateUserDto createUserDto) {
         Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
         try {
-            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
         } catch (Exception e) {
             ThrowException.userHandler(e.getMessage(), createUserDto.username());
         }
@@ -43,7 +46,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String updateUser(String userId, UpdateUserDto updateUserDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        // TODO - change to the current user
         int response;
         try {
             response = userRepository.updateUser(
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
                     updateUserDto.username(),
                     updateUserDto.departmentId(),
                     updateUserDto.role(),
-                    "some_new_id",
+                    SecurityUtil.getCurrentUserId(),
                     now);
             ThrowException.isExist(response, "пользователь");
         } catch (Exception e) {
@@ -63,8 +65,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = userRepository.changeUserPassword(userId, passwordDto.newPassword());
+        response = userRepository.changeUserPassword(
+                userId,
+                passwordEncoder.encode(passwordDto.newPassword()),
+                SecurityUtil.getCurrentUserId(),
+                now
+        );
 
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);
@@ -90,8 +98,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String deleteUser(String userId) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = userRepository.deleteUser(userId);
+        response = userRepository.deleteUser(userId, SecurityUtil.getCurrentUserId(), now);
 
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);

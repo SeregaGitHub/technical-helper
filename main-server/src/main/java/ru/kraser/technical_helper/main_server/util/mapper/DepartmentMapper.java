@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.model.Department;
+import ru.kraser.technical_helper.main_server.security.SecurityUtil;
 
 import java.time.LocalDateTime;
 
@@ -11,15 +12,14 @@ import java.time.LocalDateTime;
 public class DepartmentMapper {
     public Department toDepartment(CreateDepartmentDto createDepartmentDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
+        String currentUserId = SecurityUtil.getCurrentUserId();
         Department department = new Department();
 
         department.setName(createDepartmentDto.name());
         department.setEnabled(true);
-        // TODO - change to the current user
-        department.setCreatedBy("some_id");
+        department.setCreatedBy(currentUserId);
         department.setCreatedDate(now);
-        // TODO - change to the current user
-        department.setLastUpdatedBy("some_id");
+        department.setLastUpdatedBy(currentUserId);
         department.setLastUpdatedDate(now);
         return department;
     }

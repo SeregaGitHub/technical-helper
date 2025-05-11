@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.kraser.technical_helper.common_module.dto.api.ApiError;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.AuthException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 
@@ -24,6 +25,18 @@ public class MainServerErrorHandler {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<?> handleAuthentication(AuthException exception) {
+        ApiError error = ApiError.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     @ExceptionHandler(AlreadyExistsException.class)

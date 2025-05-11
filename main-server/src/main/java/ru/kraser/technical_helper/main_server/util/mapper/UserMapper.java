@@ -1,34 +1,35 @@
 package ru.kraser.technical_helper.main_server.util.mapper;
 
 import lombok.experimental.UtilityClass;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
+import ru.kraser.technical_helper.main_server.security.SecurityUtil;
 
 import java.time.LocalDateTime;
 
 @UtilityClass
 public class UserMapper {
-    public User toUser(CreateUserDto createUserDto, Department department) {
+    public User toUser(CreateUserDto createUserDto, Department department, PasswordEncoder passwordEncoder) {
         if (!department.isEnabled()) {
             throw new NotFoundException("fk_users_department");
         }
 
         User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
+        String currentUserId = SecurityUtil.getCurrentUserId();
 
         user.setUsername(createUserDto.username());
-        user.setPassword(createUserDto.password());
+        user.setPassword(passwordEncoder.encode(createUserDto.password()));
         user.setEnabled(true);
         user.setDepartment(department);
         user.setRole(createUserDto.role());
-        // TODO - change to the current user
-        user.setCreatedBy("some_id");
+        user.setCreatedBy(currentUserId);
         user.setCreatedDate(now);
-        // TODO - change to the current user
-        user.setLastUpdatedBy("some_id");
+        user.setLastUpdatedBy(currentUserId);
         user.setLastUpdatedDate(now);
 
         return user;

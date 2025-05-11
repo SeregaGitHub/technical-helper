@@ -8,6 +8,7 @@ import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
+import ru.kraser.technical_helper.main_server.security.SecurityUtil;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowException;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
@@ -39,9 +40,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
-            // TODO - change to the current user
             response = departmentRepository.updateDepartment(
-                    departmentId, departmentDto.name(), "some_new_id", now);
+                    departmentId, departmentDto.name(), SecurityUtil.getCurrentUserId(), now);
             ThrowException.isExist(response, "отдел");
         } catch (Exception e) {
             ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
@@ -67,8 +67,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public String deleteDepartment(String departmentId) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = departmentRepository.deleteDepartment(departmentId);
+        response = departmentRepository.deleteDepartment(departmentId, SecurityUtil.getCurrentUserId(), now);
 
         if (response != 1) {
             throw new NotFoundException(DEPARTMENT_NOT_EXIST);

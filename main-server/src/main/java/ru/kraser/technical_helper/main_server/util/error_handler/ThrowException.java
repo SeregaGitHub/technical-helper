@@ -25,7 +25,7 @@ public class ThrowException {
         if (message.contains("uk_users_username")) {
             throw new AlreadyExistsException("Сотрудник: " + name + ", - уже существует." +
                     " Используйте другое имя !!!");
-        } else if (message.contains("fk_users_department")) {
+        } else if (message.contains("fk_users_department") || message.contains("Unable to find")) {
             throw new NotFoundException("Отдел в котором находится сотрудник не существует !!!");
         } else if (message.contains("ch_users_role")) {
             throw new NotFoundException("Роль, присвоенная сотруднику - не существует !!!");
