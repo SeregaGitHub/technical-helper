@@ -1,9 +1,3 @@
---ALTER TABLE IF EXISTS department
---	DROP CONSTRAINT IF EXISTS fk_department_created_by;
---
---ALTER TABLE IF EXISTS department
---	DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
-
 --------------------- only for develop mode
 --DROP TABLE IF EXISTS users;
 --DROP TABLE IF EXISTS department;
@@ -39,13 +33,21 @@ CREATE TABLE IF NOT EXISTS users (
         REFERENCES department (id)
 );
 
---ALTER TABLE department
---	ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
---		REFERENCES users (id);
---
---ALTER TABLE department
---	ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
---		REFERENCES users (id);
+ALTER TABLE department
+	ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
+		REFERENCES users (id);
+
+ALTER TABLE department
+	ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
+		REFERENCES users (id);
+
+ALTER TABLE users
+	ADD CONSTRAINT fk_user_created_by FOREIGN KEY (created_by)
+		REFERENCES users (id);
+
+ALTER TABLE users
+	ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
+		REFERENCES users (id);
 
 CREATE OR REPLACE FUNCTION delete_all_users_from_department() RETURNS trigger AS '
 	BEGIN
