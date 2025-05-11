@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.enums.Role;
+import ru.kraser.technical_helper.common_module.exception.ServerException;
 import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
@@ -121,7 +122,7 @@ public class MainServer implements CommandLineRunner {
                 clst.execute();
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new ServerException("Неверные параметры подключения к база данных !!!");
             } finally {
                 if (prst != null) prst.close();
                 if (clst != null) clst.close();
