@@ -19,12 +19,12 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
-        var user = userRepository.findUserByUsernameAndEnabledTrue(request.getUsername()).orElseThrow(
-                () -> new NotFoundException("Пользователь с логином - " + request.getUsername() + ", не был найден.")
+        var user = userRepository.findUserByUsernameAndEnabledTrue(request.username()).orElseThrow(
+                () -> new NotFoundException("Пользователь с логином - " + request.username() + ", не был найден.")
         );
         var jwtToken = jwtService.generateToken(new JwtUserDetails(user));
         return AuthenticationResponse.builder()
