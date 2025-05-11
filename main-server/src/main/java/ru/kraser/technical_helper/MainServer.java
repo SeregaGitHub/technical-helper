@@ -10,7 +10,7 @@ import ru.kraser.technical_helper.main_server.model.Department;
 import ru.kraser.technical_helper.main_server.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
-import ru.kraser.technical_helper.main_server.util.MainServerConfiguration;
+import ru.kraser.technical_helper.main_server.util.data_sours.DataSours;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -30,6 +30,9 @@ public class MainServer implements CommandLineRunner {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    DataSours dataSours;
 
     public static void main(String[] args) {
         SpringApplication.run(MainServer.class, args);
@@ -58,7 +61,7 @@ public class MainServer implements CommandLineRunner {
             CallableStatement clst = null;
 
             try {
-                conn = MainServerConfiguration.getConnection();
+                conn = dataSours.getConnection();
 
                 prst = conn.prepareStatement(dropConstraints);
                 prst.executeUpdate();
@@ -120,15 +123,9 @@ public class MainServer implements CommandLineRunner {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
-                if (prst != null) {
-                    prst.close();
-                }
-                if (clst != null) {
-                    clst.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
+                if (prst != null) prst.close();
+                if (clst != null) clst.close();
+                if (conn != null) conn.close();
             }
         }
     }
