@@ -10,7 +10,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.kraser.technical_helper.common_module.enums.Role;
+
+import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -49,18 +54,31 @@ public class SecurityWebConfiguration {
         return http.build();
     }
 
-//    private CorsConfigurationSource corsConfigurationSource() {
-//        return new CorsConfigurationSource() {
-//            @Override
-//            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-//                CorsConfiguration cfg = new CorsConfiguration();
-//                cfg.setAllowedOrigins(Collections.singletonList("http://localhost:123"));
-//                cfg.setAllowedMethods(Collections.singletonList("*"));
-//                cfg.setAllowedHeaders(Collections.singletonList("*"));
-//                cfg.setExposedHeaders(Collections.singletonList("*"));
-//                cfg.setMaxAge(3600L);
-//                return cfg;
-//            }
-//        };
-//    }
+    /*private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:12345"));
+        configuration.setAllowedMethods(List.of("POST", "PATCH", "GET"));
+        configuration.setAllowedHeaders(List.of(
+                "Content-Type", "Authorization", "X-TH-Department-Id", "X-TH-User-Id"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }*/
+
+    /*private CorsConfigurationSource corsConfigurationSource() {
+        return new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                CorsConfiguration cfg = new CorsConfiguration();
+                cfg.setAllowedOrigins(Collections.singletonList("http://localhost:123"));
+                cfg.setAllowedMethods(Collections.singletonList("*"));
+                cfg.setAllowedHeaders(Collections.singletonList("*"));
+                cfg.setExposedHeaders(Collections.singletonList("*"));
+                cfg.setMaxAge(3600L);
+                return cfg;
+            }
+        };
+    }*/
 }
