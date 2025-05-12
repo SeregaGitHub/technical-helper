@@ -46,7 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         } catch (Exception e) {
             ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
         }
-        return "Отделу успешно присвоено имя - " + departmentDto.name() + ".";
+        return "Отдел: " + departmentDto.name() + " - был успешно изменен.";
     }
 
     @Override
