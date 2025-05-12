@@ -48,24 +48,24 @@ public class MainServerErrorHandler {
     @ExceptionHandler(AlreadyExistsException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException exception) {
-        ApiError error = ApiError.builder()
+        /*ApiError error = ApiError.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
                 .error(HttpStatus.UNPROCESSABLE_ENTITY)
                 .timestamp(LocalDateTime.now().withNano(0))
-                .build();
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+                .build();*/
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<?> handleNotFound(NotFoundException exception) {
-        ApiError error = ApiError.builder()
+        /*ApiError error = ApiError.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error(HttpStatus.NOT_FOUND)
                 .timestamp(LocalDateTime.now().withNano(0))
-                .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+                .build();*/
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception);
     }
 }

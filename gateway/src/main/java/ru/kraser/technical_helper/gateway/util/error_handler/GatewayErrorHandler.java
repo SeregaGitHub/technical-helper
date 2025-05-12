@@ -2,12 +2,15 @@ package ru.kraser.technical_helper.gateway.util.error_handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.kraser.technical_helper.common_module.dto.api.ApiError;
+import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 
 import java.net.ConnectException;
 import java.time.LocalDateTime;
@@ -53,5 +56,48 @@ public class GatewayErrorHandler {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleNotDeserialized(HttpMessageNotReadableException exception) {
+        String message;
+        if (exception.getMessage().contains("enums.Role")) {
+            message = "Выберите одно из значений для роли пользователя - [TECHNICIAN, EMPLOYEE, ADMIN] !!!";
+        } else {
+            message = "Ошибка синтаксического анализа JSON: не удается десериализовать переданное значение !!!";
+        }
+
+        ApiError error = ApiError.builder()
+                .message(message)
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException exception) {
+        ApiError error = ApiError.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .error(HttpStatus.UNPROCESSABLE_ENTITY)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<?> handleNotFound(NotFoundException exception) {
+        ApiError error = ApiError.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

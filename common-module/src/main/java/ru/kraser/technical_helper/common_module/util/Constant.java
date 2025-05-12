@@ -11,6 +11,8 @@ public class Constant {
     public static final String ADMIN_URL = "/admin";
     public static final String TECHNICIAN_URL = "/technician";
     public static final String EMPLOYEE_URL = "/employee";
+    public static final String DEPARTMENT_URL = "/department";
+    public static final String USER_URL = "/user";
 
     public static final String USER_HEADER = "X-TH-User-Id";
     public static final String DEPARTMENT_HEADER = "X-TH-Department-Id";
