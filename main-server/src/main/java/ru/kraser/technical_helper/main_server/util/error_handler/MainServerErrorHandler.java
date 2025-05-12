@@ -30,6 +30,12 @@ public class MainServerErrorHandler {
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<?> handleAuthentication(AuthException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception);
+    }
+
+    /*@ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<?> handleAuthentication(AuthException exception) {
         ApiError error = ApiError.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -37,7 +43,7 @@ public class MainServerErrorHandler {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-    }
+    }*/
 
     @ExceptionHandler(AlreadyExistsException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
