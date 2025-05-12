@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,9 +32,21 @@ public class GatewayErrorHandler {
 
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<?> handleAuthentication(AuthException exception) {
+    public ResponseEntity<?> handleAuthenticationError(AuthException exception) {
         ApiError error = ApiError.builder()
                 .message(exception.getMessage())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<?> handleNoAuthentication(MissingRequestHeaderException exception) {
+        ApiError error = ApiError.builder()
+                .message("Вы должны пройти аутентификацию.")
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error(HttpStatus.UNAUTHORIZED)
                 .timestamp(LocalDateTime.now().withNano(0))
