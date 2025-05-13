@@ -54,4 +54,13 @@ public class DepartmentGatewayController {
 
         return departmentDto;
     }
+
+    @PatchMapping(path = DELETE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteDepartment(@RequestHeader(AUTHORIZATION) String jwt,
+                                   @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+        String response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
+
+        return response;
+    }
 }

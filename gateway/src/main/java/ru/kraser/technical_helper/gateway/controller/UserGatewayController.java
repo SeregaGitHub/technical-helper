@@ -66,4 +66,13 @@ public class UserGatewayController {
 
         return userDto;
     }
+
+    @PatchMapping(path = DELETE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteUser(@RequestHeader(AUTHORIZATION) String jwt,
+                             @RequestHeader(USER_ID_HEADER) String userId) {
+        String response = userClient.deleteUser(USER_ID_HEADER, userId, jwt);
+
+        return response;
+    }
 }

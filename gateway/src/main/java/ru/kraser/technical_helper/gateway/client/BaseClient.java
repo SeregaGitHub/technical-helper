@@ -100,4 +100,23 @@ public abstract class BaseClient {
 
         return getResponse.block();
     }
+
+    protected <T, O> T delete(String url, String jwt, String entityHeaderName,
+                            String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> deleteResponse = webClient
+                .patch()
+                .uri(url)
+                .header(AUTHORIZATION, jwt)
+                .header(entityHeaderName, entityId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return deleteResponse.block();
+    }
 }

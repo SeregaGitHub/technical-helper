@@ -67,4 +67,14 @@ public class UserClient extends BaseClient {
                 ParameterizedTypeReference.forType(UserDto.class)
         );
     }
+
+    public String deleteUser(String userHeaderName, String userId, String jwt) {
+        return super.delete(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + DELETE_URL,
+                jwt,
+                userHeaderName,
+                userId,
+                ParameterizedTypeReference.forType(String.class)
+        );
+    }
 }

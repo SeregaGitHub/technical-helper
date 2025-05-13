@@ -53,4 +53,14 @@ public class DepartmentClient extends BaseClient {
                 ParameterizedTypeReference.forType(DepartmentDto.class)
         );
     }
+
+    public String deleteDepartment(String departmentHeaderName, String departmentId, String jwt) {
+        return super.delete(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL,
+                jwt,
+                departmentHeaderName,
+                departmentId,
+                ParameterizedTypeReference.forType(String.class)
+        );
+    }
 }
