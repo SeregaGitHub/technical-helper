@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, String> {
                     UPDATE User
                     SET
                     username = :username,
-                    department = :departmentId,
+                    department.id = :departmentId,
                     role = :role,
                     lastUpdatedBy = :lastUpdatedBy,
                     lastUpdatedDate = :lastUpdatedDate

@@ -122,7 +122,7 @@ public class MainServer implements CommandLineRunner {
                 clst.execute();
 
             } catch (SQLException e) {
-                throw new ServerException("Неверные параметры подключения к база данных !!!");
+                throw new ServerException("Неверные параметры подключения к базе данных !!!");
             } finally {
                 if (prst != null) prst.close();
                 if (clst != null) clst.close();

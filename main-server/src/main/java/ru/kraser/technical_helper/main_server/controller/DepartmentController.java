@@ -12,7 +12,7 @@ import java.util.List;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @RestController
-@RequestMapping(path = BASE_URL + ADMIN_URL + "/department")
+@RequestMapping(path = BASE_URL + ADMIN_URL + DEPARTMENT_URL)
 @RequiredArgsConstructor
 public class DepartmentController {
     private final DepartmentService departmentService;
@@ -25,26 +25,26 @@ public class DepartmentController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId,
+    public String updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
     }
 
-    @GetMapping(path = "/all")
+    @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<DepartmentDto> getAllDepartments() {
         return departmentService.getAllDepartments();
     }
 
-    @GetMapping
+    @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
+    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.getDepartment(departmentId);
     }
 
-    @PatchMapping(path = "/delete")
+    @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
+    public String deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }
 }

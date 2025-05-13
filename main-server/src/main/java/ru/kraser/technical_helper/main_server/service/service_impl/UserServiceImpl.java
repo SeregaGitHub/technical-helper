@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             ThrowException.userHandler(e.getMessage(), updateUserDto.username());
         }
-        return "Сотрудник: " + updateUserDto.username() + " - успешно изменен.";
+        return "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
     }
 
     @Override
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUser(String userId) {
         User user = userRepository.findByIdAndEnabledTrue(userId).orElseThrow(
-                () -> new NotFoundException("Данного пользователя не существует !!!")
+                () -> new NotFoundException(USER_NOT_EXIST)
         );
         return UserMapper.toUserDto(user);
     }
