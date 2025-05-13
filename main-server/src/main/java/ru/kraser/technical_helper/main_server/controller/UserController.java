@@ -14,7 +14,7 @@ import java.util.List;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @RestController
-@RequestMapping(path = BASE_URL + ADMIN_URL + "/user")
+@RequestMapping(path = BASE_URL + ADMIN_URL + USER_URL)
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -32,26 +32,26 @@ public class UserController {
         return userService.updateUser(userId, updateUserDto);
     }
 
-    @PatchMapping(path = "/password")
+    @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public String changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
                                      @RequestBody ChangeUserPasswordDto passwordDto) {
         return userService.changeUserPassword(userId, passwordDto);
     }
 
-    @GetMapping(path = "/all")
+    @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping()
+    @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@RequestHeader (USER_ID_HEADER) String userId) {
         return userService.getUser(userId);
     }
 
-    @PatchMapping(path = "/delete")
+    @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
     public String deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
         return userService.deleteUser(userId);

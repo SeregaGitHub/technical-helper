@@ -10,6 +10,8 @@ import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 
+import java.util.List;
+
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 public abstract class BaseClient {
@@ -62,5 +64,40 @@ public abstract class BaseClient {
                 .bodyToMono(typeReference);
 
         return patchResponse.block();
+    }
+
+    protected <T> List<T> getAll(String url, String jwt, ParameterizedTypeReference<T> typeReference) {
+        Mono<List<T>> getResponse = webClient
+                .get()
+                .uri(url)
+                .header(AUTHORIZATION, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToFlux(typeReference)
+                .collectList();
+
+        return getResponse.block();
+    }
+
+    protected <T> T get(String url, String jwt, String entityHeaderName,
+                        String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> getResponse = webClient
+                .get()
+                .uri(url)
+                .header(AUTHORIZATION, jwt)
+                .header(entityHeaderName, entityId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return getResponse.block();
     }
 }
