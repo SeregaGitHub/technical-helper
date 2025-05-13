@@ -14,8 +14,8 @@ public class Constant {
     public static final String DEPARTMENT_URL = "/department";
     public static final String USER_URL = "/user";
 
-    public static final String USER_HEADER = "X-TH-User-Id";
-    public static final String DEPARTMENT_HEADER = "X-TH-Department-Id";
+    public static final String USER_ID_HEADER = "X-TH-User-Id";
+    public static final String DEPARTMENT_ID_HEADER = "X-TH-Department-Id";
 
     public static final String AUTHORIZATION = "Authorization";
 

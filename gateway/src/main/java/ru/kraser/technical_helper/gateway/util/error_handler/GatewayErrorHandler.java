@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.kraser.technical_helper.common_module.dto.api.ApiError;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 public class GatewayErrorHandler {
     @ExceptionHandler(ConnectException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public ResponseEntity<?> handleConnect(ConnectException exception) {
+    public ResponseEntity<?> handleNoConnect(ConnectException exception) {
         ApiError error = ApiError.builder()
                 .message("Отказано в подключении к: " + exception.getMessage().substring(31))
                 .status(HttpStatus.SERVICE_UNAVAILABLE.value())
@@ -42,9 +43,21 @@ public class GatewayErrorHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
+    @ExceptionHandler(WebClientResponseException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNoAccess(WebClientResponseException exception) {
+        ApiError error = ApiError.builder()
+                .message("У Вас нет прав доступа для данного ресурса.")
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<?> handleNoAuthentication(MissingRequestHeaderException exception) {
+    public ResponseEntity<?> handleNoAuthenticationToken(MissingRequestHeaderException exception) {
         ApiError error = ApiError.builder()
                 .message("Вы должны пройти аутентификацию.")
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -56,7 +69,7 @@ public class GatewayErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> handleNotValid(MethodArgumentNotValidException exception) {
+    public ResponseEntity<?> handleNotValidArgument(MethodArgumentNotValidException exception) {
         String message = exception.getMessage();
         int beginIndex = message.lastIndexOf("default message [") + 17;
         int endIndex = message.lastIndexOf(".") + 1;

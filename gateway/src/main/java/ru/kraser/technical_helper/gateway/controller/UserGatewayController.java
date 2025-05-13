@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.gateway.client.UserClient;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -21,6 +22,16 @@ public class UserGatewayController {
     public String createUser(@Validated() @RequestBody CreateUserDto createUserDto,
                               @RequestHeader(AUTHORIZATION) String jwt) {
         String response = userClient.createUser(createUserDto, jwt);
+
+        return response;
+    }
+
+    @PatchMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public String updateUser(@Validated() @RequestBody UpdateUserDto updateUserDto,
+                             @RequestHeader(AUTHORIZATION) String jwt,
+                             @RequestHeader(USER_ID_HEADER) String userId) {
+        String response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto, jwt);
 
         return response;
     }

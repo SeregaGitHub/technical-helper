@@ -25,7 +25,7 @@ public class DepartmentController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId,
+    public String updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
     }
@@ -38,13 +38,13 @@ public class DepartmentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
+    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.getDepartment(departmentId);
     }
 
     @PatchMapping(path = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader (DEPARTMENT_HEADER) String departmentId) {
+    public String deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.kraser.technical_helper.common_module.dto.api.ApiError;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
@@ -27,45 +28,39 @@ public class MainServerErrorHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
+    @ExceptionHandler(WebClientResponseException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNoAccess(WebClientResponseException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception);
+    }
+/*
+    @ExceptionHandler(MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNotValidToken(MalformedJwtException exception) {
+        ApiError error = ApiError.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }*/
+
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<?> handleAuthentication(AuthException exception) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception);
     }
 
-    /*@ExceptionHandler(AuthException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<?> handleAuthentication(AuthException exception) {
-        ApiError error = ApiError.builder()
-                .message(exception.getMessage())
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .error(HttpStatus.UNAUTHORIZED)
-                .timestamp(LocalDateTime.now().withNano(0))
-                .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-    }*/
-
     @ExceptionHandler(AlreadyExistsException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException exception) {
-        /*ApiError error = ApiError.builder()
-                .message(exception.getMessage())
-                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
-                .error(HttpStatus.UNPROCESSABLE_ENTITY)
-                .timestamp(LocalDateTime.now().withNano(0))
-                .build();*/
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<?> handleNotFound(NotFoundException exception) {
-        /*ApiError error = ApiError.builder()
-                .message(exception.getMessage())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error(HttpStatus.NOT_FOUND)
-                .timestamp(LocalDateTime.now().withNano(0))
-                .build();*/
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception);
     }
 }

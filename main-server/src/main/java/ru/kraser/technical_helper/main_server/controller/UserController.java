@@ -27,14 +27,14 @@ public class UserController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateUser(@RequestHeader (USER_HEADER) String userId,
+    public String updateUser(@RequestHeader (USER_ID_HEADER) String userId,
                              @RequestBody UpdateUserDto updateUserDto) {
         return userService.updateUser(userId, updateUserDto);
     }
 
     @PatchMapping(path = "/password")
     @ResponseStatus(HttpStatus.OK)
-    public String changeUserPassword(@RequestHeader (USER_HEADER) String userId,
+    public String changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
                                      @RequestBody ChangeUserPasswordDto passwordDto) {
         return userService.changeUserPassword(userId, passwordDto);
     }
@@ -47,13 +47,13 @@ public class UserController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public UserDto getUser(@RequestHeader (USER_HEADER) String userId) {
+    public UserDto getUser(@RequestHeader (USER_ID_HEADER) String userId) {
         return userService.getUser(userId);
     }
 
     @PatchMapping(path = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteUser(@RequestHeader (USER_HEADER) String userId) {
+    public String deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
         return userService.deleteUser(userId);
     }
 }

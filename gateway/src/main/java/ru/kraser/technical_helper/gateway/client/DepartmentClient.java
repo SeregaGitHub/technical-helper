@@ -20,4 +20,16 @@ public class DepartmentClient extends BaseClient {
                 jwt,
                 ParameterizedTypeReference.forType(String.class));
     }
+
+    public String updateDepartment(String entityHeaderName, String departmentId,
+                                   CreateDepartmentDto createDepartmentDto, String jwt) {
+        return super.patch(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
+                createDepartmentDto,
+                jwt,
+                entityHeaderName,
+                departmentId,
+                ParameterizedTypeReference.forType(String.class)
+        );
+    }
 }
