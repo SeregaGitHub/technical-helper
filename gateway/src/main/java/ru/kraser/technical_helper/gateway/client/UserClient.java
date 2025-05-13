@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.gateway.client;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 
@@ -27,6 +28,18 @@ public class UserClient extends BaseClient {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL,
                 updateUserDto,
+                jwt,
+                entityHeaderName,
+                userId,
+                ParameterizedTypeReference.forType(String.class)
+        );
+    }
+
+    public String changeUserPassword(String entityHeaderName, String userId,
+                                     ChangeUserPasswordDto changeUserPasswordDto, String jwt) {
+        return super.patch(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + "/password",
+                changeUserPasswordDto,
                 jwt,
                 entityHeaderName,
                 userId,

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.gateway.client.UserClient;
@@ -32,6 +33,16 @@ public class UserGatewayController {
                              @RequestHeader(AUTHORIZATION) String jwt,
                              @RequestHeader(USER_ID_HEADER) String userId) {
         String response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto, jwt);
+
+        return response;
+    }
+
+    @PatchMapping(path = "/password")
+    @ResponseStatus(HttpStatus.OK)
+    public String changeUserPassword(@Validated() @RequestBody ChangeUserPasswordDto changeUserPasswordDto,
+                                     @RequestHeader(AUTHORIZATION) String jwt,
+                                     @RequestHeader(USER_ID_HEADER) String userId) {
+        String response = userClient.changeUserPassword(USER_ID_HEADER, userId, changeUserPasswordDto, jwt);
 
         return response;
     }
