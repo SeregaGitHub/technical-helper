@@ -1,1 +1,27 @@
-<p>header works!</p>
+<p>
+  <mat-toolbar class="blue-to-black-gradient text-michroma-aquamarine">
+    <span>{{ title }}</span>
+
+    <span class="example-spacer"></span>
+
+    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
+      <mat-button-toggle value="breakage" class="black-to-blue-gradient text-michroma-aquamarine button-toggle" routerLink="/breakage">
+        Заявки</mat-button-toggle>
+      <mat-button-toggle value="user" class="black-to-blue-gradient text-michroma-aquamarine button-toggle" routerLink="/user">
+        Пользователи</mat-button-toggle>
+      <mat-button-toggle value="department" class="black-to-blue-gradient text-michroma-aquamarine button-toggle" routerLink="/department">
+        Отделы</mat-button-toggle>
+    </mat-button-toggle-group>
+    
+    
+    <span class="example-spacer"></span>
+    
+    <button mat-icon-button class="example-icon favorite-icon ml-40" aria-label="Example icon-button with heart icon">
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+      <mat-icon>share</mat-icon>
+    </button>
+  </mat-toolbar>
+</p>
+

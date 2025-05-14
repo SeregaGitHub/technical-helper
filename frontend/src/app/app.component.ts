@@ -16,5 +16,5 @@ import { AuthComponent } from "./auth/component/auth/auth.component";
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'Technical Helper';
+  
 }
