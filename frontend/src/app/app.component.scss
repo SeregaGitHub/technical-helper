@@ -1,0 +1,17 @@
+@font-face {
+  font-family: michroma;
+  src: url('../../public/fonts/Michroma.ttf');
+}
+  
+.text-michroma-aquamarine {
+  color: aquamarine;
+  font-family: michroma;
+}
+
+.bgi {
+  background-image: url("../../public/images/bgi.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  //background-attachment: fixed;
+}
