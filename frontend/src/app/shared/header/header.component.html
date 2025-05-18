@@ -1,10 +1,11 @@
 <p>
-  <mat-toolbar class="blue-to-black-gradient text-michroma-aquamarine">
-    <span>{{ title }}</span>
-
+  <mat-toolbar class="blue-to-black-gradient text-michroma-aquamarine justify-between">
+    <div style="width: 16rem;">
+      <span>{{ title }}</span>
+    </div>
     <!-- <span class="example-spacer"></span> -->
-
-    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
+    <div>
+      <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
       <mat-button-toggle 
           value="breakage" 
           class="black-to-blue-gradient text-michroma-aquamarine button-toggle mouse-enter" 
@@ -21,23 +22,37 @@
           routerLink="/department">
         Отделы</mat-button-toggle>
     </mat-button-toggle-group>
-    
-    
-    <span class="example-spacer"></span>
-    
-    <button mat-icon-button class="example-icon favorite-icon ml-40" aria-label="Example icon-button with heart icon">
-      <mat-icon>favorite</mat-icon>
-    </button>
+    </div>
+    <!-- <span class="example-spacer"></span> -->
+    <div>
+      <div class="inline-block">
+        <!-- <button mat-icon-button class="example-icon favorite-icon ml-40" aria-label="Example icon-button with heart icon">
+          <mat-icon>favorite</mat-icon>
+        </button> -->
+        <div style="width: 9rem;" class="overflow-hidden flex">
+          <p>Краев</p>
+        </div>
+      </div>
+      
     <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
       <mat-icon>share</mat-icon>
     </button> -->
-    <button class="btn button-size text-michroma-aquamarine mouse-enter">
-      Выход
-    </button>
+      <div class="inline-block">
+        <button class="btn button-size text-michroma-aquamarine mouse-enter">
+          Выход
+        </button>
+        <!-- <mat-button-toggle 
+          value="exit" 
+          class="black-to-blue-gradient text-michroma-aquamarine btn button-size mouse-enter" 
+          routerLink="/auth">
+        Выход</mat-button-toggle> -->
+      </div>
+    
     <!-- <mat-button-toggle 
           value="exit" 
           class="black-to-blue-gradient text-michroma-aquamarine button-toggle border-none mouse-enter" 
           routerLink="/auth">
         Выход</mat-button-toggle> -->
+    </div>
   </mat-toolbar>
   </p>
