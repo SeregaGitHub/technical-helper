@@ -15,8 +15,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .text-michroma-aquamarine {
-  color: aquamarine;
-  font-family: michroma;
+  color: aquamarine !important;
+  font-family: michroma !important;
 }
 
 .bgi {
@@ -28,11 +28,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .blue-to-black-gradient {
-  background: rgb(8,56,134);
-  background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+  background: rgb(8,56,134) !important;
+  background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !important;
 }
 
 .black-to-blue-gradient {
-background: rgb(8,56,134);
-background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+background: rgb(8,56,134) !important;
+background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !important;
 }
