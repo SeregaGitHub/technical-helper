@@ -6,9 +6,9 @@
     color: aliceblue !important;
 }
 
-mat-button-toggle:hover {
-    opacity: 75% !important;
-}
+// mat-button-toggle:hover {
+//     opacity: 75% !important;
+// }
 
 ::ng-deep mat-pseudo-checkbox.mat-pseudo-checkbox.mat-pseudo-checkbox-checked.mat-pseudo-checkbox-minimal::after {
   color:aliceblue !important;
@@ -32,6 +32,7 @@ mat-button-toggle:hover {
   margin: 1rem 1rem 1rem 1rem;
   height: 3rem;
   width: 12rem;
+  font-size: large;
 }
 
 // .button-toggle-old {
