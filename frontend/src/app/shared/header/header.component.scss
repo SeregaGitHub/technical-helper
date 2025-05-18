@@ -2,6 +2,56 @@
     flex: 1 1 auto;
 }
 
+@font-face {
+  font-family: michroma;
+  src: url('../../../../public/fonts/Michroma.ttf');
+}
+  
+.text-michroma-aquamarine {
+  color: aquamarine;
+  font-family: michroma;
+}
+
+.bgi {
+  background-image: url("../../../../public/images/bgi.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  //background-attachment: fixed;
+}
+
+.blue-to-black-gradient {
+  background: rgb(8,56,134);
+  background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+}
+
+.black-to-blue-gradient {
+background: rgb(8,56,134);
+background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+}
+
+.mat-button-toggle-checked {
+    color: aliceblue !important;
+}
+
+mat-button-toggle:hover {
+    opacity: 75% !important;
+}
+
+::ng-deep mat-pseudo-checkbox.mat-pseudo-checkbox.mat-pseudo-checkbox-checked.mat-pseudo-checkbox-minimal::after {
+  color:aliceblue !important;
+}
+
+// .mat-sidenav-container {
+//   height: calc(205vh - 115vh);
+// }
+
+// .mat-sidenav {
+//   //width: 280px;
+//   width: 14.6%;
+//   background-color: cornflowerblue;
+// }
+
 .border-none {
   border: none;
 }
