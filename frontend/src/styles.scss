@@ -14,15 +14,21 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   src: url('../public/fonts/Michroma.ttf');
 }
 
+.text-michroma {
+  color: aquamarine !important;
+  font-family: michroma !important;
+}
+
 @font-face {
   font-family: montserrat;
   src: url('../public/fonts/Montserrat-Regular.ttf');
 }
 
-.text-michroma-aquamarine {
+.text-montserrat {
   color: aquamarine !important;
-  font-family: michroma !important;
+  font-family: montserrat !important;
 }
+
 
 .bgi {
   background-image: url("../public/images/bgi.jpg");
@@ -65,7 +71,7 @@ background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !i
     align-items: center;
     justify-content: center;
     font-size: medium;
-    font-family: montserrat !important;
+    //font-family: montserrat !important;
 }
 
 .button-size {
@@ -77,6 +83,3 @@ background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !i
     width: 6rem;
 }
 
-.text-montserrat {
-  font-family: montserrat !important;
-}
