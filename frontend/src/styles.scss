@@ -47,6 +47,12 @@ background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !i
     cursor: pointer;
 }
 
+.border {
+  border: 1px solid aquamarine;
+  border-radius: 0.3rem;
+  padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+}
+
 .btn {
     border: 1px solid aquamarine;
     //padding: 0.5rem 0.5rem !important;
@@ -69,4 +75,8 @@ background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !i
     height: 2.5rem;
     // width: 100px;
     width: 6rem;
+}
+
+.text-montserrat {
+  font-family: montserrat !important;
 }
