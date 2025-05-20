@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
-@import "tailwindcss";
+@import "tailwindcss/index.css";
+//@use "tailwindcss";
 
 *{
     margin: 0;
@@ -15,8 +16,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .text-michroma {
-  color: aquamarine !important;
-  font-family: michroma !important;
+  //color: aquamarine !important;
+  //font-family: michroma !important;
+  color: aquamarine;
+  font-family: michroma;
 }
 
 @font-face {
@@ -25,8 +28,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .text-montserrat {
-  color: aquamarine !important;
-  font-family: montserrat !important;
+  //color: aquamarine !important;
+  //font-family: montserrat !important;
+  color: aquamarine;
+  font-family: montserrat;
 }
 
 
@@ -39,13 +44,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .blue-to-black-gradient {
-  background: rgb(8,56,134) !important;
-  background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !important;
+  background: rgb(8,56,134);
+  background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
 }
 
 .black-to-blue-gradient {
-background: rgb(8,56,134) !important;
-background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !important;
+background: rgb(8,56,134);
+background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
 }
 
 .mouse-enter:hover {
