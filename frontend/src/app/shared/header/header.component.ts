@@ -4,6 +4,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -12,7 +13,8 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    RouterModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
