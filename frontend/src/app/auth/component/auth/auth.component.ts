@@ -31,12 +31,16 @@ import { Router } from '@angular/router';
 })
 export class AuthComponent {
 
-  constructor(private service: AuthService, private router: Router) {}
+  authForm: any;
 
-  authForm = new FormGroup({
-    username: new FormControl("", [Validators.required, Validators.min(4), Validators.max(64)]),
-    password: new FormControl("", [Validators.required, Validators.min(4), Validators.max(128)])
+  constructor(private service: AuthService, private router: Router) {
+    this.authForm = new FormGroup({
+    username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+    password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
   });
+  }
+
+  
 
   onSubmit() {
     console.log(this.authForm.value);  // NEED DELETE !!!
@@ -49,5 +53,13 @@ export class AuthComponent {
         }
       }
     )
+  }
+
+  get username() {
+    return this.authForm.get('username')
+  }
+
+  get password() {
+    return this.authForm.get('password')
   }
 }

@@ -1,6 +1,6 @@
 <div class="flex justify-center">
 
-    <mat-card class="max-w-sm blue-to-black-gradient mt-32 space-y-12 opacity-90" appearance="outlined">
+    <mat-card class="max-w-sm blue-to-black-gradient mt-28 space-y-12 opacity-90" appearance="outlined">
         <mat-card-header>
           <mat-card-title class="text-montserrat !font-bold !text-2xl !tracking-wider">Вход</mat-card-title>
         </mat-card-header>
@@ -8,13 +8,48 @@
             <!-- <form #f = 'ngForm' (ngSubmit)="onSubmit(f)" class="example-form mt-2"> -->
               <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="max-w-lg min-w-36 w-full mt-2">
                 <mat-form-field class="w-full">
-                  <mat-label>Username</mat-label>
-                  <input matInput placeholder="Username" formControlName="username">
+                  <mat-label>Логин</mat-label>
+                  <input matInput 
+                         formControlName="username"
+                         >
+                         @if (username.touched && username.invalid) {
+                          <div class="alert">
+                            @if (username.errors?.required) {
+                              <p>Вам необходимо ввести логин !!!</p>
+                            }
+                            @if (username.errors?.minlength) {
+                              <p class="text-center">Длина логина должна быть</p>
+                              <p class="text-center">не менее 4 символов !!!</p>
+                            }
+                            @if (username.errors?.maxlength) {
+                              <p class="text-center">Длина логина должна быть</p>
+                              <p class="text-center">не более 64 символов !!!</p>
+                            }
+                          </div>
+                         }
                 </mat-form-field>
               
                 <mat-form-field class="w-full mt-2">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" placeholder="Password" formControlName="password">
+                    <mat-label>Пароль</mat-label>
+                    <input matInput 
+                           type="password" 
+                           formControlName="password"
+                           >
+                           @if (password.touched && password.invalid) {
+                          <div class="alert">
+                            @if (password.errors?.required) {
+                              <p>Вам необходимо ввести пароль !!!</p>
+                            }
+                            @if (password.errors?.minlength) {
+                              <p class="text-center">Длина пароля должна быть</p>
+                              <p class="text-center">не менее 4 символов !!!</p>
+                            }
+                            @if (password.errors?.maxlength) {
+                              <p class="text-center">Длина пароля должна быть</p>
+                              <p class="text-center">не более 64 символов !!!</p>
+                            }
+                          </div>
+                         }
                     
                     <!-- <button
                     mat-icon-button
@@ -34,7 +69,10 @@
                                                                                                                         
                   Submit</mat-button-toggle> -->
                   <div class="mb-4 flex justify-end">
-                    <button type="submit" class="black-to-blue-gradient text-montserrat button-size btn mouse-enter" [disabled]="authForm.invalid">
+                    <button type="submit" 
+                            class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
+                            [ngClass]="authForm.invalid ? 'btn-not-active' : ''" 
+                            [disabled]="authForm.invalid">
                       Войти
                     </button>
                   </div>
