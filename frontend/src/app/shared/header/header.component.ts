@@ -12,11 +12,11 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatButtonToggleModule,
+    MatButtonToggleModule
   ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  title = 'Technical Helper';
+    title = 'Technical Helper';
 }

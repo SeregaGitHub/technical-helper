@@ -1,20 +1,33 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AuthService } from '../../service/auth.service';
-import { Router } from '@angular/router';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { AuthService } from '../../service/auth.service';
+import { Router } from '@angular/router';
 
 
 @Component({
   selector: 'app-auth',
   imports: [
-    MatCardModule,
-    MatFormFieldModule,
-    ReactiveFormsModule
+    CommonModule,
+    MatCardModule, 
+    MatButtonModule,
+    FormsModule,
+    MatFormFieldModule, 
+    MatInputModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatRadioModule
   ],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.scss'
+  styleUrl: './auth.component.css'
 })
 export class AuthComponent {
 

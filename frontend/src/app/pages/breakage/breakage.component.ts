@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-breakage',
   imports: [],
   templateUrl: './breakage.component.html',
-  styleUrl: './breakage.component.scss'
+  styleUrl: './breakage.component.css'
 })
 export class BreakageComponent {
 
