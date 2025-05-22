@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constant {
+    public static final String FRONT_URL = "http://localhost:12345";
     public static final String MAIN_SERVER_URL = "http://localhost:12333";
 
     public static final String BASE_URL = "/api/v1";
