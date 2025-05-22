@@ -23,6 +23,12 @@
     color: red !important;
 } */
 
-.mdc-text-field--filled:not(.mdc-text-field--disabled).mdc-text-field--invalid .mdc-floating-label::after    {
+/* .mdc-text-field--filled:not(.mdc-text-field--disabled).mdc-text-field--invalid .mdc-floating-label::after    {
     color: red !important;
-}
+} */
+
+/* .text-b {
+    font-weight: 700 !important;
+    font-size: 1.6rem !important;
+    line-height: 1 !important;
+} */

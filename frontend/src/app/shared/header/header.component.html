@@ -1,6 +1,6 @@
 <p>
-  <mat-toolbar class="blue-to-black-gradient text-michroma justify-between">
-    <div class="w-1/5">
+  <mat-toolbar class="blue-to-black-gradient justify-between">
+    <div class="w-1/5 text-michroma">
       <span>{{ title }}</span>
     </div>
     <!-- <span class="example-spacer"></span> -->
@@ -8,17 +8,17 @@
       <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
       <mat-button-toggle 
           value="breakage" 
-          class="black-to-blue-gradient text-michroma button-toggle mouse-enter" 
+          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
           routerLink="/breakage">
         Заявки</mat-button-toggle>
       <mat-button-toggle 
           value="user" 
-          class="black-to-blue-gradient text-michroma button-toggle mouse-enter" 
+          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
           routerLink="/user">
         Пользователи</mat-button-toggle>
       <mat-button-toggle 
           value="department" 
-          class="black-to-blue-gradient text-michroma button-toggle mouse-enter" 
+          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
           routerLink="/department">
         Отделы</mat-button-toggle>
     </mat-button-toggle-group>
