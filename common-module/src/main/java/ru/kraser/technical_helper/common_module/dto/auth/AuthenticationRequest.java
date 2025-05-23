@@ -10,7 +10,7 @@ public record AuthenticationRequest(
         @Size(min = 4, max = 64, message = "Логин пользователя должен быть от 4 до 64 символов.")
         String username,
         @NotBlank(message = "У пользователя должен быть пароль от его логина.")
-        @Size(min = 4, max = 128, message = "Длина пароля должна быть от 4 до 128 символов.")
+        @Size(min = 4, max = 64, message = "Длина пароля должна быть от 4 до 64 символов.")
         String password
 ) {
 }

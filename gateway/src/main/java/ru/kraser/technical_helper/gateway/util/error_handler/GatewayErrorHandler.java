@@ -23,7 +23,7 @@ public class GatewayErrorHandler {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ResponseEntity<?> handleNoConnect(ConnectException exception) {
         ApiError error = ApiError.builder()
-                .message("Отказано в подключении к: " + exception.getMessage().substring(31))
+                .message("Отказано в подключении к серверу " + ErrorMessageBuilder.identifyServer(exception.getMessage()))
                 .status(HttpStatus.SERVICE_UNAVAILABLE.value())
                 .error(HttpStatus.SERVICE_UNAVAILABLE)
                 .timestamp(LocalDateTime.now().withNano(0))
@@ -70,13 +70,8 @@ public class GatewayErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> handleNotValidArgument(MethodArgumentNotValidException exception) {
-        String message = exception.getMessage();
-        int beginIndex = message.lastIndexOf("default message [") + 17;
-        int endIndex = message.lastIndexOf(".") + 1;
-        String errorMessage = message.substring(beginIndex, endIndex);
-
-        ApiError error = ApiError.builder()
-                .message(errorMessage)
+                ApiError error = ApiError.builder()
+                .message(ErrorMessageBuilder.identifyNotValidArgument(exception.getMessage()))
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST)
                 .timestamp(LocalDateTime.now().withNano(0))

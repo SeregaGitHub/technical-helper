@@ -62,6 +62,12 @@
                   </button> -->
   
                   </mat-form-field>
+
+                  <div class="alert mb-4"
+                  [ngClass]="authError == null ? 'hide' : ''" 
+                  >
+                    <p class="text-center"> {{ authError }} </p> 
+                  </div>
   
                   <!-- <mat-button-toggle value="Submit" type="submit" class="black-to-blue-gradient text-michroma-aquamarine button-toggle mt-2" [disabled]="f.invalid"> -->
                     <!--mat-raised-button  [disabled]="authForm.invalid" -->

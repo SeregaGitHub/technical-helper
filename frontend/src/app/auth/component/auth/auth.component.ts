@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
+import { catchError } from 'rxjs';
 
 
 @Component({
@@ -32,6 +33,7 @@ import { Router } from '@angular/router';
 export class AuthComponent {
 
   authForm: any;
+  authError: any;
 
   constructor(private service: AuthService, private router: Router) {
     this.authForm = new FormGroup({
@@ -39,8 +41,6 @@ export class AuthComponent {
     password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
   });
   }
-
-  
 
   onSubmit() {
     console.log(this.authForm.value);  // NEED DELETE !!!
@@ -50,6 +50,13 @@ export class AuthComponent {
         if (responce.token != null) {
           localStorage.setItem("token", responce.token);
           this.router.navigateByUrl("/breakage")
+        }
+      }, (err) => {
+        if (err.status <= 0) {
+          this.authError = 'Отказано в подключении к серверу Gateway !!!';
+        } else {
+          console.log(err.error.message)
+          this.authError = err.error.message;
         }
       }
     )
