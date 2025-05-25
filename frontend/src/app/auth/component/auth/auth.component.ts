@@ -47,8 +47,8 @@ export class AuthComponent {
     this.service.auth(this.authForm.value).subscribe(
       (responce) => {
         console.log(responce);         // NEED DELETE !!!
-        if (responce.token != null) {
-          localStorage.setItem("token", responce.token);
+        if (responce.thJwt != null) {
+          localStorage.setItem("thJwt", responce.thJwt);
           this.router.navigateByUrl("/breakage")
         }
       }, (err) => {

@@ -34,7 +34,7 @@ public class AuthenticationService {
         );
         var jwtToken = jwtService.generateToken(new JwtUserDetails(user));
         return AuthenticationResponse.builder()
-                .token(jwtToken)
+                .thJwt(jwtToken)
                 .build();
     }
 }
