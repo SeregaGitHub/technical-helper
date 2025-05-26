@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -30,7 +30,8 @@ import { catchError } from 'rxjs';
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })
-export class AuthComponent {
+
+export class AuthComponent implements OnInit{
 
   authForm: any;
   authError: any;
@@ -42,14 +43,32 @@ export class AuthComponent {
   });
   }
 
+  ngOnInit(): void {
+    localStorage.removeItem('thJwt');
+    localStorage.removeItem('thUn');
+    localStorage.removeItem('thUr');
+  };
+
   onSubmit() {
     console.log(this.authForm.value);  // NEED DELETE !!!
     this.service.auth(this.authForm.value).subscribe(
       (responce) => {
         console.log(responce);         // NEED DELETE !!!
         if (responce.thJwt != null) {
+          // console.log('localStorage');
+          // console.log(responce.username);
+          // console.log(responce.role);
+          // console.log('localStorage');
+
           localStorage.setItem("thJwt", responce.thJwt);
+          localStorage.setItem("thUn", responce.username);
+          localStorage.setItem("thUr", responce.role);
+          //this.service.setUserProfile(responce.username, responce.userRole);
           this.router.navigateByUrl("/breakage")
+
+          // console.log('HeaderComponent');
+          // console.log(this.service.username$);
+          // console.log('HeaderComponent');
         }
       }, (err) => {
         if (err.status <= 0) {

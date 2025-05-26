@@ -29,8 +29,8 @@
         <!-- <button mat-icon-button class="example-icon favorite-icon ml-40" aria-label="Example icon-button with heart icon">
           <mat-icon>favorite</mat-icon>
         </button> -->
-        <div class="overflow-hidden flex w-44 text-montserrat border">
-          <p>Краев Сергей Андреевич</p>
+        <div class="overflow-hidden flex w-44 h-8 text-montserrat border items-center">
+          <p>{{ nameFromStorage }}</p>
         </div>
       </div>
       
@@ -38,7 +38,7 @@
       <mat-icon>share</mat-icon>
     </button> -->
       <div class="inline-block">
-        <button class="btn button-size black-to-blue-gradient text-montserrat mouse-enter">
+        <button (click)="logout()" class="btn button-size black-to-blue-gradient text-montserrat mouse-enter">
           Выход
         </button>
         <!-- <mat-button-toggle 

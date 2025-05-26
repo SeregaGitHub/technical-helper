@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AUTH_URL, BASE_URL, GATEWAY_URL } from '../../util/constant';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  // public username$ = new Subject<String>();
+  // public userRole$ = new Subject<String>();
 
   constructor(private http: HttpClient) { }
 
@@ -18,4 +21,17 @@ export class AuthService {
     });
   }
 
+	// public setUserProfile(username: String, userRole: String) {
+  //  	this.username$.next(username);
+  //   this.userRole$.next(userRole);  
+  // }
+
+  logout() {
+    //localStorage.clear();
+    localStorage.removeItem('thJwt');
+    localStorage.removeItem('thUn');
+    localStorage.removeItem('thUr');
+    //this.username$.unsubscribe();
+    //this.userRole$.unsubscribe(); 
+  }
 }
