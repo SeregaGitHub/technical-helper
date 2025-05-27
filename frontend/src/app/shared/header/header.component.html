@@ -4,7 +4,8 @@
       <span>{{ title }}</span>
     </div>
     <!-- <span class="example-spacer"></span> -->
-    <div>
+    @if (service.isAuthenticated) {
+      <div>
       <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
       <mat-button-toggle 
           value="breakage" 
@@ -23,6 +24,7 @@
         Отделы</mat-button-toggle>
     </mat-button-toggle-group>
     </div>
+
     <!-- <span class="example-spacer"></span> -->
     <div class="flex w-1/5 justify-between items-center">
       <div class="inline-block">
@@ -60,6 +62,7 @@
           routerLink="/auth">
         Выход</mat-button-toggle> -->
     </div>
+    }
   </mat-toolbar>
   </p>
 
