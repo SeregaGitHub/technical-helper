@@ -61,9 +61,20 @@ export class AuthComponent implements OnInit{
           // console.log('localStorage');
 
           localStorage.setItem("thJwt", responce.thJwt);
-          localStorage.setItem("thUn", responce.username);
-          localStorage.setItem("thUr", responce.role);
+          //localStorage.setItem("thUn", responce.username);
+          //localStorage.setItem("thUr", responce.role);
+
+          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile());
+          this.service.setUserProfile(responce.username, responce.role);
+          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().getUserName());
+          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isAdmin());
+          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isTechnician());
+          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isEmployee());
           //this.service.setUserProfile(responce.username, responce.userRole);
+
+          //this.service.setUsername$(responce.username);
+          //this.service.setUserRole$(responce.role);
+
           this.router.navigateByUrl("/breakage")
 
           // console.log('HeaderComponent');

@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from "./shared/header/header.component";
 import { FooterComponent } from "./shared/footer/footer.component";
-import { AuthService } from './auth/service/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +15,10 @@ import { AuthService } from './auth/service/auth.service';
 })
 export class AppComponent {
 
-    // constructor(private service: AuthService) {}
+
+  //constructor(private service: AuthService) {}
+
+  
 
     // ngOnInit(): void {
     //   console.log('AppComponent - ' + this.service.username$)

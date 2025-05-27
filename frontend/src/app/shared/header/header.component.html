@@ -30,7 +30,13 @@
           <mat-icon>favorite</mat-icon>
         </button> -->
         <div class="overflow-hidden flex w-44 h-8 text-montserrat border items-center">
-          <p>{{ nameFromStorage }}</p>
+          <!-- <p>{{ nameFromStorage }}</p> -->
+           @if (service.isAuthenticated) {
+              <p>{{ service.getUserProfile().getUserName() }}</p>
+           } @else {
+             <p>{{ noAuth }}</p>
+           }
+           
         </div>
       </div>
       
