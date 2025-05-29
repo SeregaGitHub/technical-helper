@@ -7,18 +7,16 @@ import { Role } from "../util/role";
 export class RoleGuard implements CanActivate {
   authService = inject(AuthService);
   router = inject(Router);
+    
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
-    console.log('RoleGuard - start !!!')
-    const role = route.data["role"];
+    const roles = route.data;
     const userProfile = this.authService.getUserProfile();
-    console.log('role - ' + role)
-    console.log('hasAccess - ' + userProfile)
-    //const hasAccess = this.authService.hasRole(role);
+    
     if (userProfile == null || userProfile == undefined) {
         return this.router.createUrlTree(['/auth']);
     } else {
-        return role === userProfile.getUserRole() ? true : this.router.createUrlTree(['/auth']);
+        return roles["roles"].includes(userProfile.getUserRole()) ? true : this.router.createUrlTree(['/forbidden']);
     }
   }
 }

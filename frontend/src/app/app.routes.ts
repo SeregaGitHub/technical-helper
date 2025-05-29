@@ -6,14 +6,22 @@ import { DepartmentComponent } from './pages/department/department.component';
 import { RoleGuard } from './security/roleGuard';
 import { Role } from './util/role';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
     { path: 'auth', component: AuthComponent },
-    { path: 'breakage', component: BreakageComponent },
-    { path: 'user', component: UserComponent },
-    { path: 'department', component: DepartmentComponent, canActivate: [RoleGuard], data: { role: Role.Admin } },
-    { path: 'forbidden', component: ForbiddenComponent },
+    { path: 'breakage', component: BreakageComponent, 
+        canActivate: [RoleGuard], data: {
+             roles: [Role.Admin, Role.Technician, Role.Employee]
+            } },
+    { path: 'user', component: UserComponent, 
+        canActivate: [RoleGuard], data: { 
+            roles: [Role.Admin]
+        } },
+    { path: 'department', component: DepartmentComponent, 
+        canActivate: [RoleGuard], data: {
+             roles: [Role.Admin]
+            } },
+    { path: 'forbidden', component: NotFoundComponent },
     { path: '**', component: NotFoundComponent }
 ];
