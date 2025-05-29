@@ -6,6 +6,10 @@ export class UserProfile {
         return this.name;
     }
 
+    getUserRole() : String {
+        return this.role;
+    }
+
     isAdmin() : boolean {
         return this.role === 'ADMIN';
     }
