@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
-import { catchError } from 'rxjs';
 
 
 @Component({
@@ -36,7 +35,7 @@ export class AuthComponent implements OnInit{
   authForm: any;
   authError: any;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private _authService: AuthService, private _router: Router) {
     this.authForm = new FormGroup({
     username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
     password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
@@ -51,7 +50,7 @@ export class AuthComponent implements OnInit{
 
   onSubmit() {
     console.log(this.authForm.value);  // NEED DELETE !!!
-    this.authService.auth(this.authForm.value).subscribe(
+    this._authService.auth(this.authForm.value).subscribe(
       (responce) => {
         console.log(responce);         // NEED DELETE !!!
         if (responce.thJwt != null) {
@@ -65,7 +64,7 @@ export class AuthComponent implements OnInit{
           //localStorage.setItem("thUr", responce.role);
 
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile());
-          this.authService.setUserProfile(responce.username, responce.role);
+          this._authService.setUserProfile(responce.username, responce.role);
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().getUserName());
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isAdmin());
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isTechnician());
@@ -75,7 +74,7 @@ export class AuthComponent implements OnInit{
           //this.service.setUsername$(responce.username);
           //this.service.setUserRole$(responce.role);
 
-          this.router.navigateByUrl("/breakage")
+          this._router.navigateByUrl("/breakage")
 
           // console.log('HeaderComponent');
           // console.log(this.service.username$);

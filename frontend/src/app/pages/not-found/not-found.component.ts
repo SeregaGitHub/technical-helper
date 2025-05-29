@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-not-found',
@@ -8,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class NotFoundComponent {
 
+    constructor(private _location: Location) {}
+
+    backClicked() {
+      this._location.back();
+    }
 }

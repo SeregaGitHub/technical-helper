@@ -29,10 +29,10 @@ export class AuthService {
   // private username$: any;
   // private userRole$: any;
 
-  constructor(private http: HttpClient) { }
+  constructor(private _http: HttpClient) { }
 
   auth(authRequest: any): Observable<any> {
-    return this.http.post<any>(GATEWAY_URL + BASE_URL + AUTH_URL, authRequest, {
+    return this._http.post<any>(GATEWAY_URL + BASE_URL + AUTH_URL, authRequest, {
       headers: new HttpHeaders({
            'Content-Type':  'application/json',
          })

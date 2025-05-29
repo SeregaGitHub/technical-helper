@@ -7,9 +7,9 @@ import { AuthService } from '../auth/service/auth.service';
 })
 export class UserProfileDirective {
 
-  constructor(private authService: AuthService) { }
+  constructor(private _authService: AuthService) { }
 
   getUserProfile() {
-    return this.authService.getUserProfile();
+    return this._authService.getUserProfile();
   }
 }

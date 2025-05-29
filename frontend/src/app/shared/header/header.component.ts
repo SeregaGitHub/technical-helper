@@ -36,7 +36,7 @@ export class HeaderComponent {
     //nameFromStorage: any;
     //roleFromStorage: any;
 
-    constructor(public authService: AuthService, private router: Router) {}
+    constructor(public authService: AuthService, private _router: Router) {}
 
     ngOnInit(): void {
       localStorage.removeItem('thJwt');
@@ -75,7 +75,7 @@ export class HeaderComponent {
       this.authService.logout();
       // this.username = null;
       // this.userRole = null;
-      this.router.navigate(["/auth"]);
+      this._router.navigate(["/auth"]);
 
       console.log('HeaderComponent - logout()');
       console.log(this.authService.getUserProfile());
