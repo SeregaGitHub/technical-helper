@@ -36,7 +36,7 @@ export class AuthComponent implements OnInit{
   authForm: any;
   authError: any;
 
-  constructor(private service: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router) {
     this.authForm = new FormGroup({
     username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
     password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
@@ -51,7 +51,7 @@ export class AuthComponent implements OnInit{
 
   onSubmit() {
     console.log(this.authForm.value);  // NEED DELETE !!!
-    this.service.auth(this.authForm.value).subscribe(
+    this.authService.auth(this.authForm.value).subscribe(
       (responce) => {
         console.log(responce);         // NEED DELETE !!!
         if (responce.thJwt != null) {
@@ -65,7 +65,7 @@ export class AuthComponent implements OnInit{
           //localStorage.setItem("thUr", responce.role);
 
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile());
-          this.service.setUserProfile(responce.username, responce.role);
+          this.authService.setUserProfile(responce.username, responce.role);
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().getUserName());
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isAdmin());
           //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isTechnician());

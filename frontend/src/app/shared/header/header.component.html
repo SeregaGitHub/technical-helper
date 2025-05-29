@@ -4,24 +4,26 @@
       <span>{{ title }}</span>
     </div>
     <!-- <span class="example-spacer"></span> -->
-    @if (service.isAuthenticated) {
-      <div>
-      <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
-      <mat-button-toggle 
-          value="breakage" 
-          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
-          routerLink="/breakage">
-        Заявки</mat-button-toggle>
-      <mat-button-toggle 
-          value="user" 
-          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
-          routerLink="/user">
-        Пользователи</mat-button-toggle>
-      <mat-button-toggle 
-          value="department" 
-          class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
-          routerLink="/department">
-        Отделы</mat-button-toggle>
+    @if (authService.isAuthenticated) {
+      <div appUserProfile #userProfile="userProfile">
+        <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
+          <mat-button-toggle 
+            value="breakage" 
+            class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
+            routerLink="/breakage">
+          Заявки</mat-button-toggle>
+        @if (userProfile.getUserProfile().isAdmin()) {
+          <mat-button-toggle 
+            value="user" 
+            class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
+            routerLink="/user">
+          Пользователи</mat-button-toggle>
+          <mat-button-toggle 
+            value="department" 
+            class="black-to-blue-gradient text-michroma !text-xl button-toggle mouse-enter" 
+            routerLink="/department">
+          Отделы</mat-button-toggle>
+        }
     </mat-button-toggle-group>
     </div>
 
@@ -33,8 +35,8 @@
         </button> -->
         <div class="overflow-hidden flex w-44 h-8 text-montserrat border items-center">
           <!-- <p>{{ nameFromStorage }}</p> -->
-           @if (service.isAuthenticated) {
-              <p>{{ service.getUserProfile().getUserName() }}</p>
+           @if (authService.isAuthenticated) {
+              <p>{{ authService.getUserProfile().getUserName() }}</p>
            } @else {
              <p>{{ noAuth }}</p>
            }

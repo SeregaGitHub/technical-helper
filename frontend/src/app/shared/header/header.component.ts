@@ -7,6 +7,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/service/auth.service';
 import { Subscription } from 'rxjs';
+import { UserProfileDirective } from '../../directive/user-profile.directive';
 
 @Component({
   selector: 'app-header',
@@ -16,7 +17,8 @@ import { Subscription } from 'rxjs';
     MatButtonModule,
     MatIconModule,
     MatButtonToggleModule,
-    RouterModule
+    RouterModule,
+    UserProfileDirective
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
@@ -34,12 +36,12 @@ export class HeaderComponent {
     //nameFromStorage: any;
     //roleFromStorage: any;
 
-    constructor(public service: AuthService, private router: Router) {}
+    constructor(public authService: AuthService, private router: Router) {}
 
     ngOnInit(): void {
       console.log('HeaderComponent - init');
-      console.log(this.service.getUserProfile());
-      console.log(this.service.isAuthenticated);
+      console.log(this.authService.getUserProfile());
+      console.log(this.authService.isAuthenticated);
       console.log('HeaderComponent - init');
       // this.name?.unsubscribe();
       // this.role?.unsubscribe();
@@ -62,14 +64,14 @@ export class HeaderComponent {
     logout() {
       //this.name?.unsubscribe();
       //this.role?.unsubscribe();
-      this.service.logout();
+      this.authService.logout();
       // this.username = null;
       // this.userRole = null;
       this.router.navigate(["/auth"]);
 
       console.log('HeaderComponent - init');
-      console.log(this.service.getUserProfile());
-      console.log(this.service.isAuthenticated);
+      console.log(this.authService.getUserProfile());
+      console.log(this.authService.isAuthenticated);
       console.log('HeaderComponent - init');
     }
 }
