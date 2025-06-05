@@ -14,6 +14,7 @@ import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
+@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + USER_URL)
 @RequiredArgsConstructor
