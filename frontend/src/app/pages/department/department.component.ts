@@ -29,20 +29,16 @@ export class DepartmentComponent implements AfterViewInit {
   createdDate = 'Дата';
   lastUpdatedBy = 'Обновлен';
   lastUpdatedDate = 'Обновлено';
+  actions = 'Действия';
 
   // dep: Department[] = [];
   departments: any;
 
-  public displayedColumns: string[] = ['number', 'id', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate'];
+  public displayedColumns: string[] = ['number', 'id', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];
   public dataSource!: MatTableDataSource<Department>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  // ngAfterViewInit() {
-  //   this.dataSource.paginator = this.paginator;
-  //   this.dataSource.sort = this.sort;
-  // }
 
   constructor (private _depService: DepartmentService) {
     // this.dataSource = new MatTableDataSource(this.dep);
@@ -77,6 +73,14 @@ export class DepartmentComponent implements AfterViewInit {
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
         });
+  }
+
+  updateDep(name: String): void {
+    console.log("Update Department - " + name)
+  }
+
+  deleteDep(id: String): void {
+    console.log("Delete Department - " + id)
   }
 
   // getAllDep(): void {

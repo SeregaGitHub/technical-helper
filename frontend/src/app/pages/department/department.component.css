@@ -1,10 +1,6 @@
 table {
     width: 100%;
   }
-
-  .display-block {
-    display: block;
-  }
   
   th {
     font-weight: bolder;
@@ -31,3 +27,8 @@ table {
     font-family: michroma;
     opacity: 90%;
   }
+
+  .one-long-line:hover {  
+    overflow: visible;
+    color: #FFB4AB; 
+} 
