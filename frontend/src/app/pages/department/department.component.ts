@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {MatPaginator, MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {MatSort, MatSortModule} from '@angular/material/sort';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { Component, ViewChild } from '@angular/core';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Department } from '../../model/department';
 import { DepartmentService } from '../../services/department.service';
 import { DATE_FORMAT } from '../../util/constant';
@@ -24,10 +24,11 @@ import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
   templateUrl: './department.component.html',
   styleUrl: './department.component.css',
   providers: [
-    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }  // Here
+    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
   ]
 })
-export class DepartmentComponent implements AfterViewInit {
+export class DepartmentComponent {
+  //export class DepartmentComponent implements AfterViewInit {
 
   number = '№';
   id = "Id"
@@ -52,10 +53,10 @@ export class DepartmentComponent implements AfterViewInit {
     this.getAllDep();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
+  // ngAfterViewInit() {
+  //   this.dataSource.paginator = this.paginator;
+  //   this.dataSource.sort = this.sort;
+  // }
 
 
   applyFilter(event: Event) {
