@@ -1,11 +1,11 @@
 
 <div class="flex">
 
-<div class="grow mx-64">
+  <div class="grow ml-20 mr-6">
 
     <mat-form-field class="display-block">
-      <mat-label class="">Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)" placeholder="Enter the data" #input>
+      <mat-label class="">Поиск</mat-label>
+      <input matInput (keyup)="applyFilter($event)" #input>
     </mat-form-field>
     
     <div class="mat-elevation-z8">
@@ -75,8 +75,8 @@
   
   </div>
 
-  <div class="float-right mt-20 mr-20">
-    <button class="btn button-size black-to-blue-gradient text-michroma" (click)="onCreate()">
+  <div class="float-right mt-20 mr-3">
+    <button class="btn button-size black-to-blue-gradient text-montserrat" (click)="onCreate()">
       Создать
     </button>
   </div>

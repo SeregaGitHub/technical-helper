@@ -20,7 +20,7 @@ import { DepartmentService } from '../../services/department.service';
   templateUrl: './department.component.html',
   styleUrl: './department.component.css'
 })
-export class DepartmentComponent {
+export class DepartmentComponent implements AfterViewInit {
 
   number = '№';
   id = "Id"
@@ -47,6 +47,11 @@ export class DepartmentComponent {
   constructor (private _depService: DepartmentService) {
     // this.dataSource = new MatTableDataSource(this.dep);
     this.getAllDep();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
 
