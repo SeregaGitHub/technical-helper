@@ -2,7 +2,7 @@ export interface Department {
     id: number;
     name: string;
     createdBy: string;
-    createdDate: string;
+    createdDate: Date;
     lastUpdatedBy: string;
-    lastUpdatedDate: string;
+    lastUpdatedDate: Date;
   }

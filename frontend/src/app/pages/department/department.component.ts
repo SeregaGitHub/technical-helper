@@ -1,4 +1,5 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatSort, MatSortModule} from '@angular/material/sort';
@@ -6,10 +7,12 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { Department } from '../../model/department';
 import { DepartmentService } from '../../services/department.service';
+import { DATE_FORMAT } from '../../util/constant';
 
 @Component({
   selector: 'app-department',
   imports: [
+    CommonModule,
     MatTableModule, 
     MatPaginatorModule,
     MatSort, 
@@ -31,7 +34,7 @@ export class DepartmentComponent implements AfterViewInit {
   lastUpdatedDate = 'Обновлено';
   actions = 'Действия';
 
-  // dep: Department[] = [];
+  dateFormat = DATE_FORMAT;
   departments: any;
 
   public displayedColumns: string[] = ['number', 'id', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];

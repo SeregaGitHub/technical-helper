@@ -4,3 +4,5 @@ export const AUTH_URL = '/auth';
 export const ADMIN_URL = '/admin';
 export const DEPARTMENT_URL = '/department';
 export const ALL_URL = '/all';
+
+export const DATE_FORMAT = 'dd-MM-yyyy HH:mm:ss';

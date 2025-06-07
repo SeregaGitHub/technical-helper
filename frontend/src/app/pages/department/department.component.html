@@ -40,10 +40,10 @@
         <!-- createdDate Column -->
         <ng-container matColumnDef="createdDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-28 min-w-28"> {{ createdDate }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-28  min-w-28"> {{ element.createdDate }} </td>
+          <td mat-cell *matCellDef="let element" class="max-w-28  min-w-28"> {{ element.createdDate | date: dateFormat }} </td>
         </ng-container>
 
-        <!-- lastUpdatedBy Column -->
+        <!-- lastUpdatedBy Column --> 
         <ng-container matColumnDef="lastUpdatedBy">
           <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36 min-w-36"> {{ lastUpdatedBy }} </th>
           <td mat-cell *matCellDef="let element" class="max-w-36 min-w-36 one-long-line"> {{ element.lastUpdatedBy }} </td>
@@ -52,7 +52,7 @@
         <!-- lastUpdatedDate Column -->
         <ng-container matColumnDef="lastUpdatedDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-28 min-w-28"> {{ lastUpdatedDate }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-28 min-w-28"> {{ element.lastUpdatedDate }} </td>
+          <td mat-cell *matCellDef="let element" class="max-w-28 min-w-28"> {{ element.lastUpdatedDate | date: dateFormat }} </td>
         </ng-container>
 
         <!-- actions Column -->
