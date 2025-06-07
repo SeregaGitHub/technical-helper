@@ -1,16 +1,16 @@
 table {
     width: 100%;
-  }
+}
   
-  th {
+th {
     font-weight: bolder;
     text-decoration: underline;
     text-underline-offset: 0.5rem;
     text-decoration-thickness: 0.1rem;
     text-align: center;
-  }
+}
 
-  th, td {
+th, td {
     color: aquamarine;
     /* font-family: michroma; */
     font-family: montserrat;
@@ -18,17 +18,17 @@ table {
     opacity: 20%;
     background: rgb(8,56,134);
     background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%); */
-  }
+}
 
-  table, mat-paginator {
+table, mat-paginator {
     background: rgb(8,56,134);
     background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
     color: aquamarine;
     font-family: michroma;
     opacity: 90%;
-  }
+}
 
-  .one-long-line:hover {  
+.one-long-line:hover {  
     overflow: visible;
-    color: #FFB4AB; 
-} 
+}
+
