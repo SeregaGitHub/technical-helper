@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatInputModule} from '@angular/material/input';
@@ -8,6 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { Department } from '../../model/department';
 import { DepartmentService } from '../../services/department.service';
 import { DATE_FORMAT } from '../../util/constant';
+import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
 
 @Component({
   selector: 'app-department',
@@ -21,7 +22,10 @@ import { DATE_FORMAT } from '../../util/constant';
     MatFormFieldModule
   ],
   templateUrl: './department.component.html',
-  styleUrl: './department.component.css'
+  styleUrl: './department.component.css',
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }  // Here
+  ]
 })
 export class DepartmentComponent implements AfterViewInit {
 
