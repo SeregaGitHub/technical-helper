@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.gateway.client.DepartmentClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -58,10 +60,15 @@ public class DepartmentGatewayController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader(AUTHORIZATION) String jwt,
-                                   @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader(AUTHORIZATION) String jwt,
+                                        @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         String response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
 
-        return response;
+        return ApiResponse.builder()
+                .message(response)
+                .status(HttpStatus.OK.value())
+                .error(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 }

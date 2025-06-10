@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import ru.kraser.technical_helper.common_module.dto.api.ApiError;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -19,7 +19,7 @@ public class MainServerErrorHandler {
     @ExceptionHandler(ServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleServerError(ServerException exception) {
-        ApiError error = ApiError.builder()
+        ApiResponse error = ApiResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR)

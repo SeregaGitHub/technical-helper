@@ -87,8 +87,12 @@ export class DepartmentComponent {
     console.log("Update Department - " + name)
   }
 
-  deleteDep(id: String): void {
-    console.log("Delete Department - " + id)
+  deleteDep(id: string): void {
+    this._depService.deleteDep(id)
+      .subscribe(str => {
+        console.log(str);
+        this.getAllDep();
+      });
   }
 
   // getAllDep(): void {

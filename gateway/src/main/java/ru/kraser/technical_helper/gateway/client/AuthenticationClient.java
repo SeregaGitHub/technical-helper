@@ -1,22 +1,17 @@
 package ru.kraser.technical_helper.gateway.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.kraser.technical_helper.common_module.dto.api.ApiError;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationRequest;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationResponse;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
-
-import java.util.Map;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
