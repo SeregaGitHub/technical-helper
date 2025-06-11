@@ -11,10 +11,10 @@ export class DepartmentService {
   constructor(private _http: HttpClient) { }
 
   departmentSubject = new BehaviorSubject<any>({
-      departments: [],
-      loading: false,
-      newDepartment: null
-    });
+        departments: [],
+        loading: false,
+        newDepartment: null
+      });
 
     private getHeaders(): HttpHeaders {
     //const token = localStorage.getItem("thJwt");
@@ -46,7 +46,7 @@ export class DepartmentService {
       headers = headers.append('X-TH-Department-Id', id);
 
       return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers})
-        .pipe(
+        .pipe(     
           tap(
             (str) => {
               console.log(str);

@@ -42,7 +42,7 @@ export class DepartmentComponent {
   dateFormat = DATE_FORMAT;
   departments: any;
 
-  public displayedColumns: string[] = ['number', 'id', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];
+  public displayedColumns: string[] = ['number', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];
   public dataSource!: MatTableDataSource<Department>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
