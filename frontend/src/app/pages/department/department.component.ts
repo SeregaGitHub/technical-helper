@@ -107,8 +107,11 @@ export class DepartmentComponent {
   // }
 
   onCreate() {
-    console.log("Crearte new Department...");
-    this.dialog.open(DepartmentFormComponent);
-  }
+    const openDialog = this.dialog.open(DepartmentFormComponent);
+
+    openDialog.afterClosed().subscribe(() => {
+      this.getAllDep();
+    })
+  };
 
 }

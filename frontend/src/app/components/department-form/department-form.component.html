@@ -1,7 +1,7 @@
 
 <div class="flex justify-center blue-to-black-gradient min-w-96">
 
-    <form [formGroup]="departmentForm" (ngSubmit)="createDep()" class="min-w-80">
+    <form [formGroup]="departmentForm" (ngSubmit)="createDepartment()" class="min-w-80">
 
         <div class="mb-8 flex justify-normal pt-4">
           <button 
@@ -15,24 +15,23 @@
         <mat-form-field class="w-full mb-4">
             
             <mat-label class="text-gray-200">Название отдела</mat-label>
-            <input matInput 
-                         formControlName="name"
-                         >
-                         @if (name.touched && name.invalid) {
-                          <div class="alert">
-                            @if (name.errors?.required) {
-                              <p>Вам необходимо ввести название отдела !!!</p>
-                            }
-                            @if (name.errors?.minlength) {
-                              <p class="text-center">Длина названия отдела должна быть</p>
-                              <p class="text-center">не менее 4 символов !!!</p>
-                            }
-                            @if (name.errors?.maxlength) {
-                              <p class="text-center">Длина названия отдела должна быть</p>
-                              <p class="text-center">не более 64 символов !!!</p>
-                            }
-                          </div>
-                         }
+            <input matInput formControlName="name"
+                  >
+                    @if (name.touched && name.invalid) {
+                      <div class="alert">
+                        @if (name.errors?.required) {
+                          <p>Вам необходимо ввести название отдела !!!</p>
+                        }
+                        @if (name.errors?.minlength) {
+                          <p class="text-center">Длина названия отдела должна быть</p>
+                          <p class="text-center">не менее 4 символов !!!</p>
+                        }
+                        @if (name.errors?.maxlength) {
+                          <p class="text-center">Длина названия отдела должна быть</p>
+                          <p class="text-center">не более 64 символов !!!</p>
+                        }
+                      </div>
+                    }
         </mat-form-field>
 
         <div class="mb-4 min-h-12"

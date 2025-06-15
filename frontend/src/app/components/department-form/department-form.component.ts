@@ -23,6 +23,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class DepartmentFormComponent {
 
   departmentForm: any;
+
   apiResponse: ApiResponse = {
     message: '',
     status: 0,
@@ -37,24 +38,19 @@ export class DepartmentFormComponent {
       name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
     });
   }
-    
-  createDep() {
-    console.log('createDep() - start');
-    
+
+  createDepartment() {
+
     this.newDepartment = {
         name: this.departmentForm.value.name
-    }
-    //this.newDepartment.name = this.newDepartment.name;
+    };
 
     this._depService.createDep(this.newDepartment).subscribe(response => {
         this.apiResponse = response;
+        this.newDepartment = undefined;
+        this.clearForm();
+        this.deleteResponseMessage();
       });
-    
-     this.newDepartment = undefined;
-     this.clearForm();
-     this._depService.getAllDep();
-     console.log(this._depService.getAllDep());
-     this.deleteResponseMessage();
   };
 
   deleteResponseMessage() {
@@ -66,7 +62,7 @@ export class DepartmentFormComponent {
         timestamp: new Date
       }
     }, 3000);
-  }
+  };
 
   clearForm() {
     this.departmentForm.reset();
@@ -78,5 +74,5 @@ export class DepartmentFormComponent {
 
   get name() {
     return this.departmentForm.get('name')
-  }
+  };
 }
