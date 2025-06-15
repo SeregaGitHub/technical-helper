@@ -11,6 +11,7 @@ import { DATE_FORMAT } from '../../util/constant';
 import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
 import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
+import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 
 @Component({
   selector: 'app-department',
@@ -90,12 +91,17 @@ export class DepartmentComponent {
   }
 
   deleteDep(id: string): void {
-    this._depService.deleteDep(id)
-      .subscribe(str => {
-        console.log(str);
-        this.getAllDep();
-      });
-  }
+    const openDialog = this.dialog.open(ConfirmFormComponent);
+
+    openDialog.afterClosed().subscribe((confirmResult ) => {
+      if (confirmResult) {
+        this._depService.deleteDep(id)
+          .subscribe(() => {
+            this.getAllDep();
+          });
+      };
+    });
+  };
 
   // getAllDep(): void {
   //   this._depService
@@ -111,7 +117,7 @@ export class DepartmentComponent {
 
     openDialog.afterClosed().subscribe(() => {
       this.getAllDep();
-    })
+    });
   };
 
 }
