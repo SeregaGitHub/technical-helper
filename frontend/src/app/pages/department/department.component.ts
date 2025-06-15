@@ -37,7 +37,7 @@ export class DepartmentComponent {
   id = "Id"
   name = 'Отдел';
   createdBy = 'Создан';
-  createdDate = 'Дата';
+  createdDate = 'Создано';
   lastUpdatedBy = 'Обновлен';
   lastUpdatedDate = 'Обновлено';
   actions = 'Действия';
@@ -86,8 +86,15 @@ export class DepartmentComponent {
         });
   }
 
-  updateDep(name: String): void {
-    console.log("Update Department - " + name)
+  updateDep(id: string, name: string): void {
+    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
+      departmentId: id,
+      departmentName: name
+    }});
+
+    openDialog.afterClosed().subscribe(() => {
+      this.getAllDep();
+    });
   }
 
   deleteDep(id: string): void {
