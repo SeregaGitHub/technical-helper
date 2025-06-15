@@ -25,7 +25,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message("Отказано в подключении к серверу " + ErrorMessageBuilder.identifyServer(exception.getMessage()))
                 .status(HttpStatus.SERVICE_UNAVAILABLE.value())
-                .error(HttpStatus.SERVICE_UNAVAILABLE)
+                .httpStatus(HttpStatus.SERVICE_UNAVAILABLE)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
@@ -37,7 +37,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.UNAUTHORIZED.value())
-                .error(HttpStatus.UNAUTHORIZED)
+                .httpStatus(HttpStatus.UNAUTHORIZED)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
@@ -49,7 +49,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message("У Вас нет прав доступа для данного ресурса.")
                 .status(HttpStatus.FORBIDDEN.value())
-                .error(HttpStatus.FORBIDDEN)
+                .httpStatus(HttpStatus.FORBIDDEN)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
@@ -61,7 +61,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message("Вы должны пройти аутентификацию.")
                 .status(HttpStatus.UNAUTHORIZED.value())
-                .error(HttpStatus.UNAUTHORIZED)
+                .httpStatus(HttpStatus.UNAUTHORIZED)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
@@ -73,7 +73,7 @@ public class GatewayErrorHandler {
                 ApiResponse error = ApiResponse.builder()
                 .message(ErrorMessageBuilder.identifyNotValidArgument(exception.getMessage()))
                 .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST)
+                .httpStatus(HttpStatus.BAD_REQUEST)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.badRequest().body(error);
@@ -92,7 +92,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message(message)
                 .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST)
+                .httpStatus(HttpStatus.BAD_REQUEST)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.badRequest().body(error);
@@ -104,7 +104,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
-                .error(HttpStatus.UNPROCESSABLE_ENTITY)
+                .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
@@ -116,7 +116,7 @@ public class GatewayErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.NOT_FOUND.value())
-                .error(HttpStatus.NOT_FOUND)
+                .httpStatus(HttpStatus.NOT_FOUND)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);

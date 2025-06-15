@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './auth/component/auth/auth.component';
+import { AuthComponent } from './auth/components/auth/auth.component';
 import { BreakageComponent } from './pages/breakage/breakage.component';
 import { UserComponent } from './pages/user/user.component';
 import { DepartmentComponent } from './pages/department/department.component';
 import { RoleGuard } from './security/roleGuard';
-import { Role } from './util/role';
+import { Role } from './enum/role';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+
 
 export const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },

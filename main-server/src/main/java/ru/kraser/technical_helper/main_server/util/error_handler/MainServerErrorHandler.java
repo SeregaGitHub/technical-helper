@@ -22,7 +22,7 @@ public class MainServerErrorHandler {
         ApiResponse error = ApiResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR)
+                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -37,13 +37,13 @@ public class MainServerErrorHandler {
     @ExceptionHandler(MalformedJwtException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<?> handleNotValidToken(MalformedJwtException exception) {
-        ApiError error = ApiError.builder()
+        ApiError httpStatus = ApiError.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.FORBIDDEN.value())
-                .error(HttpStatus.FORBIDDEN)
+                .httpStatus(HttpStatus.FORBIDDEN)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(httpStatus);
     }*/
 
     @ExceptionHandler(AuthException.class)

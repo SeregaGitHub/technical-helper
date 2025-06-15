@@ -93,3 +93,7 @@ background: linear-gradient(270deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%) !i
 .alert {
     color: #FFB4AB;
 }
+
+.successfully {
+    color:rgb(18, 180, 18);
+}

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public record ApiResponse(
     String message,
     int status,
-    HttpStatus error,
+    HttpStatus httpStatus,
     @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     LocalDateTime timestamp
 ) {

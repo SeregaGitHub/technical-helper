@@ -7,3 +7,5 @@ export const ALL_URL = '/all';
 export const DELETE_URL = '/delete';
 
 export const DATE_FORMAT = 'dd-MM-yyyy HH:mm:ss';
+
+export const DEPARTMENT_ID = 'X-TH-Department-Id';

@@ -9,6 +9,8 @@ import { Department } from '../../model/department';
 import { DepartmentService } from '../../services/department.service';
 import { DATE_FORMAT } from '../../util/constant';
 import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
+import { MatDialog } from '@angular/material/dialog';
+import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 
 @Component({
   selector: 'app-department',
@@ -48,7 +50,7 @@ export class DepartmentComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor (private _depService: DepartmentService) {
+  constructor (private _depService: DepartmentService, public dialog: MatDialog) {
     // this.dataSource = new MatTableDataSource(this.dep);
     this.getAllDep();
   }
@@ -105,6 +107,8 @@ export class DepartmentComponent {
   // }
 
   onCreate() {
-    console.log("Crearte new Department...")
+    console.log("Crearte new Department...");
+    this.dialog.open(DepartmentFormComponent);
   }
+
 }

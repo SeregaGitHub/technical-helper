@@ -24,9 +24,9 @@ public class DepartmentGatewayController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
+    public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
                                           @RequestHeader(AUTHORIZATION) String jwt) {
-        String response = departmentClient.createDepartment(createDepartmentDto, jwt);
+        ApiResponse response = departmentClient.createDepartment(createDepartmentDto, jwt);
 
         return response;
     }
@@ -62,13 +62,8 @@ public class DepartmentGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteDepartment(@RequestHeader(AUTHORIZATION) String jwt,
                                         @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
-        String response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
+        ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
 
-        return ApiResponse.builder()
-                .message(response)
-                .status(HttpStatus.OK.value())
-                .error(HttpStatus.OK)
-                .timestamp(LocalDateTime.now().withNano(0))
-                .build();
+        return response;
     }
 }

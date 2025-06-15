@@ -1,0 +1,59 @@
+
+<div class="flex justify-center blue-to-black-gradient min-w-96">
+
+    <form [formGroup]="departmentForm" (ngSubmit)="createDep()" class="min-w-80">
+
+        <div class="mb-8 flex justify-normal pt-4">
+          <button 
+            type="button"
+            class="black-to-blue-gradient text-montserrat button-size btn mouse-enter" 
+            (click)="closeDialog()"
+            >Закрыть
+          </button>
+        </div>
+
+        <mat-form-field class="w-full mb-4">
+            
+            <mat-label class="text-gray-200">Название отдела</mat-label>
+            <input matInput 
+                         formControlName="name"
+                         >
+                         @if (name.touched && name.invalid) {
+                          <div class="alert">
+                            @if (name.errors?.required) {
+                              <p>Вам необходимо ввести название отдела !!!</p>
+                            }
+                            @if (name.errors?.minlength) {
+                              <p class="text-center">Длина названия отдела должна быть</p>
+                              <p class="text-center">не менее 4 символов !!!</p>
+                            }
+                            @if (name.errors?.maxlength) {
+                              <p class="text-center">Длина названия отдела должна быть</p>
+                              <p class="text-center">не более 64 символов !!!</p>
+                            }
+                          </div>
+                         }
+        </mat-form-field>
+
+        <div class="mb-4 min-h-12"
+            [ngClass]="apiResponse == null ? 'hide' : ''" 
+            >
+              <p class="text-center successfully"> {{ apiResponse.message }} </p> 
+        </div>
+
+        <div class="mb-4 flex justify-between">
+          <button type="reset"
+                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter">
+                  Очистить
+          </button>
+          <button type="submit" 
+                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
+                  [ngClass]="departmentForm.invalid ? 'btn-not-active' : ''" 
+                  [disabled]="departmentForm.invalid">
+                  Создать
+          </button>
+        </div>
+
+    </form>
+
+</div>

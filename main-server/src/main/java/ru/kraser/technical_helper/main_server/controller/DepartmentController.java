@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.main_server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
@@ -19,7 +20,7 @@ public class DepartmentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
         return departmentService.createDepartment(createDepartmentDto);
     }
 
@@ -44,7 +45,7 @@ public class DepartmentController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }
 }

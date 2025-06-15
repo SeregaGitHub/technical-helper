@@ -5,4 +5,4 @@ export interface Department {
     createdDate: Date;
     lastUpdatedBy: string;
     lastUpdatedDate: Date;
-  }
+}

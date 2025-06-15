@@ -43,12 +43,12 @@ public class AuthenticationClient {
                                     try {
                                         var message = objectMapper.writeValueAsString(body);
                                         ApiError errorResponse = objectMapper.readValue(message, ApiError.class);
-                                        return Mono.error(
+                                        return Mono.httpStatus(
                                                 new AuthException(errorResponse.message()
                                                         *//*clientResponse.statusCode().value(),
-                                                        "My custom error message", errorResponse*//*));
+                                                        "My custom httpStatus message", errorResponse*//*));
                                     } catch (JsonProcessingException jsonProcessingException) {
-                                        return Mono.error(new ServerException(SERVER_ERROR));
+                                        return Mono.httpStatus(new ServerException(SERVER_ERROR));
                                     }
                                 }))*/
 
@@ -66,14 +66,14 @@ public class AuthenticationClient {
                                     try {
                                         var exception = objectMapper.writeValueAsString(body);
                                         AuthException authException = objectMapper.readValue(exception, AuthException.class);
-                                        return Mono.error(authException);
+                                        return Mono.httpStatus(authException);
                                     } catch (JsonProcessingException jsonProcessingException) {
-                                        return Mono.error(new ServerException(SERVER_ERROR));
+                                        return Mono.httpStatus(new ServerException(SERVER_ERROR));
                                     }
                                 }))*/
 
                 /*.onStatus(HttpStatusCode::is4xxClientError,
-                        clientResponse -> Mono.error(
+                        clientResponse -> Mono.httpStatus(
                                 new RuntimeException(
                                         "Пользователь с логином - " + request.username() + ", не был найден.")))*/
                 /*.onStatus(HttpStatusCode::is4xxClientError,
