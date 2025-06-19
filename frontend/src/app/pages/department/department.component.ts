@@ -12,6 +12,7 @@ import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
 import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
+import { Action } from '../../enum/action';
 
 @Component({
   selector: 'app-department',
@@ -76,7 +77,7 @@ export class DepartmentComponent {
       .getAllDep()
         .subscribe(data => {
 
-          console.log(data);
+          console.log(data);  // MUST BE DELETED !!!
 
           this.departments = data;
           this.dataSource = new MatTableDataSource(this.departments);
@@ -88,6 +89,7 @@ export class DepartmentComponent {
 
   updateDep(id: string, name: string): void {
     const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
+      action: Action.Update,
       departmentId: id,
       departmentName: name
     }});
@@ -120,7 +122,9 @@ export class DepartmentComponent {
   // }
 
   onCreate() {
-    const openDialog = this.dialog.open(DepartmentFormComponent);
+    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
+      action: Action.Create
+    }});
 
     openDialog.afterClosed().subscribe(() => {
       this.getAllDep();

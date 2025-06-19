@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { DepartmentDto } from '../../model/departmentDto';
 import { DepartmentService } from '../../services/department.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ApiResponse } from '../../model/apiResponse';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Action } from '../../enum/action';
 
 @Component({
   selector: 'app-department-form',
@@ -20,9 +21,14 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   templateUrl: './department-form.component.html',
   styleUrl: './department-form.component.css'
 })
-export class DepartmentFormComponent {
+export class DepartmentFormComponent implements OnInit {
+
+  newDepartment: DepartmentDto = {
+    name: ''
+  }
 
   departmentForm: any;
+  buttonName!: string;
 
   apiResponse: ApiResponse = {
     message: '',
@@ -30,10 +36,6 @@ export class DepartmentFormComponent {
     httpStatus: '',
     timestamp: new Date
   }
-
-  newDepartment?: DepartmentDto;
-
-  
 
   constructor(private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
@@ -43,9 +45,29 @@ export class DepartmentFormComponent {
     });
   }
 
-  createDepartment() {
+  ngOnInit(): void {
+    if (this.data.action === Action.Update) {
+      this.newDepartment = {
+        name: this.data.departmentName
+      }
 
+      this.buttonName = 'Изменить';
+      this.departmentForm.get('name').setValue(this.newDepartment.name);
+      } else {
+        this.buttonName = 'Создать';
+      }
     console.log(this.data);
+  }
+
+  clickButton() {
+    if (this.buttonName == 'Создать') {
+      this.createDepartment();
+    } else {
+      this.updateDepartment();
+    }
+  }
+
+  createDepartment() {
 
     this.newDepartment = {
         name: this.departmentForm.value.name
@@ -53,11 +75,28 @@ export class DepartmentFormComponent {
 
     this._depService.createDep(this.newDepartment).subscribe(response => {
         this.apiResponse = response;
-        this.newDepartment = undefined;
+        this.newDepartment = {
+          name: ''
+        }
         this.clearForm();
         this.deleteResponseMessage();
       });
   };
+
+  updateDepartment() {
+
+    this.newDepartment = {
+        name: this.departmentForm.value.name
+    };
+
+    this._depService.updateDep(this.newDepartment, this.data.departmentId).subscribe(response => {
+      this.apiResponse = response;
+        this.newDepartment = {
+          name: ''
+        }
+        this.deleteResponseMessage();
+    });
+  }
 
   deleteResponseMessage() {
     setTimeout(() => {

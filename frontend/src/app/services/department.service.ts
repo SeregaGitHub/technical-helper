@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ADMIN_URL, ALL_URL, BASE_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_URL, GATEWAY_URL } from '../util/constant';
@@ -18,15 +18,7 @@ export class DepartmentService {
         newDepartment: null
     });
 
-    // private getHeaders(): HttpHeaders {
-    //     return new HttpHeaders({
-    //         Authorization: `Bearer ${localStorage.getItem("thJwt")}`,
-    //         'Content-Type': 'application/json'
-    //     })
-    // };
-
     createDep(departmentDto: DepartmentDto): Observable<any> {
-        console.log('DepartmentService createDep() - start');
 
         const headers = Utilities.getHeaders();
 
@@ -42,10 +34,26 @@ export class DepartmentService {
             )
     }
 
+    updateDep(departmentDto: DepartmentDto, id: string): Observable<any> {
+
+        let headers = Utilities.getHeaders();
+        headers = headers.append(DEPARTMENT_ID, id);
+
+        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
+        .pipe(
+            tap((dep) => {
+                const currentState = this.departmentSubject.value;
+
+                    this.departmentSubject.next({...currentState, 
+                    departments:
+                    [dep, ...currentState.departments] });
+            })
+        )
+    }
+
     getAllDep(): Observable<any> {
+        
         const headers = Utilities.getHeaders();
-        // const headers = this.getHeaders();
-        //const dep = this.http.get<Department[]>(BASE_URL + this.departmentUrl, {headers});
     
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
             .pipe(
@@ -61,6 +69,7 @@ export class DepartmentService {
     }
 
     deleteDep(id: string): Observable<any> {
+
         let headers = Utilities.getHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
@@ -73,7 +82,4 @@ export class DepartmentService {
                 )
             );
     }
-
-
-
 }

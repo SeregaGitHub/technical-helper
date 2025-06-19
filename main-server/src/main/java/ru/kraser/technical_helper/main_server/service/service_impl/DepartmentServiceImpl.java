@@ -43,7 +43,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public String updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
+    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
@@ -53,7 +53,12 @@ public class DepartmentServiceImpl implements DepartmentService {
         } catch (Exception e) {
             ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
         }
-        return "Отдел: " + departmentDto.name() + " - был успешно изменен.";
+        return ApiResponse.builder()
+                .message("Отдел: " + departmentDto.name() + " - был успешно изменен.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
     }
 
     @Override

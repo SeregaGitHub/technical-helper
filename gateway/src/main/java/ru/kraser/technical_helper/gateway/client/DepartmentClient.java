@@ -25,7 +25,7 @@ public class DepartmentClient extends BaseClient {
                 ParameterizedTypeReference.forType(ApiResponse.class));
     }
 
-    public String updateDepartment(String departmentHeaderName, String departmentId,
+    public ApiResponse updateDepartment(String departmentHeaderName, String departmentId,
                                    CreateDepartmentDto createDepartmentDto, String jwt) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
@@ -33,7 +33,7 @@ public class DepartmentClient extends BaseClient {
                 jwt,
                 departmentHeaderName,
                 departmentId,
-                ParameterizedTypeReference.forType(String.class)
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 

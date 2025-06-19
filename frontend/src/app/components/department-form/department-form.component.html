@@ -1,7 +1,7 @@
 
 <div class="flex justify-center blue-to-black-gradient min-w-96">
 
-    <form [formGroup]="departmentForm" (ngSubmit)="createDepartment()" class="min-w-80">
+    <form [formGroup]="departmentForm" (ngSubmit)="clickButton()" class="min-w-80">
 
         <div class="mb-8 flex justify-normal pt-4">
           <button 
@@ -13,9 +13,9 @@
         </div>
 
         <mat-form-field class="w-full mb-4">
-            
             <mat-label class="text-gray-200">Название отдела</mat-label>
-            <input matInput formControlName="name"
+            <input matInput 
+                   formControlName="name"
                   >
                     @if (name.touched && name.invalid) {
                       <div class="alert">
@@ -49,7 +49,7 @@
                   class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
                   [ngClass]="departmentForm.invalid ? 'btn-not-active' : ''" 
                   [disabled]="departmentForm.invalid">
-                  Создать
+                  {{ buttonName }}
           </button>
         </div>
 

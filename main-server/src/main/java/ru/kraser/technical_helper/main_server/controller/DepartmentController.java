@@ -26,7 +26,7 @@ public class DepartmentController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
+    public ApiResponse updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
     }

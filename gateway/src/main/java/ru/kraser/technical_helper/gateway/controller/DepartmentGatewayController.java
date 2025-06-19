@@ -33,10 +33,10 @@ public class DepartmentGatewayController {
 
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
+    public ApiResponse updateDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
                                    @RequestHeader(AUTHORIZATION) String jwt,
                                    @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
-        String response = departmentClient.updateDepartment(DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto, jwt);
+        ApiResponse response = departmentClient.updateDepartment(DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto, jwt);
 
         return response;
     }
