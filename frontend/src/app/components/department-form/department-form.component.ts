@@ -23,7 +23,7 @@ import { Action } from '../../enum/action';
 })
 export class DepartmentFormComponent implements OnInit {
 
-  newDepartment: DepartmentDto = {
+  departmentDto: DepartmentDto = {
     name: ''
   }
 
@@ -47,12 +47,12 @@ export class DepartmentFormComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data.action === Action.Update) {
-      this.newDepartment = {
+      this.departmentDto = {
         name: this.data.departmentName
       }
 
       this.buttonName = 'Изменить';
-      this.departmentForm.get('name').setValue(this.newDepartment.name);
+      this.departmentForm.get('name').setValue(this.departmentDto.name);
       } else {
         this.buttonName = 'Создать';
       }
@@ -69,13 +69,13 @@ export class DepartmentFormComponent implements OnInit {
 
   createDepartment() {
 
-    this.newDepartment = {
+    this.departmentDto = {
         name: this.departmentForm.value.name
     };
 
-    this._depService.createDep(this.newDepartment).subscribe(response => {
+    this._depService.createDep(this.departmentDto).subscribe(response => {
         this.apiResponse = response;
-        this.newDepartment = {
+        this.departmentDto = {
           name: ''
         }
         this.clearForm();
@@ -85,13 +85,13 @@ export class DepartmentFormComponent implements OnInit {
 
   updateDepartment() {
 
-    this.newDepartment = {
+    this.departmentDto = {
         name: this.departmentForm.value.name
     };
 
-    this._depService.updateDep(this.newDepartment, this.data.departmentId).subscribe(response => {
+    this._depService.updateDep(this.departmentDto, this.data.departmentId).subscribe(response => {
       this.apiResponse = response;
-        this.newDepartment = {
+        this.departmentDto = {
           name: ''
         }
         this.deleteResponseMessage();

@@ -121,7 +121,7 @@ export class DepartmentComponent {
   //     console.log("getAllDep() - " + this.dep);
   // }
 
-  onCreate() {
+  createDep() {
     const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
       action: Action.Create
     }});
