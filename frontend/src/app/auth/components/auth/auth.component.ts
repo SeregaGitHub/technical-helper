@@ -30,16 +30,16 @@ import { Router } from '@angular/router';
   styleUrl: './auth.component.css'
 })
 
-export class AuthComponent implements OnInit{
+export class AuthComponent implements OnInit {
 
   authForm: any;
   authError: any;
 
   constructor(private _authService: AuthService, private _router: Router) {
-    this.authForm = new FormGroup({
-    username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-    password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
-  });
+      this.authForm = new FormGroup({
+      username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+      password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
+    });
   }
 
   ngOnInit(): void {
@@ -84,7 +84,6 @@ export class AuthComponent implements OnInit{
         if (err.status <= 0) {
           this.authError = 'Отказано в подключении к серверу Gateway !!!';
         } else {
-          console.log(err.error.message)
           this.authError = err.error.message;
         }
       }

@@ -46,6 +46,7 @@ export class DepartmentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     if (this.data.action === Action.Update) {
       this.departmentDto = {
         name: this.data.departmentName
@@ -53,10 +54,10 @@ export class DepartmentFormComponent implements OnInit {
 
       this.buttonName = 'Изменить';
       this.departmentForm.get('name').setValue(this.departmentDto.name);
+      
       } else {
         this.buttonName = 'Создать';
       }
-    console.log(this.data);
   }
 
   clickButton() {
@@ -65,7 +66,7 @@ export class DepartmentFormComponent implements OnInit {
     } else {
       this.updateDepartment();
     }
-  }
+  };
 
   createDepartment() {
 
@@ -73,14 +74,19 @@ export class DepartmentFormComponent implements OnInit {
         name: this.departmentForm.value.name
     };
 
-    this._depService.createDep(this.departmentDto).subscribe(response => {
+    this._depService.createDep(this.departmentDto).subscribe({
+      next: response => {
         this.apiResponse = response;
         this.departmentDto = {
           name: ''
         }
         this.clearForm();
         this.deleteResponseMessage();
-      });
+      },
+      error: err => {
+        this.apiResponse = err.error;
+      }
+    })
   };
 
   updateDepartment() {
@@ -111,6 +117,12 @@ export class DepartmentFormComponent implements OnInit {
 
   clearForm() {
     this.departmentForm.reset();
+    this.apiResponse = {
+        message: '',
+        status: 0,
+        httpStatus: '',
+        timestamp: new Date
+      };
   };
 
   closeDialog() {

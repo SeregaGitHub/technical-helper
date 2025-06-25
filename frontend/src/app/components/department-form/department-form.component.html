@@ -34,15 +34,20 @@
                     }
         </mat-form-field>
 
-        <div class="mb-4 min-h-12"
-            [ngClass]="apiResponse == null ? 'hide' : ''" 
+        <div class="mb-4 min-h-12 max-w-80"
+            [ngClass]="apiResponse.status === 0 ? 'hide' : ''" 
             >
+            @if (apiResponse.status === 201) {
               <p class="text-center successfully"> {{ apiResponse.message }} </p> 
+            } @else {
+              <p class="text-center alert"> {{ apiResponse.message }} </p> 
+            }
         </div>
 
         <div class="mb-4 flex justify-between">
           <button type="reset"
-                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter">
+                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
+                  (click)="clearForm()">
                   Очистить
           </button>
           <button type="submit" 
