@@ -9,6 +9,7 @@ import { ApiResponse } from '../../model/apiResponse';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action';
 import { ApiResponseFactory } from '../../generator/apiResponse-factory';
+import { DepartmentDtoFactory } from '../../generator/departmentDto-factory';
 
 @Component({
   selector: 'app-department-form',
@@ -24,13 +25,10 @@ import { ApiResponseFactory } from '../../generator/apiResponse-factory';
 })
 export class DepartmentFormComponent implements OnInit {
 
-  departmentDto: DepartmentDto = {
-    name: ''
-  }
-
   departmentForm: any;
   buttonName!: string;
   apiResponse: ApiResponse;
+  departmentDto: DepartmentDto;
 
   constructor(private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
@@ -38,7 +36,8 @@ export class DepartmentFormComponent implements OnInit {
       this.departmentForm = new FormGroup({
         name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
       });
-      this.apiResponse = ApiResponseFactory.getEmptyApiResponse();
+      this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
+      this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
     }
 
   ngOnInit(): void {
@@ -69,9 +68,7 @@ export class DepartmentFormComponent implements OnInit {
     this._depService.createDep(this.departmentDto).subscribe({
       next: response => {
         this.apiResponse = response;
-        this.departmentDto = {
-          name: ''
-        }
+        this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
         this.clearForm();
         this.deleteResponseMessage();
       },
@@ -90,9 +87,7 @@ export class DepartmentFormComponent implements OnInit {
     this._depService.updateDep(this.departmentDto, this.data.departmentId).subscribe({
       next: response => {
         this.apiResponse = response;
-        this.departmentDto = {
-          name: ''
-        }
+        this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
         this.deleteResponseMessage();
       },
       error: err => {
@@ -103,7 +98,7 @@ export class DepartmentFormComponent implements OnInit {
 
   deleteResponseMessage() {
     setTimeout(() => {
-      this.apiResponse = ApiResponseFactory.getEmptyApiResponse();
+      this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
     }, 3000);
   };
 

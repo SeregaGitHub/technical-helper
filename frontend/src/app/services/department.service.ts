@@ -20,7 +20,7 @@ export class DepartmentService {
 
     createDep(departmentDto: DepartmentDto): Observable<any> {
 
-        const headers = HttpHeadersFactory.getHeaders();
+        const headers = HttpHeadersFactory.createPermanentHeaders();
 
         return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             .pipe(
@@ -36,7 +36,7 @@ export class DepartmentService {
 
     updateDep(departmentDto: DepartmentDto, id: string): Observable<any> {
 
-        let headers = HttpHeadersFactory.getHeaders();
+        let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
@@ -53,7 +53,7 @@ export class DepartmentService {
 
     getAllDep(): Observable<any> {
         
-        const headers = HttpHeadersFactory.getHeaders();
+        const headers = HttpHeadersFactory.createPermanentHeaders();
     
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
             .pipe(
@@ -70,7 +70,7 @@ export class DepartmentService {
 
     deleteDep(id: string): Observable<any> {
 
-        let headers = HttpHeadersFactory.getHeaders();
+        let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers})
