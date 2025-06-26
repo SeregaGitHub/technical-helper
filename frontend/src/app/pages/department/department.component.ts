@@ -77,7 +77,7 @@ export class DepartmentComponent {
       .getAllDep()
         .subscribe(data => {
 
-          console.log(data);  // MUST BE DELETED !!!
+         // console.log(data);
 
           this.departments = data;
           this.dataSource = new MatTableDataSource(this.departments);
@@ -99,8 +99,10 @@ export class DepartmentComponent {
     });
   }
 
-  deleteDep(id: string): void {
-    const openDialog = this.dialog.open(ConfirmFormComponent);
+  deleteDep(id: string, name: string): void {
+    const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
+      departmentName: name 
+    }});
 
     openDialog.afterClosed().subscribe((confirmResult ) => {
       if (confirmResult) {

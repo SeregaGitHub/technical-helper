@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-confirm-form',
@@ -7,9 +7,15 @@ import { MatDialogRef } from '@angular/material/dialog';
   templateUrl: './confirm-form.component.html',
   styleUrl: './confirm-form.component.css'
 })
-export class ConfirmFormComponent {
+export class ConfirmFormComponent implements OnInit {
 
-  constructor(private _dialogRef: MatDialogRef<ConfirmFormComponent>) {}
+  content!: string;
+
+  constructor(private _dialogRef: MatDialogRef<ConfirmFormComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+
+  ngOnInit(): void {
+    this.content = 'Вы подтверждаете удаление: ' + this.data.departmentName + ' ?';
+  }
 
   onCancelClick(): void {
     this._dialogRef.close(false);
@@ -18,5 +24,4 @@ export class ConfirmFormComponent {
   onConfirmClick(): void {
     this._dialogRef.close(true);
   }
-
 }

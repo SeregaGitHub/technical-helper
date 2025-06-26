@@ -41,10 +41,10 @@ export class HeaderComponent {
     ngOnInit(): void {
       localStorage.removeItem('thJwt');
 
-      console.log('HeaderComponent - init');
-      console.log('this.authService.getUserProfile() -' + this.authService.getUserProfile());
-      console.log('this.authService.isAuthenticated - ' + this.authService.isAuthenticated);
-      console.log('HeaderComponent - init');
+      // console.log('HeaderComponent - init');
+      // console.log('this.authService.getUserProfile() -' + this.authService.getUserProfile());
+      // console.log('this.authService.isAuthenticated - ' + this.authService.isAuthenticated);
+      // console.log('HeaderComponent - init');
 
       // if (this.authService.getUserProfile == null || this.authService.getUserProfile == undefined) {
       //   console.log('HeaderComponent, ngOnInit(), authService.getUserProfile == null')
@@ -77,9 +77,9 @@ export class HeaderComponent {
       // this.userRole = null;
       this._router.navigate(["/auth"]);
 
-      console.log('HeaderComponent - logout()');
-      console.log(this.authService.getUserProfile());
-      console.log(this.authService.isAuthenticated);
-      console.log('HeaderComponent - logout() ');
+      // console.log('HeaderComponent - logout()');
+      // console.log(this.authService.getUserProfile());
+      // console.log(this.authService.isAuthenticated);
+      // console.log('HeaderComponent - logout() ');
     }
 }
