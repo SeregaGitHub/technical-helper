@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { ApiResponse } from '../../model/apiResponse';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action';
+import { ApiResponseFactory } from '../../generator/apiResponse-factory';
 
 @Component({
   selector: 'app-department-form',
@@ -29,13 +30,7 @@ export class DepartmentFormComponent implements OnInit {
 
   departmentForm: any;
   buttonName!: string;
-
-  apiResponse: ApiResponse = {
-    message: '',
-    status: 0,
-    httpStatus: '',
-    timestamp: new Date
-  }
+  apiResponse: ApiResponse;
 
   constructor(private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
@@ -43,6 +38,7 @@ export class DepartmentFormComponent implements OnInit {
       this.departmentForm = new FormGroup({
         name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
       });
+      this.apiResponse = ApiResponseFactory.getEmptyApiResponse();
     }
 
   ngOnInit(): void {
@@ -107,23 +103,12 @@ export class DepartmentFormComponent implements OnInit {
 
   deleteResponseMessage() {
     setTimeout(() => {
-      this.apiResponse = {
-        message: '',
-        status: 0,
-        httpStatus: '',
-        timestamp: new Date
-      }
+      this.apiResponse = ApiResponseFactory.getEmptyApiResponse();
     }, 3000);
   };
 
   clearForm() {
     this.departmentForm.reset();
-    this.apiResponse = {
-        message: '',
-        status: 0,
-        httpStatus: '',
-        timestamp: new Date
-      };
   };
 
   closeDialog() {
