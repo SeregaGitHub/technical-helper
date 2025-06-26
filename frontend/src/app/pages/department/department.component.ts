@@ -13,6 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { Action } from '../../enum/action';
+import { ApiResponse } from '../../model/api-response';
+import { ApiResponseFactory } from '../../generator/api-response-factory';
 
 @Component({
   selector: 'app-department',
@@ -45,6 +47,7 @@ export class DepartmentComponent {
 
   dateFormat = DATE_FORMAT;
   departments: any;
+  getAllDepError: ApiResponse;
 
   public displayedColumns: string[] = ['number', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];
   public dataSource!: MatTableDataSource<Department>;
@@ -54,6 +57,7 @@ export class DepartmentComponent {
 
   constructor (private _depService: DepartmentService, public dialog: MatDialog) {
     // this.dataSource = new MatTableDataSource(this.dep);
+    this.getAllDepError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllDep();
   }
 
@@ -75,16 +79,17 @@ export class DepartmentComponent {
   getAllDep(): void {
     this._depService
       .getAllDep()
-        .subscribe(data => {
-
-         // console.log(data);
-
-          this.departments = data;
-          this.dataSource = new MatTableDataSource(this.departments);
-
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        });
+        .subscribe({
+          next: data => {
+            this.departments = data;
+            this.dataSource = new MatTableDataSource(this.departments);
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
+          },
+          error: err => {
+            this.getAllDepError = err.error;
+          }
+        })
   }
 
   updateDep(id: string, name: string): void {

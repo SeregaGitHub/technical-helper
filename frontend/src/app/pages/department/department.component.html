@@ -7,6 +7,10 @@
       <mat-label class="">Поиск</mat-label>
       <input matInput (keyup)="applyFilter($event)" #input>
     </mat-form-field>
+
+    <div [ngClass]="getAllDepError.status < 400 ? 'hide' : 'pb-4' ">
+        <p class="text-center alert"> {{ getAllDepError.message }} </p> 
+    </div>
     
     <div class="mat-elevation-z8">
       <table mat-table [dataSource]="dataSource" matSort>
