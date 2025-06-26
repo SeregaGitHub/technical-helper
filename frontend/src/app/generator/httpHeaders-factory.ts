@@ -1,6 +1,6 @@
 import { HttpHeaders } from "@angular/common/http";
 
-export class Utilities {
+export class HttpHeadersFactory {
     
     public static getHeaders(): HttpHeaders {
         //const token = localStorage.getItem("thJwt");

@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ADMIN_URL, ALL_URL, BASE_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_URL, GATEWAY_URL } from '../util/constant';
-import { Utilities } from '../util/utilities';
 import { DepartmentDto } from '../model/departmentDto';
+import { HttpHeadersFactory } from '../generator/httpHeaders-factory';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class DepartmentService {
 
     createDep(departmentDto: DepartmentDto): Observable<any> {
 
-        const headers = Utilities.getHeaders();
+        const headers = HttpHeadersFactory.getHeaders();
 
         return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             .pipe(
@@ -36,7 +36,7 @@ export class DepartmentService {
 
     updateDep(departmentDto: DepartmentDto, id: string): Observable<any> {
 
-        let headers = Utilities.getHeaders();
+        let headers = HttpHeadersFactory.getHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
@@ -53,7 +53,7 @@ export class DepartmentService {
 
     getAllDep(): Observable<any> {
         
-        const headers = Utilities.getHeaders();
+        const headers = HttpHeadersFactory.getHeaders();
     
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
             .pipe(
@@ -70,7 +70,7 @@ export class DepartmentService {
 
     deleteDep(id: string): Observable<any> {
 
-        let headers = Utilities.getHeaders();
+        let headers = HttpHeadersFactory.getHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers})
