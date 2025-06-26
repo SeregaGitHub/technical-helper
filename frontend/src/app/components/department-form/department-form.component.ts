@@ -41,9 +41,9 @@ export class DepartmentFormComponent implements OnInit {
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
       this.departmentForm = new FormGroup({
-      name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-    });
-  }
+        name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+      });
+    }
 
   ngOnInit(): void {
 
@@ -61,11 +61,7 @@ export class DepartmentFormComponent implements OnInit {
   }
 
   clickButton() {
-    if (this.buttonName == 'Создать') {
-      this.createDepartment();
-    } else {
-      this.updateDepartment();
-    }
+    this.buttonName == 'Создать' ? this.createDepartment() : this.updateDepartment();
   };
 
   createDepartment() {
