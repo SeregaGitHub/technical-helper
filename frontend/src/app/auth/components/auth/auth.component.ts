@@ -44,57 +44,75 @@ export class AuthComponent implements OnInit {
 
   ngOnInit(): void {
     localStorage.removeItem('thJwt');
-    localStorage.removeItem('thUn');
-    localStorage.removeItem('thUr');
   };
 
   onSubmit() {
-    console.log(this.authForm.value);  // NEED DELETE !!!
-    this._authService.auth(this.authForm.value).subscribe(
-      (responce) => {
-        console.log(responce);         // NEED DELETE !!!
-        if (responce.thJwt != null) {
-          // console.log('localStorage');
-          // console.log(responce.username);
-          // console.log(responce.role);
-          // console.log('localStorage');
 
-          localStorage.setItem("thJwt", responce.thJwt);
-          //localStorage.setItem("thUn", responce.username);
-          //localStorage.setItem("thUr", responce.role);
-
-          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile());
-          this._authService.setUserProfile(responce.username, responce.role);
-          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().getUserName());
-          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isAdmin());
-          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isTechnician());
-          //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isEmployee());
-          //this.service.setUserProfile(responce.username, responce.userRole);
-
-          //this.service.setUsername$(responce.username);
-          //this.service.setUserRole$(responce.role);
-
-          this._router.navigateByUrl("/breakage")
-
-          // console.log('HeaderComponent');
-          // console.log(this.service.username$);
-          // console.log('HeaderComponent');
+    this._authService.auth(this.authForm.value).subscribe({
+      next: response => {
+        if (response.thJwt != null) {
+          localStorage.setItem("thJwt", response.thJwt);
+          this._authService.setUserProfile(response.username, response.role);
+          this._router.navigateByUrl("/breakage");
         }
-      }, (err) => {
+      },
+      error: err => {
         if (err.status <= 0) {
           this.authError = 'Отказано в подключении к серверу Gateway !!!';
         } else {
           this.authError = err.error.message;
         }
       }
-    )
-  }
+    });
+  };
+
+  // onSubmit() {
+  //   console.log(this.authForm.value);  // NEED DELETE !!!
+  //   this._authService.auth(this.authForm.value).subscribe(
+  //     (responce) => {
+  //       console.log(responce);         // NEED DELETE !!!
+  //       if (responce.thJwt != null) {
+  //         // console.log('localStorage');
+  //         // console.log(responce.username);
+  //         // console.log(responce.role);
+  //         // console.log('localStorage');
+
+  //         localStorage.setItem("thJwt", responce.thJwt);
+  //         //localStorage.setItem("thUn", responce.username);
+  //         //localStorage.setItem("thUr", responce.role);
+
+  //         //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile());
+  //         this._authService.setUserProfile(responce.username, responce.role);
+  //         //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().getUserName());
+  //         //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isAdmin());
+  //         //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isTechnician());
+  //         //console.log('this.service.getUserProfile() - ' + this.service.getUserProfile().isEmployee());
+  //         //this.service.setUserProfile(responce.username, responce.userRole);
+
+  //         //this.service.setUsername$(responce.username);
+  //         //this.service.setUserRole$(responce.role);
+
+  //         this._router.navigateByUrl("/breakage")
+
+  //         // console.log('HeaderComponent');
+  //         // console.log(this.service.username$);
+  //         // console.log('HeaderComponent');
+  //       }
+  //     }, (err) => {
+  //       if (err.status <= 0) {
+  //         this.authError = 'Отказано в подключении к серверу Gateway !!!';
+  //       } else {
+  //         this.authError = err.error.message;
+  //       }
+  //     }
+  //   )
+  // }
 
   get username() {
     return this.authForm.get('username')
-  }
+  };
 
   get password() {
     return this.authForm.get('password')
-  }
+  };
 }
