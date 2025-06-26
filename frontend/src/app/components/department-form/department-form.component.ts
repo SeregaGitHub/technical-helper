@@ -95,14 +95,19 @@ export class DepartmentFormComponent implements OnInit {
         name: this.departmentForm.value.name
     };
 
-    this._depService.updateDep(this.departmentDto, this.data.departmentId).subscribe(response => {
-      this.apiResponse = response;
+    this._depService.updateDep(this.departmentDto, this.data.departmentId).subscribe({
+      next: response => {
+        this.apiResponse = response;
         this.departmentDto = {
           name: ''
         }
         this.deleteResponseMessage();
+      },
+      error: err => {
+        this.apiResponse = err.error;
+      }
     });
-  }
+  };
 
   deleteResponseMessage() {
     setTimeout(() => {

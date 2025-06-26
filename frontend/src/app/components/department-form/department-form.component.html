@@ -37,7 +37,7 @@
         <div class="mb-4 min-h-12 max-w-80"
             [ngClass]="apiResponse.status === 0 ? 'hide' : ''" 
             >
-            @if (apiResponse.status === 201) {
+            @if (apiResponse.status === 201 || apiResponse.status === 200) {
               <p class="text-center successfully"> {{ apiResponse.message }} </p> 
             } @else {
               <p class="text-center alert"> {{ apiResponse.message }} </p> 
