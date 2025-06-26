@@ -1,15 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { DepartmentDto } from '../../model/departmentDto';
+import { DepartmentDto } from '../../model/department-dto';
 import { DepartmentService } from '../../services/department.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '../../model/apiResponse';
+import { ApiResponse } from '../../model/api-response';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action';
-import { ApiResponseFactory } from '../../generator/apiResponse-factory';
-import { DepartmentDtoFactory } from '../../generator/departmentDto-factory';
+import { ApiResponseFactory } from '../../generator/api-response-factory';
+import { DepartmentDtoFactory } from '../../generator/department-dto-factory';
 
 @Component({
   selector: 'app-department-form',

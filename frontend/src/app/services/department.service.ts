@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ADMIN_URL, ALL_URL, BASE_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_URL, GATEWAY_URL } from '../util/constant';
-import { DepartmentDto } from '../model/departmentDto';
-import { HttpHeadersFactory } from '../generator/httpHeaders-factory';
+import { DepartmentDto } from '../model/department-dto';
+import { HttpHeadersFactory } from '../generator/headers-factory';
 
 @Injectable({
   providedIn: 'root'

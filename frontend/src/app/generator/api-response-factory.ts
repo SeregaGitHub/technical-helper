@@ -1,4 +1,4 @@
-import { ApiResponse } from "../model/apiResponse";
+import { ApiResponse } from "../model/api-response";
 
 export class ApiResponseFactory {
 

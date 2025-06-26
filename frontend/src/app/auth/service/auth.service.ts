@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AUTH_URL, BASE_URL, GATEWAY_URL } from '../../util/constant';
-import { UserProfile } from '../../model/userProfile';
-import { R } from '@angular/cdk/keycodes';
+import { UserProfile } from '../../model/user-profile';
 
 @Injectable({
   providedIn: 'root'

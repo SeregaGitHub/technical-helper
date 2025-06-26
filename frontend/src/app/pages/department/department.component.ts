@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { Department } from '../../model/department';
 import { DepartmentService } from '../../services/department.service';
 import { DATE_FORMAT } from '../../util/constant';
-import { CustomPaginatorIntl } from '../../util/customPaginatorIntl';
+import { CustomPaginatorIntl } from '../../util/custom-paginator-intl';
 import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
