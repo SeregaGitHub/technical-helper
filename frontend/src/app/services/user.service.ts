@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { CreateUserDto } from '../model/create-user-dto';
+import { CreateUserDto } from '../model/user/create-user-dto';
 import { HttpHeadersFactory } from '../generator/headers-factory';
 import { ADMIN_URL, ALL_URL, BASE_URL, DELETE_URL, GATEWAY_URL, USER_ID, USER_URL } from '../util/constant';
-import { UpdateUserDto } from '../model/update-user-dto';
-import { ChangeUserPasswordDto } from '../model/change-user-password-dto';
+import { UpdateUserDto } from '../model/user/update-user-dto';
+import { ChangeUserPasswordDto } from '../model/user/change-user-password-dto';
 
 @Injectable({
   providedIn: 'root'
