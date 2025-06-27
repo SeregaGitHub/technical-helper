@@ -17,8 +17,8 @@
 
         <!-- number Column -->
         <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-14"> {{ number }} </th>
-          <td mat-cell *matCellDef="let element; let i = index" class="max-w-14"> {{ 
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-14 min-w-14"> {{ number }} </th>
+          <td mat-cell *matCellDef="let element; let i = index" class="max-w-14 min-w-14 one-long-line"> {{ 
           this.paginator.pageIndex == 
             0 ? i + 1 : 1 + i + this.paginator.pageIndex * this.paginator.pageSize }} </td>
         </ng-container>
@@ -31,38 +31,38 @@
         
         <!-- name Column -->
         <ng-container matColumnDef="name">  
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-64"> {{ name }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-64 one-long-line"> {{ element.name }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-64 min-w-64"> {{ name }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-64 min-w-64 one-long-line"> {{ element.name }} </td>
         </ng-container>
 
         <!-- createdBy Column -->
         <ng-container matColumnDef="createdBy">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36"> {{ createdBy }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-36 one-long-line"> {{ element.createdBy }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36 min-w-36"> {{ createdBy }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-36 min-w-36 one-long-line"> {{ element.createdBy }} </td>
         </ng-container>
     
         <!-- createdDate Column -->
         <ng-container matColumnDef="createdDate">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24"> {{ createdDate }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-24"> {{ element.createdDate | date: dateFormat }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ createdDate }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24"> {{ element.createdDate | date: dateFormat }} </td>
         </ng-container>
 
         <!-- lastUpdatedBy Column --> 
         <ng-container matColumnDef="lastUpdatedBy">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36"> {{ lastUpdatedBy }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-36 one-long-line"> {{ element.lastUpdatedBy }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36 min-w-36"> {{ lastUpdatedBy }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-36 min-w-36 one-long-line"> {{ element.lastUpdatedBy }} </td>
         </ng-container>
     
         <!-- lastUpdatedDate Column -->
         <ng-container matColumnDef="lastUpdatedDate">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24"> {{ lastUpdatedDate }} </th>
-          <td mat-cell *matCellDef="let element" class="max-w-24"> {{ element.lastUpdatedDate | date: dateFormat }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ lastUpdatedDate }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24"> {{ element.lastUpdatedDate | date: dateFormat }} </td>
         </ng-container>
 
         <!-- actions Column -->
         <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="max-w-52"> {{ actions }} </th>
-        <td mat-cell *matCellDef="let row" class="max-w-52 space-x-8">
+        <th mat-header-cell *matHeaderCellDef class="max-w-52 min-w-52"> {{ actions }} </th>
+        <td mat-cell *matCellDef="let row" class="max-w-52 min-w-52 space-x-8">
           <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" (click)="updateDep(row.id, row.name)">Изменить</button>
           <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" (click)="deleteDep(row.id, row.name)">Удалить</button>
         </td>
@@ -81,7 +81,7 @@
       </table>
     
       <mat-paginator  
-                      [pageSizeOptions]="[10, 15, 20]"
+                      [pageSizeOptions]="[10, 20, 50]"
                       showFirstLastButtons
                       aria-label="Select page of periodic elements" 
                       class="text-montserrat">
