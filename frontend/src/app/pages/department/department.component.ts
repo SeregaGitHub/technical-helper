@@ -109,13 +109,19 @@ export class DepartmentComponent {
       departmentName: name 
     }});
 
-    openDialog.afterClosed().subscribe((confirmResult ) => {
-      if (confirmResult) {
-        this._depService.deleteDep(id)
-          .subscribe(() => {
-            this.getAllDep();
-          });
-      };
+    openDialog.afterClosed().subscribe(
+      (confirmResult ) => {
+        if (confirmResult) {
+          this._depService.deleteDep(id)
+            .subscribe({
+              next: () => {
+                this.getAllDep();
+              },
+              error: () => {
+                this.getAllDep();
+              }
+            });
+        };
     });
   };
 
