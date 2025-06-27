@@ -31,8 +31,8 @@ export class DepartmentService {
                     departments:
                     [newDep, ...currentState.departments] });
                 })
-            )
-    }
+            );
+    };
 
     updateDep(departmentDto: DepartmentDto, id: string): Observable<any> {
 
@@ -48,8 +48,8 @@ export class DepartmentService {
                     departments:
                     [dep, ...currentState.departments] });
             })
-        )
-    }
+        );
+    };
 
     getAllDep(): Observable<any> {
         
@@ -63,23 +63,14 @@ export class DepartmentService {
                         this.departmentSubject.next({...currentState, dep})
                     }
                 )
-                //tap(_ => this.log('fetched heroes')),
-                //,catchError(this.handleError<Department[]>('getAllDepartments', []))
             );
-    }
+    };
 
     deleteDep(id: string): Observable<any> {
 
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
-        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers})
-            .pipe(     
-                tap(
-                    (str) => {
-                        console.log(str);
-                    }
-                )
-            );
-    }
+        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers});
+    };
 }

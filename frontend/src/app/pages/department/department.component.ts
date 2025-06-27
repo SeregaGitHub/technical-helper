@@ -76,6 +76,28 @@ export class DepartmentComponent {
     }
   }
 
+  createDep() {
+    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
+      action: Action.Create
+    }});
+
+    openDialog.afterClosed().subscribe(() => {
+      this.getAllDep();
+    });
+  };
+
+  updateDep(id: string, name: string): void {
+    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
+      action: Action.Update,
+      departmentId: id,
+      departmentName: name
+    }});
+
+    openDialog.afterClosed().subscribe(() => {
+      this.getAllDep();
+    });
+  };
+
   getAllDep(): void {
     this._depService
       .getAllDep()
@@ -90,19 +112,7 @@ export class DepartmentComponent {
             this.getAllDepError = err.error;
           }
         })
-  }
-
-  updateDep(id: string, name: string): void {
-    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
-      action: Action.Update,
-      departmentId: id,
-      departmentName: name
-    }});
-
-    openDialog.afterClosed().subscribe(() => {
-      this.getAllDep();
-    });
-  }
+  };
 
   deleteDep(id: string, name: string): void {
     const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
@@ -124,24 +134,4 @@ export class DepartmentComponent {
         };
     });
   };
-
-  // getAllDep(): void {
-  //   this._depService
-  //     .getAllDep()
-  //       .subscribe(data => {
-  //         this.dataSource = new MatTableDataSource(data)
-  //       });
-  //     console.log("getAllDep() - " + this.dep);
-  // }
-
-  createDep() {
-    const openDialog = this.dialog.open(DepartmentFormComponent, {data: {
-      action: Action.Create
-    }});
-
-    openDialog.afterClosed().subscribe(() => {
-      this.getAllDep();
-    });
-  };
-
 }
