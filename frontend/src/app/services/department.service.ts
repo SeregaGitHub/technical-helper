@@ -40,15 +40,16 @@ export class DepartmentService {
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
-        .pipe(
-            tap((dep) => {
-                const currentState = this.departmentSubject.value;
+            .pipe(
+                tap((dep) => {
+                    const currentState = this.departmentSubject.value;
 
                     this.departmentSubject.next({...currentState, 
                     departments:
-                    [dep, ...currentState.departments] });
-            })
-        );
+                    [dep, ...currentState.departments] 
+                  });
+                })
+            );
     };
 
     getAllDep(): Observable<any> {
