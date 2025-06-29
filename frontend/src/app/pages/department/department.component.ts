@@ -37,7 +37,6 @@ export class DepartmentComponent {
   //export class DepartmentComponent implements AfterViewInit {
 
   number = '№';
-  id = "Id"
   name = 'Отдел';
   createdBy = 'Создан';
   createdDate = 'Создано';
@@ -49,7 +48,15 @@ export class DepartmentComponent {
   departments: any;
   getAllDepError: ApiResponse;
 
-  public displayedColumns: string[] = ['number', 'name', 'createdBy', 'createdDate', 'lastUpdatedBy', 'lastUpdatedDate', 'actions'];
+  public displayedColumns: string[] = [
+                                    'number', 
+                                    'name', 
+                                    'createdBy', 
+                                    'createdDate', 
+                                    'lastUpdatedBy', 
+                                    'lastUpdatedDate', 
+                                    'actions'
+                                  ];
   public dataSource!: MatTableDataSource<Department>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
