@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AUTH_URL, BASE_URL, GATEWAY_URL } from '../../util/constant';
-import { UserProfile } from '../../model/user-profile';
+import { UserProfile } from '../../model/profile/user-profile';
 
 @Injectable({
   providedIn: 'root'

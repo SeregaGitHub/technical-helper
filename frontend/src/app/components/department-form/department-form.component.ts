@@ -1,11 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { DepartmentDto } from '../../model/department-dto';
+import { DepartmentDto } from '../../model/department/department-dto';
 import { DepartmentService } from '../../services/department.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '../../model/api-response';
+import { ApiResponse } from '../../model/response/api-response';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action';
 import { ApiResponseFactory } from '../../generator/api-response-factory';

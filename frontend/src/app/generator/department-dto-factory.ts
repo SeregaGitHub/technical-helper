@@ -1,4 +1,4 @@
-import { DepartmentDto } from "../model/department-dto";
+import { DepartmentDto } from "../model/department/department-dto";
 
 export class DepartmentDtoFactory {
 

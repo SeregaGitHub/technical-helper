@@ -5,7 +5,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { Department } from '../../model/department';
+import { Department } from '../../model/department/department';
 import { DepartmentService } from '../../services/department.service';
 import { DATE_FORMAT } from '../../util/constant';
 import { CustomPaginatorIntl } from '../../util/custom-paginator-intl';
@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { Action } from '../../enum/action';
-import { ApiResponse } from '../../model/api-response';
+import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 
 @Component({
