@@ -1,21 +1,32 @@
 import { Component, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { CustomPaginatorIntl } from '../../util/custom-paginator-intl';
 import { DATE_FORMAT } from '../../util/constant';
 import { ApiResponse } from '../../model/response/api-response';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { User } from '../../model/user/user';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../services/user.service';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { Action } from '../../enum/action';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
+import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-user',
-  imports: [],
+  imports: [
+    CommonModule,
+    MatTableModule, 
+    MatPaginatorModule,
+    MatSort, 
+    MatSortModule,
+    MatInputModule,
+    MatFormFieldModule
+  ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css',
   providers: [
@@ -68,7 +79,7 @@ export class UserComponent {
     }
   }
 
-  createDep() {
+  createUser() {
       const openDialog = this.dialog.open(UserFormComponent, {data: {
         action: Action.Create
       }});
@@ -78,11 +89,11 @@ export class UserComponent {
       });
   };
 
-  updateDep(id: string, name: string): void {
+  updateUser(id: string, name: string): void {
       const openDialog = this.dialog.open(UserFormComponent, {data: {
         action: Action.Update,
-        departmentId: id,
-        departmentName: name
+        userId: id,
+        username: name
       }});
   
       openDialog.afterClosed().subscribe(() => {
@@ -106,7 +117,7 @@ export class UserComponent {
         })
   };
 
-  deleteDep(id: string, name: string): void {
+  deleteUser(id: string, name: string): void {
       const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
         username: name 
       }});

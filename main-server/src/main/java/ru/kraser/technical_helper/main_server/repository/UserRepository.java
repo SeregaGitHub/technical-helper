@@ -59,11 +59,14 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query(
             value = """
                     SELECT new ru.kraser.technical_helper.common_module.dto.user.UserDto
-                    (u.id, u.username, d.name, u.role, u.createdBy, u.createdDate, u.lastUpdatedBy, u.lastUpdatedDate)
+                    (u.id, u.username, d.name AS department, u.role,
+                    uc.username AS createdBy, u.createdDate, uu.username AS lastUpdatedBy, u.lastUpdatedDate)
                     FROM User AS u
                     JOIN FETCH Department AS d ON d.id = u.department.id
+                    JOIN FETCH User AS uc ON uc.id = u.createdBy
+                    JOIN FETCH User AS uu ON uu.id = u.lastUpdatedBy
                     WHERE u.enabled = true
-                    ORDER BY name
+                    ORDER BY u.username
                     """
     )
     List<UserDto> getAllUsers();
