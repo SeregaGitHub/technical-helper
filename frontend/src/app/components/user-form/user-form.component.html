@@ -34,9 +34,10 @@
                     }
         </mat-form-field>
 
-        <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Пароль</mat-label>
-            <input matInput 
+        @if (data.action == 'CREATE' || data.action == 'CHANGE_PASSWORD') {
+            <mat-form-field class="w-full mb-4">
+              <mat-label class="text-gray-200">Пароль</mat-label>
+                <input matInput 
                    formControlName="password"
                   >
                     @if (password.touched && password.invalid) {
@@ -54,11 +55,11 @@
                         }
                       </div>
                     }
-        </mat-form-field>
+            </mat-form-field>
 
-        <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Подтверждение пароля</mat-label>
-            <input matInput 
+            <mat-form-field class="w-full mb-4">
+              <mat-label class="text-gray-200">Подтверждение пароля</mat-label>
+                <input matInput 
                    formControlName="confirmPassword"
                   >
                     @if (confirmPassword.touched && userForm.errors?.['passwordMatchError']) {
@@ -66,7 +67,8 @@
                           <p>Пароли не совпадают !!!</p>                        
                       </div>
                     }
-        </mat-form-field>
+            </mat-form-field>
+        }
 
         <mat-form-field class="w-full mb-4">
             <mat-label class="text-gray-200">Отдел</mat-label>

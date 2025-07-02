@@ -34,25 +34,24 @@ export class UserFormComponent implements OnInit {
   userForm: any;
   buttonName!: string;
   apiResponse: ApiResponse;
-  //userDto: UpdateUserDto;
   deps!: Department[];
 
   constructor(private _userService: UserService,
               private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<UserFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
-      this.userForm = new FormGroup({
-        username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-        password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-        confirmPassword: new FormControl(null),
-        departmentId: new FormControl("", [Validators.required]),
-        role: new FormControl("", [Validators.required])
-      },
-      {
-        validators: matchPassword
-      });
+    //   this.userForm = new FormGroup({
+    //     username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+    //     password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+    //     confirmPassword: new FormControl(null),
+    //     departmentId: new FormControl("", [Validators.required]),
+    //     role: new FormControl("", [Validators.required])
+    //   },
+    //   {
+    //     validators: matchPassword
+    //   }
+    // );
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
-      //this.userDto = UserDtoFactory.createEmptyUserDto();
       this._depService.getAllDep().subscribe({
         next: data => {
           this.deps = data;
@@ -66,24 +65,33 @@ export class UserFormComponent implements OnInit {
   ngOnInit(): void {
     
     if (this.data.action === Action.Update) {
-      //let userDto = UserDtoFactory.createUpdateUserDto(this.data.username, this.data.department, this.data.role);
-      // this.userDto = UserDtoFactory.createUpdateUserDto(this.data.username, this.data.department, this.data.role);
-      // this.departmentDto = {
-      //   name: this.data.departmentName
-      // }
+
+      this.userForm = new FormGroup({
+        username: new FormControl(this.data.username, [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+        departmentId: new FormControl("ac11e001-96bf-1ea0-8196-bf2eae7a0000", [Validators.required]),
+        role: new FormControl(this.data.role, [Validators.required])
+      });
     
       this.buttonName = 'Изменить';
       // ???????????????????????????? in dep to ???????????????????????????????????
-      // this.userForm.get('username').setValue(userDto.username);
-      // this.userForm.get('department').setValue(userDto.department);
-      // this.userForm.get('role').setValue(userDto.role);
-      this.userForm.get('username').setValue(this.data.username);
-      this.userForm.get('departmentId').setValue(this.data.departmentId);
-      this.userForm.get('role').setValue(this.data.role);
+      //this.userForm.get('username').setValue(this.data.username);
+      //this.userForm.get('role').setValue(this.data.role);
       // ???????????????????????????? in dep to ???????????????????????????????????
           
       } else {
         this.buttonName = 'Создать';
+
+        this.userForm = new FormGroup({
+          username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+          password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+          confirmPassword: new FormControl(null),
+          departmentId: new FormControl("", [Validators.required]),
+          role: new FormControl("", [Validators.required])
+          },
+          {
+            validators: matchPassword
+          }
+        );
       }
   };
 
@@ -103,7 +111,6 @@ export class UserFormComponent implements OnInit {
     this._userService.createUser(newUserDto).subscribe({
       next: response => {
         this.apiResponse = response;
-        //this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
         this.clearForm();
         this.deleteResponseMessage();
       },
@@ -121,14 +128,9 @@ export class UserFormComponent implements OnInit {
       this.userForm.value.role
     );
   
-      // this.departmentDto = {
-      //     name: this.departmentForm.value.name
-      // };
-  
     this._userService.updateUser(userDto, this.data.userId).subscribe({
       next: response => {
         this.apiResponse = response;
-        //this.userDto = UserDtoFactory.createEmptyUserDto();
         this.deleteResponseMessage();
       },
       error: err => {
