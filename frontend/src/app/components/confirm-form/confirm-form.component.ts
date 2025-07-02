@@ -14,7 +14,7 @@ export class ConfirmFormComponent implements OnInit {
   constructor(private _dialogRef: MatDialogRef<ConfirmFormComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   ngOnInit(): void {
-    this.content = 'Вы подтверждаете удаление: ' + this.data.departmentName + ' ?';
+    this.content = 'Вы подтверждаете удаление: ' + this.data.name + ' ?';
   }
 
   onCancelClick(): void {

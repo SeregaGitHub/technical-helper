@@ -120,9 +120,9 @@ export class UserComponent {
         })
   };
 
-  deleteUser(id: string, name: string): void {
+  deleteUser(id: string, username: string): void {
       const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
-        username: name 
+        name: username 
       }});
   
       openDialog.afterClosed().subscribe(

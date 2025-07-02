@@ -123,7 +123,7 @@ export class DepartmentComponent {
 
   deleteDep(id: string, name: string): void {
     const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
-      departmentName: name 
+      name: name 
     }});
 
     openDialog.afterClosed().subscribe(

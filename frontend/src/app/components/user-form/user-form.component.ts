@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { ApiResponse } from '../../model/response/api-response';
-import { UpdateUserDto } from '../../model/user/update-user-dto';
 import { Action } from '../../enum/action';
 import { UserService } from '../../services/user.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -57,7 +56,10 @@ export class UserFormComponent implements OnInit {
       this._depService.getAllDep().subscribe({
         next: data => {
           this.deps = data;
-        }
+        },
+        error: err => {
+        this.apiResponse = err.error;
+      }
       });
     }
 
