@@ -1,9 +1,11 @@
 package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
@@ -32,19 +34,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String createUser(CreateUserDto createUserDto) {
+    public ApiResponse createUser(CreateUserDto createUserDto) {
         Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
         try {
             userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
         } catch (Exception e) {
             ThrowException.userHandler(e.getMessage(), createUserDto.username());
         }
-        return "Сотрудник: " + createUserDto.username() + ", - был успешно создан.";
+        return ApiResponse.builder()
+                .message("Сотрудник: " + createUserDto.username() + ", - был успешно создан.")
+                .status(201)
+                .httpStatus(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 
     @Override
     @Transactional
-    public String updateUser(String userId, UpdateUserDto updateUserDto) {
+    public ApiResponse updateUser(String userId, UpdateUserDto updateUserDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
@@ -59,12 +66,17 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             ThrowException.userHandler(e.getMessage(), updateUserDto.username());
         }
-        return "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
+        return ApiResponse.builder()
+                .message("Сотрудник: " + updateUserDto.username() + " - был успешно изменен.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 
     @Override
     @Transactional
-    public String changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
+    public ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         response = userRepository.changeUserPassword(
@@ -77,7 +89,12 @@ public class UserServiceImpl implements UserService {
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);
         }
-        return "Пароль - был успешно изменён.";
+        return ApiResponse.builder()
+                .message("Пароль - был успешно изменён.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 
     @Override
@@ -97,7 +114,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String deleteUser(String userId) {
+    public ApiResponse deleteUser(String userId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         response = userRepository.deleteUser(userId, SecurityUtil.getCurrentUserId(), now);
@@ -105,6 +122,11 @@ public class UserServiceImpl implements UserService {
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);
         }
-        return "Пользователь - был успешно удалён.";
+        return ApiResponse.builder()
+                .message("Пользователь - был успешно удалён.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 }

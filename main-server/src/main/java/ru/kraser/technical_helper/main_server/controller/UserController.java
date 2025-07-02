@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.main_server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
@@ -21,20 +22,20 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createUser(@RequestBody CreateUserDto createUserDto) {
+    public ApiResponse createUser(@RequestBody CreateUserDto createUserDto) {
         return userService.createUser(createUserDto);
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateUser(@RequestHeader (USER_ID_HEADER) String userId,
+    public ApiResponse updateUser(@RequestHeader (USER_ID_HEADER) String userId,
                              @RequestBody UpdateUserDto updateUserDto) {
         return userService.updateUser(userId, updateUserDto);
     }
 
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
+    public ApiResponse changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
                                      @RequestBody ChangeUserPasswordDto passwordDto) {
         return userService.changeUserPassword(userId, passwordDto);
     }
@@ -53,7 +54,7 @@ public class UserController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
+    public ApiResponse deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
         return userService.deleteUser(userId);
     }
 }

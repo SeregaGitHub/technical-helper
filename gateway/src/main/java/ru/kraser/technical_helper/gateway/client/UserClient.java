@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.gateway.client;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
@@ -18,15 +19,15 @@ public class UserClient extends BaseClient {
         super(webClient);
     }
 
-    public String createUser(CreateUserDto createUserDto, String jwt) {
+    public ApiResponse createUser(CreateUserDto createUserDto, String jwt) {
         return super.post(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL,
                 createUserDto,
                 jwt,
-                ParameterizedTypeReference.forType(String.class));
+                ParameterizedTypeReference.forType(ApiResponse.class));
     }
 
-    public String updateUser(String entityHeaderName, String userId,
+    public ApiResponse updateUser(String entityHeaderName, String userId,
                              UpdateUserDto updateUserDto, String jwt) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL,
@@ -34,11 +35,11 @@ public class UserClient extends BaseClient {
                 jwt,
                 entityHeaderName,
                 userId,
-                ParameterizedTypeReference.forType(String.class)
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 
-    public String changeUserPassword(String entityHeaderName, String userId,
+    public ApiResponse changeUserPassword(String entityHeaderName, String userId,
                                      ChangeUserPasswordDto changeUserPasswordDto, String jwt) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL,
@@ -46,7 +47,7 @@ public class UserClient extends BaseClient {
                 jwt,
                 entityHeaderName,
                 userId,
-                ParameterizedTypeReference.forType(String.class)
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 
@@ -68,13 +69,13 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public String deleteUser(String userHeaderName, String userId, String jwt) {
+    public ApiResponse deleteUser(String userHeaderName, String userId, String jwt) {
         return super.delete(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + DELETE_URL,
                 jwt,
                 userHeaderName,
                 userId,
-                ParameterizedTypeReference.forType(String.class)
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 }
