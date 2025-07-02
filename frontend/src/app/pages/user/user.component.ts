@@ -15,6 +15,7 @@ import { UserFormComponent } from '../../components/user-form/user-form.componen
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Role } from '../../enum/role';
 
 @Component({
   selector: 'app-user',
@@ -89,11 +90,13 @@ export class UserComponent {
       });
   };
 
-  updateUser(id: string, name: string): void {
+  updateUser(userId: string, username: string, departmentId: string, role: Role): void {
       const openDialog = this.dialog.open(UserFormComponent, {data: {
         action: Action.Update,
-        userId: id,
-        username: name
+        userId: userId,
+        username: username,
+        departmentId: departmentId,
+        role: role
       }});
   
       openDialog.afterClosed().subscribe(() => {

@@ -1,8 +1,11 @@
 import { Role } from "../../enum/role";
+import { UpdateUserDto } from "./update-user-dto";
 
-export interface CreateUserDto {
-    username: string;
+export class CreateUserDto extends UpdateUserDto {
     password: string;
-    departmentId: string;
-    role: Role;
+
+    constructor(username: string, password: string, departmentId: string, role: Role) {
+        super(username, departmentId, role);
+        this.password = password;
+    }
 }

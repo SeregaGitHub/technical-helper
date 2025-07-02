@@ -1,1 +1,124 @@
-<p>user-form works!</p>
+
+<div class="flex justify-center blue-to-black-gradient min-w-96">
+
+    <form [formGroup]="userForm" (ngSubmit)="clickButton()" class="min-w-80">
+
+        <div class="mb-8 flex justify-normal pt-4">
+          <button 
+            type="button"
+            class="black-to-blue-gradient text-montserrat button-size btn mouse-enter" 
+            (click)="closeDialog()"
+            >Закрыть
+          </button>
+        </div>
+
+        <mat-form-field class="w-full mb-4">
+            <mat-label class="text-gray-200">Логин</mat-label>
+            <input matInput 
+                   formControlName="username"
+                  >
+                    @if (username.touched && username.invalid) {
+                      <div class="alert">
+                        @if (username.errors?.required) {
+                          <p>Вам необходимо ввести логин пользователя !!!</p>
+                        }
+                        @if (username.errors?.minlength) {
+                          <p class="text-center">Длина логина должна быть</p>
+                          <p class="text-center">не менее 4 символов !!!</p>
+                        }
+                        @if (username.errors?.maxlength) {
+                          <p class="text-center">Длина логина должна быть</p>
+                          <p class="text-center">не более 64 символов !!!</p>
+                        }
+                      </div>
+                    }
+        </mat-form-field>
+
+        <mat-form-field class="w-full mb-4">
+            <mat-label class="text-gray-200">Пароль</mat-label>
+            <input matInput 
+                   formControlName="password"
+                  >
+                    @if (password.touched && password.invalid) {
+                      <div class="alert">
+                        @if (password.errors?.required) {
+                          <p>Вам необходимо ввести пароль пользователя !!!</p>
+                        }
+                        @if (password.errors?.minlength) {
+                          <p class="text-center">Длина пароля должна быть</p>
+                          <p class="text-center">не менее 4 символов !!!</p>
+                        }
+                        @if (password.errors?.maxlength) {
+                          <p class="text-center">Длина пароля должна быть</p>
+                          <p class="text-center">не более 64 символов !!!</p>
+                        }
+                      </div>
+                    }
+        </mat-form-field>
+
+        <mat-form-field class="w-full mb-4">
+            <mat-label class="text-gray-200">Подтверждение пароля</mat-label>
+            <input matInput 
+                   formControlName="confirmPassword"
+                  >
+                    @if (confirmPassword.touched && userForm.errors?.['passwordMatchError']) {
+                      <div class="alert">
+                          <p>Пароли не совпадают !!!</p>                        
+                      </div>
+                    }
+        </mat-form-field>
+
+        <mat-form-field class="w-full mb-4">
+            <mat-label class="text-gray-200">Отдел</mat-label>
+            <mat-select 
+              formControlName="departmentId"
+              name="departmentId"
+            >
+            <!-- [(ngModel)]="newUser.departmentId" -->
+              @for (dep of deps; track dep) {
+                <mat-option [value]="dep.id">{{ dep.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+        <div class="mb-4">
+            <mat-radio-group 
+            name="role" 
+            formControlName="role"
+            aria-label="Select an option"
+            >
+            <!-- [(ngModel)]="newUser.role" -->
+                <mat-radio-button value="ADMIN">Admin</mat-radio-button>
+                <mat-radio-button value="TECHNICIAN">Technician</mat-radio-button>
+                <mat-radio-button value="EMPLOYEE">Employee</mat-radio-button>
+            </mat-radio-group>
+        </div>
+
+        <div class="mb-4 min-h-12 max-w-80"
+            [ngClass]="apiResponse.status === 0 ? 'hide' : ''" 
+            >
+            @if (apiResponse.status === 201 || apiResponse.status === 200) {
+              <p class="text-center successfully"> {{ apiResponse.message }} </p> 
+            } @else {
+              <p class="text-center alert"> {{ apiResponse.message }} </p> 
+            }
+        </div>
+
+        <div class="mb-4 flex justify-between">
+          <button type="button"
+                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
+                  (click)="clearForm()">
+                  Очистить
+          </button>
+          <button type="submit" 
+                  class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
+                  [ngClass]="userForm.invalid ? 'btn-not-active' : ''" 
+                  [disabled]="userForm.invalid">
+                  {{ buttonName }}
+          </button>
+        </div>
+
+    </form>
+
+</div>
+

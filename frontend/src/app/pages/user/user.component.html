@@ -69,8 +69,12 @@
         <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="max-w-52 min-w-52"> {{ actions }} </th>
         <td mat-cell *matCellDef="let row" class="max-w-52 min-w-52 space-x-8">
-          <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" (click)="updateUser(row.id, row.name)">Изменить</button>
-          <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" (click)="deleteUser(row.id, row.name)">Удалить</button>
+          <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" 
+            (click)="updateUser(row.id, row.username, row.department, row.role)"
+            >Изменить</button>
+          <button class="btn button-size black-to-blue-gradient mouse-enter !inline-block" 
+            (click)="deleteUser(row.id, row.username)"
+            >Удалить</button>
         </td>
         <!-- <td mat-cell *matCellDef="let row">
           <button class="btn-del-upd black-to-blue-gradient mouse-enter" (click)="deleteDep(row.id)">Delete</button>
