@@ -25,7 +25,7 @@ public abstract class BaseClient {
         Mono<T> entityMono = webClient
                 .post()
                 .uri(url)
-                .header(AUTHORIZATION, jwt)
+                .header(AUTH_HEADER, jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(obj)
                 .retrieve()
@@ -47,7 +47,7 @@ public abstract class BaseClient {
         Mono<T> patchResponse = webClient
                 .patch()
                 .uri(url)
-                .header(AUTHORIZATION, jwt)
+                .header(AUTH_HEADER, jwt)
                 .header(entityHeaderName, entityId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(obj)
@@ -70,7 +70,7 @@ public abstract class BaseClient {
         Mono<List<T>> getResponse = webClient
                 .get()
                 .uri(url)
-                .header(AUTHORIZATION, jwt)
+                .header(AUTH_HEADER, jwt)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
@@ -86,7 +86,7 @@ public abstract class BaseClient {
         Mono<T> getResponse = webClient
                 .get()
                 .uri(url)
-                .header(AUTHORIZATION, jwt)
+                .header(AUTH_HEADER, jwt)
                 .header(entityHeaderName, entityId)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -106,7 +106,7 @@ public abstract class BaseClient {
         Mono<T> deleteResponse = webClient
                 .patch()
                 .uri(url)
-                .header(AUTHORIZATION, jwt)
+                .header(AUTH_HEADER, jwt)
                 .header(entityHeaderName, entityId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

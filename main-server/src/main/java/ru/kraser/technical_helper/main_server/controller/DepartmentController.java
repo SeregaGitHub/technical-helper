@@ -39,8 +39,8 @@ public class DepartmentController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
-        return departmentService.getDepartment(departmentId);
+    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_NAME_HEADER) String departmentName) {
+        return departmentService.getDepartment(departmentName);
     }
 
     @PatchMapping(path = DELETE_URL)

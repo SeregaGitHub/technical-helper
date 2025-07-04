@@ -26,7 +26,7 @@ public class UserGatewayController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createUser(@Validated() @RequestBody CreateUserDto createUserDto,
-                                  @RequestHeader(AUTHORIZATION) String jwt) {
+                                  @RequestHeader(AUTH_HEADER) String jwt) {
         ApiResponse response = userClient.createUser(createUserDto, jwt);
 
         return response;
@@ -35,7 +35,7 @@ public class UserGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@Validated() @RequestBody UpdateUserDto updateUserDto,
-                             @RequestHeader(AUTHORIZATION) String jwt,
+                             @RequestHeader(AUTH_HEADER) String jwt,
                              @RequestHeader(USER_ID_HEADER) String userId) {
         ApiResponse response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto, jwt);
 
@@ -45,7 +45,7 @@ public class UserGatewayController {
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@Validated() @RequestBody ChangeUserPasswordDto changeUserPasswordDto,
-                                     @RequestHeader(AUTHORIZATION) String jwt,
+                                     @RequestHeader(AUTH_HEADER) String jwt,
                                      @RequestHeader(USER_ID_HEADER) String userId) {
         ApiResponse response = userClient.changeUserPassword(USER_ID_HEADER, userId, changeUserPasswordDto, jwt);
 
@@ -54,7 +54,7 @@ public class UserGatewayController {
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getAllUsers(@RequestHeader(AUTHORIZATION) String jwt) {
+    public List<UserDto> getAllUsers(@RequestHeader(AUTH_HEADER) String jwt) {
         List<UserDto> userDtoList = userClient.getAllUsers(jwt);
 
         return userDtoList;
@@ -62,7 +62,7 @@ public class UserGatewayController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public UserDto getUser(@RequestHeader(AUTHORIZATION) String jwt,
+    public UserDto getUser(@RequestHeader(AUTH_HEADER) String jwt,
                            @RequestHeader(USER_ID_HEADER) String userId) {
         UserDto userDto = userClient.getUser(userId, jwt, USER_ID_HEADER);
 
@@ -71,7 +71,7 @@ public class UserGatewayController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteUser(@RequestHeader(AUTHORIZATION) String jwt,
+    public ApiResponse deleteUser(@RequestHeader(AUTH_HEADER) String jwt,
                              @RequestHeader(USER_ID_HEADER) String userId) {
         ApiResponse response = userClient.deleteUser(USER_ID_HEADER, userId, jwt);
 

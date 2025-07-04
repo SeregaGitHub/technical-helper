@@ -10,6 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { DepartmentDtoFactory } from '../../generator/department-dto-factory';
+import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 
 @Component({
   selector: 'app-department-form',
@@ -47,16 +48,16 @@ export class DepartmentFormComponent implements OnInit {
         name: this.data.departmentName
       }
 
-      this.buttonName = 'Изменить';
+      this.buttonName = BUTTON_UPDATE;
       this.departmentForm.get('name').setValue(this.departmentDto.name);
       
       } else {
-        this.buttonName = 'Создать';
+        this.buttonName = BUTTON_CREATE;
       }
   }
 
   clickButton() {
-    this.buttonName == 'Создать' ? this.createDepartment() : this.updateDepartment();
+    this.buttonName == BUTTON_CREATE ? this.createDepartment() : this.updateDepartment();
   };
 
   createDepartment() {

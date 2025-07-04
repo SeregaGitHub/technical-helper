@@ -69,8 +69,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public DepartmentDto getDepartment(String departmentId) {
-        Department department = departmentRepository.findByIdAndEnabledTrue(departmentId).orElseThrow(
+    public DepartmentDto getDepartment(String departmentName) {
+        Department department = departmentRepository.findByNameAndEnabledTrue(departmentName).orElseThrow(
                 () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
         );
         return DepartmentMapper.toDepartmentDto(department);

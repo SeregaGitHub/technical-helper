@@ -14,6 +14,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { Department } from '../../model/department/department';
 import { DepartmentService } from '../../services/department.service';
+import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 
 @Component({
   selector: 'app-user-form',
@@ -40,17 +41,7 @@ export class UserFormComponent implements OnInit {
               private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<UserFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
-    //   this.userForm = new FormGroup({
-    //     username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-    //     password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-    //     confirmPassword: new FormControl(null),
-    //     departmentId: new FormControl("", [Validators.required]),
-    //     role: new FormControl("", [Validators.required])
-    //   },
-    //   {
-    //     validators: matchPassword
-    //   }
-    // );
+
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
       this._depService.getAllDep().subscribe({
         next: data => {
@@ -58,7 +49,7 @@ export class UserFormComponent implements OnInit {
         },
         error: err => {
         this.apiResponse = err.error;
-      }
+        }
       });
     }
 
@@ -68,18 +59,24 @@ export class UserFormComponent implements OnInit {
 
       this.userForm = new FormGroup({
         username: new FormControl(this.data.username, [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-        departmentId: new FormControl("ac11e001-96bf-1ea0-8196-bf2eae7a0000", [Validators.required]),
+        departmentId: new FormControl('', [Validators.required]),
         role: new FormControl(this.data.role, [Validators.required])
       });
+
+      let departmentId = this._depService.getDep(this.data.department).subscribe({
+        next: data => {
+          departmentId = data.id;
+          this.userForm.get('departmentId').setValue(departmentId);         
+        },
+        error: err => {
+          this.apiResponse = err.error;
+        }
+      });
     
-      this.buttonName = 'Изменить';
-      // ???????????????????????????? in dep to ???????????????????????????????????
-      //this.userForm.get('username').setValue(this.data.username);
-      //this.userForm.get('role').setValue(this.data.role);
-      // ???????????????????????????? in dep to ???????????????????????????????????
+      this.buttonName = BUTTON_UPDATE;
           
       } else {
-        this.buttonName = 'Создать';
+        this.buttonName = BUTTON_CREATE;
 
         this.userForm = new FormGroup({
           username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
@@ -96,7 +93,7 @@ export class UserFormComponent implements OnInit {
   };
 
   clickButton() {
-    this.buttonName == 'Создать' ? this.createUser() : this.updateUser();
+    this.buttonName == BUTTON_CREATE ? this.createUser() : this.updateUser();
   };
 
   createUser() {

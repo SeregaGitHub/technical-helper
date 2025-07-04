@@ -6,6 +6,7 @@ export class HttpHeadersFactory {
         //const token = localStorage.getItem("thJwt");
         return new HttpHeaders({
             Authorization: `Bearer ${localStorage.getItem("thJwt")}`,
+            //'X-Auth-Token': `Bearer ${localStorage.getItem("thJwt")}`,
             'Content-Type': 'application/json'
         })
     };

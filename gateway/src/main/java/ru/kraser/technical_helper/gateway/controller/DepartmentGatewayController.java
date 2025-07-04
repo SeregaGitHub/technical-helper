@@ -9,7 +9,6 @@ import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentD
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.gateway.client.DepartmentClient;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -25,7 +24,7 @@ public class DepartmentGatewayController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                          @RequestHeader(AUTHORIZATION) String jwt) {
+                                          @RequestHeader(AUTH_HEADER) String jwt) {
         ApiResponse response = departmentClient.createDepartment(createDepartmentDto, jwt);
 
         return response;
@@ -34,7 +33,7 @@ public class DepartmentGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                   @RequestHeader(AUTHORIZATION) String jwt,
+                                   @RequestHeader(AUTH_HEADER) String jwt,
                                    @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         ApiResponse response = departmentClient.updateDepartment(DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto, jwt);
 
@@ -43,7 +42,7 @@ public class DepartmentGatewayController {
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<DepartmentDto> getAllDepartments(@RequestHeader(AUTHORIZATION) String jwt) {
+    public List<DepartmentDto> getAllDepartments(@RequestHeader(AUTH_HEADER) String jwt) {
         List<DepartmentDto> departmentDtoList = departmentClient.getAllDepartments(jwt);
 
         return departmentDtoList;
@@ -51,16 +50,16 @@ public class DepartmentGatewayController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader(AUTHORIZATION) String jwt,
-                                       @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
-        DepartmentDto departmentDto = departmentClient.getDepartment(departmentId, jwt, DEPARTMENT_ID_HEADER);
+    public DepartmentDto getDepartment(@RequestHeader(AUTH_HEADER) String jwt,
+                                       @RequestHeader(DEPARTMENT_NAME_HEADER) String departmentName) {
+        DepartmentDto departmentDto = departmentClient.getDepartment(departmentName, jwt, DEPARTMENT_NAME_HEADER);
 
         return departmentDto;
     }
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteDepartment(@RequestHeader(AUTHORIZATION) String jwt,
+    public ApiResponse deleteDepartment(@RequestHeader(AUTH_HEADER) String jwt,
                                         @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
 
