@@ -11,10 +11,22 @@
             >Закрыть
           </button>
         </div>
-
-        <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Логин</mat-label>
-            <input matInput 
+        
+        @if (data.action === 'UPDATE') {
+          <div class="mb-8 flex justify-normal pt-4">
+            <button 
+              type="button"
+              class="black-to-blue-gradient text-montserrat cp-button-size btn mouse-enter" 
+              (click)="changePasswordForm()"
+              >Изменить пароль
+            </button>
+          </div>
+        }
+        
+        @if (data.action != 'CHANGE_PASSWORD') {
+            <mat-form-field class="w-full mb-4">
+              <mat-label class="text-gray-200">Логин</mat-label>
+              <input matInput 
                    formControlName="username"
                   >
                     @if (username.touched && username.invalid) {
@@ -32,7 +44,9 @@
                         }
                       </div>
                     }
-        </mat-form-field>
+            </mat-form-field>
+        }
+        
 
         @if (data.action == 'CREATE' || data.action == 'CHANGE_PASSWORD') {
             <mat-form-field class="w-full mb-4">
@@ -70,7 +84,8 @@
             </mat-form-field>
         }
 
-        <mat-form-field class="w-full mb-4">
+        @if (data.action != 'CHANGE_PASSWORD') {
+          <mat-form-field class="w-full mb-4">
             <mat-label class="text-gray-200">Отдел</mat-label>
             <mat-select 
               formControlName="departmentId"
@@ -83,18 +98,19 @@
             </mat-select>
           </mat-form-field>
 
-        <div class="mb-4">
+          <div class="mb-4">
             <mat-radio-group 
-            name="role" 
-            formControlName="role"
-            aria-label="Select an option"
+                name="role" 
+                formControlName="role"
+                aria-label="Select an option"
             >
             <!-- [(ngModel)]="newUser.role" -->
                 <mat-radio-button value="ADMIN">Admin</mat-radio-button>
                 <mat-radio-button value="TECHNICIAN">Technician</mat-radio-button>
                 <mat-radio-button value="EMPLOYEE">Employee</mat-radio-button>
             </mat-radio-group>
-        </div>
+          </div>
+        }
 
         <div class="mb-4 min-h-12 max-w-80"
             [ngClass]="apiResponse.status === 0 ? 'hide' : ''" 

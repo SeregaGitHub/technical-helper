@@ -15,6 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Department } from '../../model/department/department';
 import { DepartmentService } from '../../services/department.service';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
+import { ChangeUserPasswordDto } from '../../model/user/change-user-password-dto';
 
 @Component({
   selector: 'app-user-form',
@@ -76,7 +77,6 @@ export class UserFormComponent implements OnInit {
       this.buttonName = BUTTON_UPDATE;
           
       } else {
-        this.buttonName = BUTTON_CREATE;
 
         this.userForm = new FormGroup({
           username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
@@ -89,11 +89,24 @@ export class UserFormComponent implements OnInit {
             validators: matchPassword
           }
         );
+
+        this.buttonName = BUTTON_CREATE;
       }
   };
 
   clickButton() {
-    this.buttonName == BUTTON_CREATE ? this.createUser() : this.updateUser();
+    switch(this.data.action) {
+
+      case Action.Create: this.createUser();
+      break;
+
+      case Action.Update : this.updateUser();
+      break;
+
+      case Action.ChangePassword: this.changePassword();
+      break;
+    }
+    //this.buttonName == BUTTON_CREATE ? this.createUser() : this.updateUser();
   };
 
   createUser() {
@@ -135,6 +148,35 @@ export class UserFormComponent implements OnInit {
       }
     });
   };
+
+  changePasswordForm() {
+
+    this.userForm = new FormGroup({
+          password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+          confirmPassword: new FormControl(null),
+          },
+          {
+            validators: matchPassword
+          }
+    );
+
+    this.data.action = Action.ChangePassword;
+  };
+
+  changePassword() {
+    
+    const newPassword = new ChangeUserPasswordDto(this.userForm.value.password);
+
+    this._userService.changeUserPassword(newPassword, this.data.userId).subscribe({
+      next: response => {
+        this.apiResponse = response;
+        this.deleteResponseMessage();
+      },
+      error: err => {
+        this.apiResponse = err.error;
+      }
+    });
+  }
 
   deleteResponseMessage() {
     setTimeout(() => {
