@@ -12,7 +12,7 @@ import { CustomPaginatorIntl } from '../../util/custom-paginator-intl';
 import { MatDialog } from '@angular/material/dialog';
 import { DepartmentFormComponent } from '../../components/department-form/department-form.component';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
-import { Action } from '../../enum/action';
+import { Action } from '../../enum/action.enum';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 

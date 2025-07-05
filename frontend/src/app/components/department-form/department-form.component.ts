@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ApiResponse } from '../../model/response/api-response';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Action } from '../../enum/action';
+import { Action } from '../../enum/action.enum';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { DepartmentDtoFactory } from '../../generator/department-dto-factory';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';

@@ -1,4 +1,4 @@
-import { Role } from "../enum/role";
+import { Role } from "../enum/role.enum";
 import { CreateUserDto } from "../model/user/create-user-dto";
 import { UpdateUserDto } from "../model/user/update-user-dto";
 

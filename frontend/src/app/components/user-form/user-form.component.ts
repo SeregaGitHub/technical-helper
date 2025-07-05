@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { ApiResponse } from '../../model/response/api-response';
-import { Action } from '../../enum/action';
+import { Action } from '../../enum/action.enum';
 import { UserService } from '../../services/user.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';

@@ -9,13 +9,13 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../services/user.service';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
-import { Action } from '../../enum/action';
+import { Action } from '../../enum/action.enum';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { Role } from '../../enum/role';
+import { Role } from '../../enum/role.enum';
 
 @Component({
   selector: 'app-user',

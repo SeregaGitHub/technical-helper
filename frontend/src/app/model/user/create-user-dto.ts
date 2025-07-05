@@ -1,4 +1,4 @@
-import { Role } from "../../enum/role";
+import { Role } from "../../enum/role.enum";
 import { UpdateUserDto } from "./update-user-dto";
 
 export class CreateUserDto extends UpdateUserDto {

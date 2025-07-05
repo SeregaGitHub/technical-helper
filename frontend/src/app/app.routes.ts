@@ -3,8 +3,8 @@ import { AuthComponent } from './auth/components/auth/auth.component';
 import { BreakageComponent } from './pages/breakage/breakage.component';
 import { UserComponent } from './pages/user/user.component';
 import { DepartmentComponent } from './pages/department/department.component';
-import { RoleGuard } from './security/role-guard';
-import { Role } from './enum/role';
+import { RoleGuard } from './security/role-guard.guard';
+import { Role } from './enum/role.enum';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 
