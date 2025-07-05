@@ -5,7 +5,6 @@ import { UserService } from '../../services/user.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
-import { UserDtoFactory } from '../../generator/user-dto-factory';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,6 +15,8 @@ import { Department } from '../../model/department/department';
 import { DepartmentService } from '../../services/department.service';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 import { ChangeUserPasswordDto } from '../../model/user/change-user-password-dto';
+import { UpdateUserDto } from '../../model/user/update-user-dto';
+import { CreateUserDto } from '../../model/user/create-user-dto';
 
 @Component({
   selector: 'app-user-form',
@@ -106,17 +107,16 @@ export class UserFormComponent implements OnInit {
       case Action.ChangePassword: this.changePassword();
       break;
     }
-    //this.buttonName == BUTTON_CREATE ? this.createUser() : this.updateUser();
   };
 
   createUser() {
 
-    const newUserDto = UserDtoFactory.createUserDto(
-        this.userForm.value.username,
-        this.userForm.value.password,
-        this.userForm.value.departmentId,
-        this.userForm.value.role
-      );
+    const newUserDto = new CreateUserDto(
+      this.userForm.value.username,
+      this.userForm.value.password,
+      this.userForm.value.departmentId,
+      this.userForm.value.role
+    );
   
     this._userService.createUser(newUserDto).subscribe({
       next: response => {
@@ -132,7 +132,7 @@ export class UserFormComponent implements OnInit {
 
   updateUser() {
 
-    const userDto = UserDtoFactory.createUpdateUserDto(
+    const userDto = new UpdateUserDto(
       this.userForm.value.username,
       this.userForm.value.departmentId,
       this.userForm.value.role

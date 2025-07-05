@@ -9,7 +9,6 @@ import { ApiResponse } from '../../model/response/api-response';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action.enum';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
-import { DepartmentDtoFactory } from '../../generator/department-dto-factory';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 
 @Component({
@@ -29,29 +28,29 @@ export class DepartmentFormComponent implements OnInit {
   departmentForm: any;
   buttonName!: string;
   apiResponse: ApiResponse;
-  departmentDto: DepartmentDto;
 
   constructor(private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
-      this.departmentForm = new FormGroup({
-        name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-      });
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
-      this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
     }
 
   ngOnInit(): void {
 
     if (this.data.action === Action.Update) {
-      this.departmentDto = {
-        name: this.data.departmentName
-      }
+
+      this.departmentForm = new FormGroup({
+        name: new FormControl(this.data.departmentName, [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+      });
 
       this.buttonName = BUTTON_UPDATE;
-      this.departmentForm.get('name').setValue(this.departmentDto.name);
       
       } else {
+
+        this.departmentForm = new FormGroup({
+        name: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
+      });
+
         this.buttonName = BUTTON_CREATE;
       }
   }
@@ -62,14 +61,11 @@ export class DepartmentFormComponent implements OnInit {
 
   createDepartment() {
 
-    this.departmentDto = {
-        name: this.departmentForm.value.name
-    };
+    const departmentDto = new DepartmentDto(this.departmentForm.value.name);
 
-    this._depService.createDep(this.departmentDto).subscribe({
+    this._depService.createDep(departmentDto).subscribe({
       next: response => {
         this.apiResponse = response;
-        this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
         this.clearForm();
         this.deleteResponseMessage();
       },
@@ -81,14 +77,11 @@ export class DepartmentFormComponent implements OnInit {
 
   updateDepartment() {
 
-    this.departmentDto = {
-        name: this.departmentForm.value.name
-    };
+    const departmentDto = new DepartmentDto(this.departmentForm.value.name);
 
-    this._depService.updateDep(this.departmentDto, this.data.departmentId).subscribe({
+    this._depService.updateDep(departmentDto, this.data.departmentId).subscribe({
       next: response => {
         this.apiResponse = response;
-        this.departmentDto = DepartmentDtoFactory.createEmptyDepartmentDto();
         this.deleteResponseMessage();
       },
       error: err => {
