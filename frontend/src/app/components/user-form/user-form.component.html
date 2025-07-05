@@ -1,7 +1,7 @@
 
-<div class="flex justify-center blue-to-black-gradient min-w-96">
+<div class="flex justify-center blue-to-black-gradient min-w-96 max-w-96">
 
-    <form [formGroup]="userForm" (ngSubmit)="clickButton()" class="min-w-80">
+    <form [formGroup]="userForm" (ngSubmit)="clickButton()" class="min-w-80 max-w-80">
 
         <div class="mb-8 flex justify-normal pt-4">
           <button 
@@ -13,7 +13,7 @@
         </div>
         
         @if (data.action === 'UPDATE') {
-          <div class="mb-8 flex justify-normal pt-4">
+          <div class="mb-8 flex justify-center pt-4">
             <button 
               type="button"
               class="black-to-blue-gradient text-montserrat cp-button-size btn mouse-enter" 
