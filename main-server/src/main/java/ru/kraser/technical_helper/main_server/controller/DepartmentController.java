@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.main_server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
@@ -19,13 +20,13 @@ public class DepartmentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
         return departmentService.createDepartment(createDepartmentDto);
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public String updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
+    public ApiResponse updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
                                    @RequestBody CreateDepartmentDto departmentDto) {
         return departmentService.updateDepartment(departmentId, departmentDto);
     }
@@ -38,13 +39,13 @@ public class DepartmentController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
-        return departmentService.getDepartment(departmentId);
+    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_NAME_HEADER) String departmentName) {
+        return departmentService.getDepartment(departmentName);
     }
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public String deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }
 }

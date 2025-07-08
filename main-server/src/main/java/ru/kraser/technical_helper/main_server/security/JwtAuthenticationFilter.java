@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.AUTHORIZATION;
+import static ru.kraser.technical_helper.common_module.util.Constant.AUTH_HEADER;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader(AUTHORIZATION);
+        final String authHeader = request.getHeader(AUTH_HEADER);
         final String jwt;
         final String username;
 

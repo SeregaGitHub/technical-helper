@@ -1,8 +1,10 @@
 package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -25,18 +27,23 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public String createDepartment(CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto) {
         try {
             departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
         } catch (Exception e) {
             ThrowException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }
-        return "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
+        return ApiResponse.builder()
+                .message("Отдел: " + createDepartmentDto.name() + ", - был успешно создан.")
+                .status(201)
+                .httpStatus(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 
     @Override
     @Transactional
-    public String updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
+    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
@@ -46,7 +53,12 @@ public class DepartmentServiceImpl implements DepartmentService {
         } catch (Exception e) {
             ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
         }
-        return "Отдел: " + departmentDto.name() + " - был успешно изменен.";
+        return ApiResponse.builder()
+                .message("Отдел: " + departmentDto.name() + " - был успешно изменен.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
     }
 
     @Override
@@ -57,8 +69,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public DepartmentDto getDepartment(String departmentId) {
-        Department department = departmentRepository.findByIdAndEnabledTrue(departmentId).orElseThrow(
+    public DepartmentDto getDepartment(String departmentName) {
+        Department department = departmentRepository.findByNameAndEnabledTrue(departmentName).orElseThrow(
                 () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
         );
         return DepartmentMapper.toDepartmentDto(department);
@@ -66,7 +78,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public String deleteDepartment(String departmentId) {
+    public ApiResponse deleteDepartment(String departmentId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         response = departmentRepository.deleteDepartment(departmentId, SecurityUtil.getCurrentUserId(), now);
@@ -74,7 +86,12 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (response != 1) {
             throw new NotFoundException(DEPARTMENT_NOT_EXIST);
         }
-        return "Отдел - был успешно удалён.";
+        return ApiResponse.builder()
+                .message("Отдел - был успешно удалён.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
     }
 
 }

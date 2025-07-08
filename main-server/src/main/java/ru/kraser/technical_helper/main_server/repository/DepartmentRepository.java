@@ -36,15 +36,29 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     @Query(
             value = """
                     SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
-                    (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
+                    (d.id, d.name,
+                    uc.username AS createdBy, d.createdDate, uu.username AS lastUpdatedBy, d.lastUpdatedDate)
                     FROM Department as d
+                    JOIN FETCH User as uc ON uc.id = d.createdBy
+                    JOIN FETCH User as uu ON uu.id = d.lastUpdatedBy
                     WHERE d.enabled = true
                     ORDER BY name
                     """
     )
     List<DepartmentDto> getAllDepartments();
 
-    Optional<Department> findByIdAndEnabledTrue(String departmentId);
+//    @Query(
+//            value = """
+//                    SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
+//                    (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
+//                    FROM Department as d
+//                    WHERE d.enabled = true
+//                    ORDER BY name
+//                    """
+//    )
+//    List<DepartmentDto> getAllDepartments();
+
+    Optional<Department> findByNameAndEnabledTrue(String departmentName);
 
     @Modifying
     @Query(

@@ -10,10 +10,11 @@ public record DepartmentDto(
         String id,
         String name,
         String createdBy,
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        //@JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+        @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
         LocalDateTime createdDate,
         String lastUpdatedBy,
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
         LocalDateTime lastUpdatedDate
 ) {
 }

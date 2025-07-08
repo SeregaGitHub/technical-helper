@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 
 @Builder
-public record ApiError(
+public record ApiResponse(
     String message,
     int status,
-    HttpStatus error,
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    HttpStatus httpStatus,
+    @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     LocalDateTime timestamp
 ) {
 }
