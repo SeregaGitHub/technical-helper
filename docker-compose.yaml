@@ -1,5 +1,19 @@
-# version: '3.8'
+
 services:
+
+  frontend:
+    build: ./frontend
+    image: th-frontend-image:0.0.1
+    restart: on-failure
+    container_name: th-frontend-container
+    ports:
+     - "12345:12345"
+    depends_on:
+      - gateway
+    environment:
+      GATEWAY_URL: http://gateway:12344
+      TZ: Europe/Moscow
+
   gateway:
     build: ./gateway
     image: th-gateway-image:0.0.1
@@ -12,8 +26,6 @@ services:
     environment:
       MAIN_SERVER_URL: http://main-server:12333
       TZ: Europe/Moscow
-    links:
-      - main-server
 
   main-server:
     build: ./servers/main-server
@@ -45,10 +57,6 @@ services:
       POSTGRES_DB: technical_helper
       POSTGRES_USER: sa
       POSTGRES_PASSWORD: sapassword
-#      - POSTGRES_DB_HOST=localhost
-#      - POSTGRES_DB_PORT=5432
-#      - POSTGRES_DB_NAME=technical_helper
-
 
   pgadmin4:
     image: dpage/pgadmin4
@@ -57,8 +65,9 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@mail.com
       PGADMIN_DEFAULT_PASSWORD: pgpassword
+      PGADMIN_LISTEN_PORT: 12221
     ports:
-      - "12221:80"
+      - "12221:12221"
     depends_on:
       - db-postgres
     volumes:
