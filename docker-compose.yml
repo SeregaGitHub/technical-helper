@@ -16,7 +16,7 @@ services:
     # expose:
     #   - 80
     networks:
-      - th-network
+      - network
 
 
   # frontend:
@@ -62,7 +62,7 @@ services:
       MAIN_SERVER_URL: http://main-server:12333
       TZ: Europe/Moscow
     networks:
-      - th-network
+      - network
 
   main-server:
     build:
@@ -79,14 +79,14 @@ services:
       - db-postgres
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db-postgres:5432/technical_helper
-      #      - DB_NAME=later
-      #      - POSTGRES_USER=root
-      #      - POSTGRES_PASSWORD=root
-      #      - DB_HOST=db
+      #      - DB_NAME=technical_helper
+      #      - POSTGRES_USER=sa
+      #      - POSTGRES_PASSWORD=sapassword
+      #      - DB_HOST=db-postgres
       #      - DB_PORT=5432
       TZ: Europe/Moscow
     networks:
-      - th-network
+      - network
 
   db-postgres:
     image: postgres:17-alpine
@@ -101,7 +101,7 @@ services:
       POSTGRES_USER: sa
       POSTGRES_PASSWORD: sapassword
     networks:
-      - th-network
+      - network
 
   pgadmin4:
     image: dpage/pgadmin4
@@ -118,12 +118,12 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
     networks:
-      - th-network
+      - network
 
 volumes:
   data:
   pgadmin:
 
 networks:
-  th-network:
+  network:
     driver: bridge

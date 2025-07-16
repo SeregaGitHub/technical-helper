@@ -5,8 +5,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constant {
 //    public static final String FRONT_URL = "http://localhost:80";
-    public static final String FRONT_URL = "http://localhost:12345";
-    // public static final String FRONT_URL = "http://192.168.0.102:12345";
+//    public static final String FRONT_URL = "http://localhost:12345";
+    public static final String FRONT_URL = "http://192.168.0.102:12345";
     // public static final String FRONT_URL = "http://frontend:12345";
     // public static final String FRONT_URL = "http://frontend:80";
 //    public static final String MAIN_SERVER_URL = "http://localhost:12333";
