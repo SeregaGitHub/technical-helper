@@ -13,8 +13,6 @@ services:
       - "12345:80"
     depends_on:
       - gateway
-    # expose:
-    #   - 80
     networks:
       - network
 
