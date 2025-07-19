@@ -1,4 +1,5 @@
-export const GATEWAY_URL = 'http://localhost:12344';
+export const GATEWAY_URL = 'http://192.168.0.102:12344';
+
 export const BASE_URL = '/api/v1';
 export const AUTH_URL = '/auth';
 export const ADMIN_URL = '/admin';

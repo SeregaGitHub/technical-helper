@@ -1,0 +1,127 @@
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile    
+    # build: ./frontend
+    image: th-frontend-image:0.0.1
+    restart: on-failure
+    container_name: th-frontend-container
+    ports:
+      - "12345:80"
+    depends_on:
+      - gateway
+    networks:
+      - network
+
+
+  # frontend:
+  #   # build:
+  #   #   context: ./frontend
+  #   #   dockerfile: ./frontend/Dockerfile
+  #   build: ./frontend
+  #   image: th-frontend-image:0.0.1
+  #   restart: on-failure
+  #   container_name: th-frontend-container
+  #   ports:
+  #    - "12345:12345"
+  #   depends_on:
+  #     - gateway
+  #   environment:
+  #     GATEWAY_URL: http://gateway:12344
+  #     TZ: Europe/Moscow
+
+  # th-nginx:
+  #   # build:
+  #   #   context: ./
+  #   #   dockerfile: ./Dockerfile
+  #   build: ./frontend
+  #   image: nginx:alpine
+  #   container_name: th-nginx-container
+  #   ports:
+  #    - "12346:80"
+  #   command: ["nginx", "-g", "daemon off;"]
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    #build: gateway
+    image: th-gateway-image:0.0.1
+    restart: on-failure
+    container_name: th-gateway-container
+    ports:
+      - "12344:12344"
+    depends_on:
+      - main-server
+    environment:
+      MAIN_SERVER_URL: http://main-server:12333
+      TZ: Europe/Moscow
+    networks:
+      - network
+
+  main-server:
+    build:
+      context: ./servers/main-server
+      dockerfile: Dockerfile
+      # dockerfile: ./servers/main-server/Dockerfile
+    # build: ./servers/main-server
+    image: th-main-server-image:0.0.1
+    restart: on-failure
+    container_name: th-main-server-container
+    ports:
+      - "12333:12333"
+    depends_on:
+      - db-postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-postgres:5432/technical_helper
+      #      - DB_NAME=technical_helper
+      #      - POSTGRES_USER=sa
+      #      - POSTGRES_PASSWORD=sapassword
+      #      - DB_HOST=db-postgres
+      #      - DB_PORT=5432
+      TZ: Europe/Moscow
+    networks:
+      - network
+
+  db-postgres:
+    image: postgres:17-alpine
+    restart: on-failure
+    container_name: postgresql-container
+    ports:
+      - "12222:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: technical_helper
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sapassword
+    networks:
+      - network
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    container_name: pgadmin4-container
+    restart: on-failure
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: pgpassword
+      PGADMIN_LISTEN_PORT: 12221
+    ports:
+      - "12221:12221"
+    depends_on:
+      - db-postgres
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - network
+
+volumes:
+  data:
+  pgadmin:
+
+networks:
+  network:
+    driver: bridge
