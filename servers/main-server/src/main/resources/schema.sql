@@ -1,4 +1,7 @@
 --------------------- only for develop mode
+--DROP TABLE IF EXISTS breakage_comment;
+--DROP TABLE IF EXISTS breakage_audit;
+--DROP TABLE IF EXISTS breakage;
 --DROP TABLE IF EXISTS users;
 --DROP TABLE IF EXISTS department;
 --------------------- only for develop mode
@@ -20,10 +23,10 @@ CREATE TABLE IF NOT EXISTS department (
   id                varchar(36) NOT NULL,
   name              varchar(64) NOT NULL,
   enabled           boolean     NOT NULL,
-  created_by        varchar(36),
-  created_date      timestamp,
-  last_updated_by   varchar(36),
-  last_updated_date timestamp,
+  created_by        varchar(36) NOT NULL,
+  created_date      timestamp   NOT NULL,
+  last_updated_by   varchar(36) NOT NULL,
+  last_updated_date timestamp   NOT NULL,
   CONSTRAINT pk_department_id   PRIMARY KEY (id),
   CONSTRAINT uk_department_name UNIQUE (name)
 );
@@ -35,15 +38,84 @@ CREATE TABLE IF NOT EXISTS users (
   enabled           boolean      NOT NULL,
   department        varchar(36)  NOT NULL,
   role              varchar(15)  NOT NULL,
-  created_by        varchar(36),
-  created_date      timestamp,
-  last_updated_by   varchar(36),
-  last_updated_date timestamp,
+  created_by        varchar(36)  NOT NULL,
+  created_date      timestamp    NOT NULL,
+  last_updated_by   varchar(36)  NOT NULL,
+  last_updated_date timestamp    NOT NULL,
   CONSTRAINT pk_users_id         PRIMARY KEY (id),
   CONSTRAINT uk_users_username   UNIQUE (username),
   CONSTRAINT ch_users_role       CHECK (role IN ('ADMIN', 'TECHNICIAN', 'EMPLOYEE')),
   CONSTRAINT fk_users_department FOREIGN KEY (department)
         REFERENCES department (id)
+);
+
+CREATE TABLE IF NOT EXISTS breakage (
+  id                         varchar(36)   NOT NULL,
+  department                 varchar(36)   NOT NULL,
+  room                       varchar(128)  NOT NULL,
+  breakage_topic             varchar(64)   NOT NULL,
+  breakage_text              varchar(2048) NOT NULL,
+  status                     varchar(15)   NOT NULL,
+  priority                   varchar(15)   NOT NULL,
+  executor                   varchar(36)   NOT NULL,
+  executor_appointed_by      varchar(36)   NOT NULL,
+  created_by                 varchar(36)   NOT NULL,
+  created_date               timestamp     NOT NULL,
+  last_updated_by            varchar(36)   NOT NULL,
+  last_updated_date          timestamp     NOT NULL,
+  CONSTRAINT pk_breakage_id                    PRIMARY KEY (id),
+  CONSTRAINT fk_breakage_department            FOREIGN KEY (department)
+        REFERENCES department (id),
+  CONSTRAINT ch_breakage_status                CHECK (status IN (
+                                                        'NEW',
+                                                        'SOLVED',
+                                                        'IN_PROGRESS',
+                                                        'PAUSED',
+                                                        'REDIRECTED',
+                                                        'CANCELLED')
+                                                        ),
+  CONSTRAINT ch_breakage_priority              CHECK (priority IN ('URGENTLY', 'HIGH', 'MEDIUM', 'LOW')),
+  CONSTRAINT fk_breakage_executor              FOREIGN KEY (executor)
+        REFERENCES users (id),
+  CONSTRAINT fk_breakage_executor_appointed_by FOREIGN KEY (executor_appointed_by)
+        REFERENCES users (id),
+  CONSTRAINT fk_breakage_created_by            FOREIGN KEY (created_by)
+        REFERENCES users (id),
+  CONSTRAINT fk_breakage_last_updated_by       FOREIGN KEY (last_updated_by)
+        REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS breakage_audit (
+--  id                         varchar(36)   NOT NULL,
+  breakage                   varchar(36)   NOT NULL,
+  department                 varchar(36)   NOT NULL,
+  room                       varchar(128)  NOT NULL,
+  breakage_topic             varchar(64)   NOT NULL,
+  breakage_text              varchar(1024) NOT NULL,
+  status                     varchar(15)   NOT NULL,
+  priority                   varchar(15)   NOT NULL,
+  executor                   varchar(36)   NOT NULL,
+  executor_appointed_by      varchar(36)   NOT NULL,
+  last_updated_by            varchar(36)   NOT NULL,
+  last_updated_date          timestamp     NOT NULL,
+--  CONSTRAINT pk_breakage_audit_id                PRIMARY KEY (id),
+  CONSTRAINT fk_breakage_audit_breakage_id       FOREIGN KEY (breakage)
+        REFERENCES breakage (id),
+  CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
+        REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS breakage_comment (
+  id                varchar(36) NOT NULL,
+  breakage          varchar(36) NOT NULL,
+  comment           text        NOT NULL,
+  last_updated_by   varchar(36) NOT NULL,
+  last_updated_date timestamp   NOT NULL,
+  CONSTRAINT pk_breakage_comment_id              PRIMARY KEY (id),
+  CONSTRAINT fk_breakage_comment_breakage_id     FOREIGN KEY (breakage)
+        REFERENCES breakage (id),
+  CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
+        REFERENCES users (id)
 );
 
 
@@ -123,8 +195,13 @@ CREATE OR REPLACE FUNCTION delete_all_users_from_department() RETURNS trigger AS
 	END;
 ' LANGUAGE plpgsql;
 
+--CREATE OR REPLACE FUNCTION update_breakage() RETURNS trigger AS '
+--
+--' LANGUAGE plpgsql;
+
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 
 CREATE TRIGGER delete_all_users_from_department AFTER UPDATE OF enabled ON department
 FOR EACH ROW EXECUTE PROCEDURE delete_all_users_from_department();
+

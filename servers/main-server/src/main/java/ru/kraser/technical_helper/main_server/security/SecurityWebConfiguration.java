@@ -40,10 +40,13 @@ public class SecurityWebConfiguration {
                         .requestMatchers(BASE_URL + ADMIN_URL + "/**").hasAnyAuthority(
                                 Role.ADMIN.name())
 
-                        .requestMatchers(BASE_URL + TECHNICIAN_URL + "/**").hasAnyAuthority(
+                        .requestMatchers(BASE_URL + BREAKAGE_URL + ADMIN_URL + "/**").hasAnyAuthority(
+                                Role.ADMIN.name())
+
+                        .requestMatchers(BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + "/**").hasAnyAuthority(
                                 Role.TECHNICIAN.name(), Role.ADMIN.name())
 
-                        .requestMatchers(BASE_URL + EMPLOYEE_URL + "/**").hasAnyAuthority(
+                        .requestMatchers(BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/**").hasAnyAuthority(
                                 Role.EMPLOYEE.name(), Role.TECHNICIAN.name(), Role.ADMIN.name())
 
                         .anyRequest().authenticated())

@@ -14,6 +14,7 @@ public class Constant {
     public static final String EMPLOYEE_URL = "/employee";
     public static final String DEPARTMENT_URL = "/department";
     public static final String USER_URL = "/user";
+    public static final String BREAKAGE_URL = "/breakage";
     public static final String CURRENT_URL = "/current";
     public static final String ALL_URL = "/all";
     public static final String PASSWORD_URL = "/password";
