@@ -187,21 +187,36 @@ END; '
 ;
 
 CREATE OR REPLACE FUNCTION delete_all_users_from_department() RETURNS trigger AS '
-	BEGIN
-			UPDATE users
-			SET enabled = false
-			WHERE department = OLD.id;
-		RETURN OLD;
-	END;
+BEGIN
+	UPDATE users
+		SET enabled = false
+		WHERE department = OLD.id;
+	RETURN OLD;
+END;
 ' LANGUAGE plpgsql;
 
---CREATE OR REPLACE FUNCTION update_breakage() RETURNS trigger AS '
---
---' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION audit_breakage_update() RETURNS trigger AS '
+BEGIN
+	INSERT INTO breakage_audit
+	    SELECT nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
+	       nt.executor, nt.executor_appointed_by, nt.last_updated_by, nt.last_updated_date
+	    FROM new_table AS nt;
+	RETURN NULL;
+END
+' LANGUAGE plpgsql;
 
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 
+DROP TRIGGER IF EXISTS audit_breakage_update ON breakage;
+
+
 CREATE TRIGGER delete_all_users_from_department AFTER UPDATE OF enabled ON department
 FOR EACH ROW EXECUTE PROCEDURE delete_all_users_from_department();
+
+CREATE TRIGGER audit_breakage_update AFTER UPDATE ON breakage
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_update();
+
+
 
