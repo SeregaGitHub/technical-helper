@@ -86,7 +86,6 @@ CREATE TABLE IF NOT EXISTS breakage (
 );
 
 CREATE TABLE IF NOT EXISTS breakage_audit (
---  id                         varchar(36)   NOT NULL,
   breakage                   varchar(36)   NOT NULL,
   department                 varchar(36)   NOT NULL,
   room                       varchar(128)  NOT NULL,
@@ -98,7 +97,7 @@ CREATE TABLE IF NOT EXISTS breakage_audit (
   executor_appointed_by      varchar(36)   NOT NULL,
   last_updated_by            varchar(36)   NOT NULL,
   last_updated_date          timestamp     NOT NULL,
---  CONSTRAINT pk_breakage_audit_id                PRIMARY KEY (id),
+  CONSTRAINT pk_breakage_audit_id                PRIMARY KEY (breakage, last_updated_date, last_updated_by),
   CONSTRAINT fk_breakage_audit_breakage_id       FOREIGN KEY (breakage)
         REFERENCES breakage (id),
   CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
@@ -195,7 +194,7 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION audit_breakage_update() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION audit_breakage() RETURNS trigger AS '
 BEGIN
 	INSERT INTO breakage_audit
 	    SELECT nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
@@ -208,15 +207,19 @@ END
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 
+DROP TRIGGER IF EXISTS audit_breakage_create ON breakage;
+
 DROP TRIGGER IF EXISTS audit_breakage_update ON breakage;
 
 
 CREATE TRIGGER delete_all_users_from_department AFTER UPDATE OF enabled ON department
 FOR EACH ROW EXECUTE PROCEDURE delete_all_users_from_department();
 
+CREATE TRIGGER audit_breakage_create AFTER INSERT ON breakage
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
+
 CREATE TRIGGER audit_breakage_update AFTER UPDATE ON breakage
 REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_update();
-
-
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
 
