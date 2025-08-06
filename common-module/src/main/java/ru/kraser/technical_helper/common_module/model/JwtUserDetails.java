@@ -1,10 +1,9 @@
-package ru.kraser.technical_helper.main_server.security;
+package ru.kraser.technical_helper.common_module.model;
 
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.kraser.technical_helper.main_server.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +19,10 @@ public class JwtUserDetails implements UserDetails {
 
     public String getUserId() {
         return user.getId();
+    }
+
+    public String getUserDepartmentId() {
+        return user.getDepartment().getId();
     }
 
     @Override

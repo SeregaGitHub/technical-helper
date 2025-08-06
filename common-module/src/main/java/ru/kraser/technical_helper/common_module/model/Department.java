@@ -17,7 +17,7 @@ import java.util.Objects;
 @Table(name = "department")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department {
+public class Department extends BaseEntity {
     @Column(name = "name", length = 64, nullable = false, unique = true)
     private String name;
 

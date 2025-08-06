@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS breakage (
   breakage_text              varchar(2048) NOT NULL,
   status                     varchar(11)   NOT NULL,
   priority                   varchar(8)    NOT NULL,
-  executor                   varchar(36)   NOT NULL,
-  executor_appointed_by      varchar(36)   NOT NULL,
+  executor                   varchar(36),
+  executor_appointed_by      varchar(36),
   created_by                 varchar(36)   NOT NULL,
   created_date               timestamp     NOT NULL,
   last_updated_by            varchar(36)   NOT NULL,
@@ -93,14 +93,20 @@ CREATE TABLE IF NOT EXISTS breakage_audit (
   breakage_text              varchar(1024) NOT NULL,
   status                     varchar(15)   NOT NULL,
   priority                   varchar(15)   NOT NULL,
-  executor                   varchar(36)   NOT NULL,
-  executor_appointed_by      varchar(36)   NOT NULL,
+  executor                   varchar(36),
+  executor_appointed_by      varchar(36),
   last_updated_by            varchar(36)   NOT NULL,
   last_updated_date          timestamp     NOT NULL,
-  CONSTRAINT pk_breakage_audit_id                PRIMARY KEY (breakage, last_updated_date, last_updated_by),
-  CONSTRAINT fk_breakage_audit_breakage_id       FOREIGN KEY (breakage)
+  CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
+  CONSTRAINT fk_breakage_audit_department            FOREIGN KEY (department)
+        REFERENCES department (id),
+  CONSTRAINT fk_breakage_audit_breakage_id           FOREIGN KEY (breakage)
         REFERENCES breakage (id),
-  CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
+  CONSTRAINT fk_breakage_audit_executor              FOREIGN KEY (executor)
+        REFERENCES users (id),
+  CONSTRAINT fk_breakage_audit_executor_appointed_by FOREIGN KEY (executor_appointed_by)
+        REFERENCES users (id),
+  CONSTRAINT fk_breakage_audit_last_updated_by       FOREIGN KEY (last_updated_by)
         REFERENCES users (id)
 );
 
@@ -117,12 +123,8 @@ CREATE TABLE IF NOT EXISTS breakage_comment (
         REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS breakage_test (
-  id                varchar(36) NOT NULL,
-  breakage_test     varchar(36) NOT NULL,
-  comment           text        NOT NULL,
-  CONSTRAINT pk_breakage_test_id                    PRIMARY KEY (id)
-);
+
+CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
 
 
 ALTER TABLE department

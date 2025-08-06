@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
-import ru.kraser.technical_helper.main_server.model.Department;
+import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.LocalDateTime;
 import java.util.List;

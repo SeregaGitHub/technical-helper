@@ -5,9 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
-import ru.kraser.technical_helper.main_server.model.Department;
-import ru.kraser.technical_helper.main_server.model.User;
-import ru.kraser.technical_helper.main_server.security.SecurityUtil;
+import ru.kraser.technical_helper.common_module.model.Department;
+import ru.kraser.technical_helper.common_module.model.User;
+import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.time.LocalDateTime;
 

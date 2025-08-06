@@ -13,7 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
-import ru.kraser.technical_helper.main_server.model.User;
+import ru.kraser.technical_helper.common_module.model.JwtUserDetails;
+import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 @Configuration

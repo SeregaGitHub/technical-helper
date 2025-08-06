@@ -3,8 +3,8 @@ package ru.kraser.technical_helper.main_server.util.mapper;
 import lombok.experimental.UtilityClass;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
-import ru.kraser.technical_helper.main_server.model.Department;
-import ru.kraser.technical_helper.main_server.security.SecurityUtil;
+import ru.kraser.technical_helper.common_module.model.Department;
+import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package ru.kraser.technical_helper.main_server.model;
+package ru.kraser.technical_helper.common_module.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

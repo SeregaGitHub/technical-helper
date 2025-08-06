@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
-import ru.kraser.technical_helper.main_server.model.User;
+import ru.kraser.technical_helper.common_module.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

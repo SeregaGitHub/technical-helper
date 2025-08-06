@@ -9,6 +9,7 @@ import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationRequest;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationResponse;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
+import ru.kraser.technical_helper.common_module.model.JwtUserDetails;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 @Service
