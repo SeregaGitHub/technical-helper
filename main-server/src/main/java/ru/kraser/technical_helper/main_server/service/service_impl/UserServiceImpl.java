@@ -17,7 +17,7 @@ import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import ru.kraser.technical_helper.main_server.service.UserService;
-import ru.kraser.technical_helper.main_server.util.error_handler.ThrowException;
+import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         try {
             userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
         } catch (Exception e) {
-            ThrowException.userHandler(e.getMessage(), createUserDto.username());
+            ThrowMainServerException.userHandler(e.getMessage(), createUserDto.username());
         }
         return ApiResponse.builder()
                 .message("Сотрудник: " + createUserDto.username() + ", - был успешно создан.")
@@ -62,9 +62,9 @@ public class UserServiceImpl implements UserService {
                     updateUserDto.role(),
                     SecurityUtil.getCurrentUserId(),
                     now);
-            ThrowException.isExist(response, "пользователь");
+            ThrowMainServerException.isExist(response, "пользователь");
         } catch (Exception e) {
-            ThrowException.userHandler(e.getMessage(), updateUserDto.username());
+            ThrowMainServerException.userHandler(e.getMessage(), updateUserDto.username());
         }
         return ApiResponse.builder()
                 .message("Сотрудник: " + updateUserDto.username() + " - был успешно изменен.")

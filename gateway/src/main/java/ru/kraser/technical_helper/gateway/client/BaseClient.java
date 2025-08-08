@@ -66,6 +66,30 @@ public abstract class BaseClient {
         return patchResponse.block();
     }
 
+    protected <T, O> T patch(String url, String jwt, String entityHeaderName1, String entityId1,
+                             String entityHeaderName2, String entityId2, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> patchResponse = webClient
+                .patch()
+                .uri(url)
+                .header(AUTH_HEADER, jwt)
+                .header(entityHeaderName1, entityId1)
+                .header(entityHeaderName2, entityId2)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return patchResponse.block();
+    }
+
     protected <T> List<T> getAll(String url, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<List<T>> getResponse = webClient
                 .get()

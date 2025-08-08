@@ -21,10 +21,6 @@ public class JwtUserDetails implements UserDetails {
         return user.getId();
     }
 
-    public String getUserDepartmentId() {
-        return user.getDepartment().getId();
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> list = new ArrayList<>();

@@ -8,7 +8,7 @@ import ru.kraser.technical_helper.common_module.exception.ServerException;
 import static ru.kraser.technical_helper.common_module.util.Constant.SERVER_ERROR;
 
 @UtilityClass
-public class ThrowException {
+public class ThrowMainServerException {
 
     public void departmentHandler(String message, String name) {
         if (message.contains("uk_department_name")) {

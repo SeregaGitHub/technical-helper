@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
+import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 
 import java.net.ConnectException;
@@ -48,6 +49,18 @@ public class GatewayErrorHandler {
     public ResponseEntity<?> handleNoAccess(WebClientResponseException exception) {
         ApiResponse error = ApiResponse.builder()
                 .message("У Вас нет прав доступа для данного ресурса.")
+                .status(HttpStatus.FORBIDDEN.value())
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNoAccess(ForbiddenException exception) {
+        ApiResponse error = ApiResponse.builder()
+                .message(exception.getMessage())
                 .status(HttpStatus.FORBIDDEN.value())
                 .httpStatus(HttpStatus.FORBIDDEN)
                 .timestamp(LocalDateTime.now().withNano(0))

@@ -12,7 +12,7 @@ import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
-import ru.kraser.technical_helper.main_server.util.error_handler.ThrowException;
+import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         try {
             departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
         } catch (Exception e) {
-            ThrowException.departmentHandler(e.getMessage(), createDepartmentDto.name());
+            ThrowMainServerException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }
         return ApiResponse.builder()
                 .message("Отдел: " + createDepartmentDto.name() + ", - был успешно создан.")
@@ -49,9 +49,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         try {
             response = departmentRepository.updateDepartment(
                     departmentId, departmentDto.name(), SecurityUtil.getCurrentUserId(), now);
-            ThrowException.isExist(response, "отдел");
+            ThrowMainServerException.isExist(response, "отдел");
         } catch (Exception e) {
-            ThrowException.departmentHandler(e.getMessage(), departmentDto.name());
+            ThrowMainServerException.departmentHandler(e.getMessage(), departmentDto.name());
         }
         return ApiResponse.builder()
                 .message("Отдел: " + departmentDto.name() + " - был успешно изменен.")
