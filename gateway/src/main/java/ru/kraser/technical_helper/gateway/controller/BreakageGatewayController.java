@@ -6,7 +6,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.EmployeeBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
+
+import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -33,9 +37,26 @@ public class BreakageGatewayController {
                                       @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                       @RequestHeader(DEPARTMENT_ID_HEADER) String breakageDepartmentId) {
         ApiResponse response = breakageClient.cancelBreakage(BREAKAGE_ID_HEADER, breakageId,
-                                                             DEPARTMENT_ID_HEADER, breakageDepartmentId,
-                                                             jwt);
+                DEPARTMENT_ID_HEADER, breakageDepartmentId,
+                jwt);
 
         return response;
+    }
+
+    @GetMapping(path = EMPLOYEE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public List<EmployeeBreakageDto> getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
+                                                     @RequestParam(value = "size", defaultValue = "10")
+                                                     Integer size,
+                                                     @RequestParam(value = "from", defaultValue = "0")
+                                                     Integer from,
+                                                     @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                                     String sortBy,
+                                                     @RequestParam(value = "direction", defaultValue = "DESC")
+                                                     String direction) {
+        List<EmployeeBreakageDto> employeeBreakageDtoList = breakageClient.getAllBreakages(
+                jwt, size, from, sortBy, direction);
+
+        return employeeBreakageDtoList;
     }
 }

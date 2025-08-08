@@ -105,6 +105,27 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
+    protected <T> List<T> getAllByPage(String url, Integer size, Integer from, String sortBy, String direction,
+                                       String jwt, ParameterizedTypeReference<T> typeReference) {
+        Mono<List<T>> getResponse = webClient
+                .get()
+                .uri(url, uriBuilder ->
+                        uriBuilder.queryParam("size", size)
+                                .queryParam("from", from)
+                                .queryParam("sortBy", sortBy)
+                                .queryParam("direction", direction)
+                                .build())
+                .header(AUTH_HEADER, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToFlux(typeReference)
+                .collectList();
+
+        return getResponse.block();
+    }
+
     protected <T> T get(String url, String jwt, String entityHeaderName,
                         String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
@@ -126,7 +147,7 @@ public abstract class BaseClient {
     }
 
     protected <T, O> T delete(String url, String jwt, String entityHeaderName,
-                            String entityId, ParameterizedTypeReference<T> typeReference) {
+                              String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> deleteResponse = webClient
                 .patch()
                 .uri(url)
