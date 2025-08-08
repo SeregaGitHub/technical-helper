@@ -6,8 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.EmployeeBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
 
 import java.util.List;
@@ -45,16 +44,16 @@ public class BreakageGatewayController {
 
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<EmployeeBreakageDto> getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
-                                                     @RequestParam(value = "size", defaultValue = "10")
+    public List<BreakageDto> getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
+                                             @RequestParam(value = "size", defaultValue = "10")
                                                      Integer size,
-                                                     @RequestParam(value = "from", defaultValue = "0")
+                                             @RequestParam(value = "from", defaultValue = "0")
                                                      Integer from,
-                                                     @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                             @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
-                                                     @RequestParam(value = "direction", defaultValue = "DESC")
+                                             @RequestParam(value = "direction", defaultValue = "DESC")
                                                      String direction) {
-        List<EmployeeBreakageDto> employeeBreakageDtoList = breakageClient.getAllBreakages(
+        List<BreakageDto> employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, size, from, sortBy, direction);
 
         return employeeBreakageDtoList;

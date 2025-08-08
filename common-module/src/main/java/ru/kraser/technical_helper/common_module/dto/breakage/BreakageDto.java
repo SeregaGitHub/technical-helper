@@ -8,9 +8,10 @@ import ru.kraser.technical_helper.common_module.enums.Status;
 import java.time.LocalDateTime;
 
 @Builder
-public record EmployeeBreakageDto(
+public record BreakageDto(
         String id,
         String departmentId,
+        String departmentName,
         String room,
         String breakageTopic,
         String breakageText,

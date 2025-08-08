@@ -11,7 +11,7 @@ import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.EmployeeBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -80,7 +80,7 @@ public class BreakageServiceImpl implements BreakageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmployeeBreakageDto> getAllBreakages(
+    public List<BreakageDto> getAllBreakages(
             Integer size, Integer from, String sortBy, String direction) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
