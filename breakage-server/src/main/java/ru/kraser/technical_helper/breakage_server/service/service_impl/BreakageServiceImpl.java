@@ -81,16 +81,19 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional(readOnly = true)
     public List<BreakageDto> getAllBreakages(
-            Integer size, Integer from, String sortBy, String direction) {
+            Integer pageSize, Integer pageIndex, String sortBy, String direction) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(breakagesDirection, sortBy);
-        PageRequest pageRequest = PageRequest.of(from / size, size, sort);
-        // size - item on page
-        // from - size * pageNumber
-        String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize, sort);
+        // size: item on page (Angular: this.paginator.pageSize)
 
+        // from: pageNumber * size (Angular: this.paginator.pageSize * paginator.pageIndex)
+        // NOW - pageIndex (Angular: this.paginator.pageIndex)
+
+        // length: count of all items (Angular: this.paginator.length)
         if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
+            String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
             return breakageRepository.getAllEmployeeBreakages(currentUserDepartmentId, pageRequest);
         } else {
             return breakageRepository.getAllBreakages(pageRequest);

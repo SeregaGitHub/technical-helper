@@ -40,11 +40,11 @@ public class BreakageClient extends BaseClient {
     }
 
     public List<BreakageDto> getAllBreakages(
-            String jwt, Integer size, Integer from, String sortBy, String direction) {
+            String jwt, Integer pageSize, Integer pageIndex, String sortBy, String direction) {
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
-                size,
-                from,
+                pageSize,
+                pageIndex,
                 sortBy,
                 direction,
                 jwt,

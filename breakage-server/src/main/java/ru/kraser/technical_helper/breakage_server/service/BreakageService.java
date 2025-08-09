@@ -13,5 +13,5 @@ public interface BreakageService {
     ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId);
 
     List<BreakageDto> getAllBreakages(
-            Integer size, Integer from, String sortBy, String direction);
+            Integer pageSize, Integer pageIndex, String sortBy, String direction);
 }

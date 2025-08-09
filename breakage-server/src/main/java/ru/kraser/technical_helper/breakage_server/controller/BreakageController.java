@@ -33,15 +33,15 @@ public class BreakageController {
 
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<BreakageDto> getAllBreakages(@RequestParam(value = "size", defaultValue = "10")
-                                                     Integer size,
-                                             @RequestParam(value = "from", defaultValue = "0")
-                                                     Integer from,
+    public List<BreakageDto> getAllBreakages(@RequestParam(value = "pageSize", defaultValue = "10")
+                                                     Integer pageSize,
+                                             @RequestParam(value = "pageIndex", defaultValue = "0")
+                                                     Integer pageIndex,
                                              @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
                                              @RequestParam(value = "direction", defaultValue = "DESC")
                                                      String direction
     ) {
-        return breakageService.getAllBreakages(size, from, sortBy, direction);
+        return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction);
     }
 }

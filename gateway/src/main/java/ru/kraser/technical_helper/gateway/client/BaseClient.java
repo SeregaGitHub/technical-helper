@@ -105,13 +105,13 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T> List<T> getAllByPage(String url, Integer size, Integer from, String sortBy, String direction,
+    protected <T> List<T> getAllByPage(String url, Integer pageSize, Integer pageIndex, String sortBy, String direction,
                                        String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<List<T>> getResponse = webClient
                 .get()
                 .uri(url, uriBuilder ->
-                        uriBuilder.queryParam("size", size)
-                                .queryParam("from", from)
+                        uriBuilder.queryParam("pageSize", pageSize)
+                                .queryParam("pageIndex", pageIndex)
                                 .queryParam("sortBy", sortBy)
                                 .queryParam("direction", direction)
                                 .build())

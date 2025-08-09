@@ -45,16 +45,16 @@ public class BreakageGatewayController {
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<BreakageDto> getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
-                                             @RequestParam(value = "size", defaultValue = "10")
-                                                     Integer size,
-                                             @RequestParam(value = "from", defaultValue = "0")
-                                                     Integer from,
+                                             @RequestParam(value = "pageSize", defaultValue = "10")
+                                                     Integer pageSize,
+                                             @RequestParam(value = "pageIndex", defaultValue = "0")
+                                                     Integer pageIndex,
                                              @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
                                              @RequestParam(value = "direction", defaultValue = "DESC")
                                                      String direction) {
         List<BreakageDto> employeeBreakageDtoList = breakageClient.getAllBreakages(
-                jwt, size, from, sortBy, direction);
+                jwt, pageSize, pageIndex, sortBy, direction);
 
         return employeeBreakageDtoList;
     }
