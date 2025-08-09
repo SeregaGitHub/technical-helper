@@ -11,6 +11,7 @@ import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
@@ -25,7 +26,8 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             "LEFT JOIN FETCH User as ua ON ua.id = b.executorAppointedBy.id " +
             "JOIN FETCH User as uc ON uc.id = b.createdBy " +
             "JOIN FETCH User as uu ON uu.id = b.lastUpdatedBy " +
-            "JOIN FETCH Department as d ON d.id = b.department.id";
+            "JOIN FETCH Department as d ON d.id = b.department.id " +
+            "WHERE status IN (?1)";
 
     @Modifying
     @Query(
@@ -41,12 +43,12 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     int cancelBreakage(String breakageId, Status status, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
 
     @Query(
-            value = GET_ALL_BREAKAGES + " WHERE d.id = :currentUserDepartmentId"
+            value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId"
     )
-    Page<BreakageDto> getAllEmployeeBreakages(String currentUserDepartmentId, PageRequest pageRequest);
+    Page<BreakageDto> getAllEmployeeBreakages(List<Status> statusList, String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
             value = GET_ALL_BREAKAGES
     )
-    Page<BreakageDto> getAllBreakages(PageRequest pageRequest);
+    Page<BreakageDto> getAllBreakages(List<Status> statusList, PageRequest pageRequest);
 }

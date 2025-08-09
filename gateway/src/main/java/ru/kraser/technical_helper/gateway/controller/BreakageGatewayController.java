@@ -44,15 +44,29 @@ public class BreakageGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public AppPage getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
                                    @RequestParam(value = "pageSize", defaultValue = "10")
-                                                     Integer pageSize,
+                                       Integer pageSize,
                                    @RequestParam(value = "pageIndex", defaultValue = "0")
-                                                     Integer pageIndex,
+                                       Integer pageIndex,
                                    @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
-                                                     String sortBy,
+                                       String sortBy,
                                    @RequestParam(value = "direction", defaultValue = "DESC")
-                                                     String direction) {
+                                       String direction,
+                                   @RequestParam(value = "statusNew", defaultValue = "false")
+                                       boolean statusNew,
+                                   @RequestParam(value = "statusSolved", defaultValue = "false")
+                                       boolean statusSolved,
+                                   @RequestParam(value = "statusInProgress", defaultValue = "false")
+                                       boolean statusInProgress,
+                                   @RequestParam(value = "statusPaused", defaultValue = "false")
+                                       boolean statusPaused,
+                                   @RequestParam(value = "statusRedirected", defaultValue = "false")
+                                       boolean statusRedirected,
+                                   @RequestParam(value = "statusCancelled", defaultValue = "false")
+                                       boolean statusCancelled
+    ) {
         AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
-                jwt, pageSize, pageIndex, sortBy, direction);
+                jwt, pageSize, pageIndex, sortBy, direction,
+                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled);
 
         return employeeBreakageDtoList;
     }

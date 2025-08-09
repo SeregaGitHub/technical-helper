@@ -11,5 +11,7 @@ public interface BreakageService {
     ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId);
 
     AppPage getAllBreakages(
-            Integer pageSize, Integer pageIndex, String sortBy, String direction);
+            Integer pageSize, Integer pageIndex, String sortBy, String direction,
+            boolean statusNew, boolean statusSolved, boolean statusInProgress,
+            boolean statusPaused, boolean statusRedirected, boolean statusCancelled);
 }

@@ -38,8 +38,21 @@ public class BreakageController {
                                    @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
                                    @RequestParam(value = "direction", defaultValue = "DESC")
-                                                     String direction
+                                                     String direction,
+                                   @RequestParam(value = "statusNew", defaultValue = "false")
+                                       boolean statusNew,
+                                   @RequestParam(value = "statusSolved", defaultValue = "false")
+                                       boolean statusSolved,
+                                   @RequestParam(value = "statusInProgress", defaultValue = "false")
+                                       boolean statusInProgress,
+                                   @RequestParam(value = "statusPaused", defaultValue = "false")
+                                       boolean statusPaused,
+                                   @RequestParam(value = "statusRedirected", defaultValue = "false")
+                                       boolean statusRedirected,
+                                   @RequestParam(value = "statusCancelled", defaultValue = "false")
+                                       boolean statusCancelled
     ) {
-        return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction);
+        return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
+                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled);
     }
 }

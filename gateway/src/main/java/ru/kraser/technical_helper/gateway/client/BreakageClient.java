@@ -38,13 +38,21 @@ public class BreakageClient extends BaseClient {
     }
 
     public AppPage getAllBreakages(
-            String jwt, Integer pageSize, Integer pageIndex, String sortBy, String direction) {
+            String jwt, Integer pageSize, Integer pageIndex, String sortBy, String direction,
+            boolean statusNew, boolean statusSolved, boolean statusInProgress,
+            boolean statusPaused, boolean statusRedirected, boolean statusCancelled) {
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
                 pageSize,
                 pageIndex,
                 sortBy,
                 direction,
+                statusNew,
+                statusSolved,
+                statusInProgress,
+                statusPaused,
+                statusRedirected,
+                statusCancelled,
                 jwt,
                 ParameterizedTypeReference.forType(AppPage.class)
         );
