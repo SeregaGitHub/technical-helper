@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
-import ru.kraser.technical_helper.breakage_server.util.mapper.AppPageMapper;
+import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;

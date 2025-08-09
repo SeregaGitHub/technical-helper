@@ -1,4 +1,4 @@
-package ru.kraser.technical_helper.breakage_server.util.mapper;
+package ru.kraser.technical_helper.common_module.util;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Page;
