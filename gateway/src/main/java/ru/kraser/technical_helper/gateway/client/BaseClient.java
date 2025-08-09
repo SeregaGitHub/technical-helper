@@ -109,7 +109,9 @@ public abstract class BaseClient {
     protected <T> T getAllByPage(String url, Integer pageSize, Integer pageIndex, String sortBy, String direction,
                                  boolean statusNew, boolean statusSolved, boolean statusInProgress,
                                  boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
-                                       String jwt, ParameterizedTypeReference<T> typeReference) {
+                                 boolean priorityUrgently, boolean priorityHigh,
+                                 boolean priorityMedium, boolean priorityLow,
+                                 String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
                 .uri(url, uriBuilder ->
@@ -123,6 +125,10 @@ public abstract class BaseClient {
                                 .queryParam("statusPaused", statusPaused)
                                 .queryParam("statusRedirected", statusRedirected)
                                 .queryParam("statusCancelled", statusCancelled)
+                                .queryParam("priorityUrgently", priorityUrgently)
+                                .queryParam("priorityHigh", priorityHigh)
+                                .queryParam("priorityMedium", priorityMedium)
+                                .queryParam("priorityLow", priorityLow)
                                 .build())
                 .header(AUTH_HEADER, jwt)
                 .accept(MediaType.APPLICATION_JSON)

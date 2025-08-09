@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
+import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 
@@ -27,7 +28,8 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             "JOIN FETCH User as uc ON uc.id = b.createdBy " +
             "JOIN FETCH User as uu ON uu.id = b.lastUpdatedBy " +
             "JOIN FETCH Department as d ON d.id = b.department.id " +
-            "WHERE status IN (?1)";
+            "WHERE status IN (?1) " +
+            "AND priority IN (?2)";
 
     @Modifying
     @Query(
@@ -45,10 +47,11 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     @Query(
             value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId"
     )
-    Page<BreakageDto> getAllEmployeeBreakages(List<Status> statusList, String currentUserDepartmentId, PageRequest pageRequest);
+    Page<BreakageDto> getAllEmployeeBreakages(List<Status> statusList, List<Priority> priorityList,
+                                              String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
             value = GET_ALL_BREAKAGES
     )
-    Page<BreakageDto> getAllBreakages(List<Status> statusList, PageRequest pageRequest);
+    Page<BreakageDto> getAllBreakages(List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
 }

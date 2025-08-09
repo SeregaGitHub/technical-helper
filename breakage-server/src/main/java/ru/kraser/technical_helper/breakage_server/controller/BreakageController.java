@@ -32,27 +32,36 @@ public class BreakageController {
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
     public AppPage getAllBreakages(@RequestParam(value = "pageSize", defaultValue = "10")
-                                                     Integer pageSize,
+                                       Integer pageSize,
                                    @RequestParam(value = "pageIndex", defaultValue = "0")
-                                                     Integer pageIndex,
+                                       Integer pageIndex,
                                    @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
-                                                     String sortBy,
+                                       String sortBy,
                                    @RequestParam(value = "direction", defaultValue = "DESC")
-                                                     String direction,
-                                   @RequestParam(value = "statusNew", defaultValue = "false")
+                                       String direction,
+                                   @RequestParam(value = "statusNew", defaultValue = "true")
                                        boolean statusNew,
                                    @RequestParam(value = "statusSolved", defaultValue = "false")
                                        boolean statusSolved,
-                                   @RequestParam(value = "statusInProgress", defaultValue = "false")
+                                   @RequestParam(value = "statusInProgress", defaultValue = "true")
                                        boolean statusInProgress,
-                                   @RequestParam(value = "statusPaused", defaultValue = "false")
+                                   @RequestParam(value = "statusPaused", defaultValue = "true")
                                        boolean statusPaused,
-                                   @RequestParam(value = "statusRedirected", defaultValue = "false")
+                                   @RequestParam(value = "statusRedirected", defaultValue = "true")
                                        boolean statusRedirected,
                                    @RequestParam(value = "statusCancelled", defaultValue = "false")
-                                       boolean statusCancelled
+                                       boolean statusCancelled,
+                                   @RequestParam(value = "priorityUrgently", defaultValue = "true")
+                                       boolean priorityUrgently,
+                                   @RequestParam(value = "priorityHigh", defaultValue = "true")
+                                       boolean priorityHigh,
+                                   @RequestParam(value = "priorityMedium", defaultValue = "true")
+                                       boolean priorityMedium,
+                                   @RequestParam(value = "priorityLow", defaultValue = "true")
+                                       boolean priorityLow
     ) {
         return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
-                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled);
+                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow);
     }
 }

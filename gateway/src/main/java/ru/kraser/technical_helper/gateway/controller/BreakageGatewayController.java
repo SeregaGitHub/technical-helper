@@ -51,22 +51,31 @@ public class BreakageGatewayController {
                                        String sortBy,
                                    @RequestParam(value = "direction", defaultValue = "DESC")
                                        String direction,
-                                   @RequestParam(value = "statusNew", defaultValue = "false")
+                                   @RequestParam(value = "statusNew", defaultValue = "true")
                                        boolean statusNew,
                                    @RequestParam(value = "statusSolved", defaultValue = "false")
                                        boolean statusSolved,
-                                   @RequestParam(value = "statusInProgress", defaultValue = "false")
+                                   @RequestParam(value = "statusInProgress", defaultValue = "true")
                                        boolean statusInProgress,
-                                   @RequestParam(value = "statusPaused", defaultValue = "false")
+                                   @RequestParam(value = "statusPaused", defaultValue = "true")
                                        boolean statusPaused,
-                                   @RequestParam(value = "statusRedirected", defaultValue = "false")
+                                   @RequestParam(value = "statusRedirected", defaultValue = "true")
                                        boolean statusRedirected,
                                    @RequestParam(value = "statusCancelled", defaultValue = "false")
-                                       boolean statusCancelled
+                                       boolean statusCancelled,
+                                   @RequestParam(value = "priorityUrgently", defaultValue = "true")
+                                       boolean priorityUrgently,
+                                   @RequestParam(value = "priorityHigh", defaultValue = "true")
+                                       boolean priorityHigh,
+                                   @RequestParam(value = "priorityMedium", defaultValue = "true")
+                                       boolean priorityMedium,
+                                   @RequestParam(value = "priorityLow", defaultValue = "true")
+                                       boolean priorityLow
     ) {
         AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, pageSize, pageIndex, sortBy, direction,
-                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled);
+                statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow);
 
         return employeeBreakageDtoList;
     }

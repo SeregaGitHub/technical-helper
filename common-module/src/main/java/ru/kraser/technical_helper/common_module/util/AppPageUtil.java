@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.common_module.util;
 
 import lombok.experimental.UtilityClass;
+import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 
 import java.util.ArrayList;
@@ -21,5 +22,17 @@ public class AppPageUtil {
         if (statusCancelled) {statusList.add(Status.CANCELLED);}
 
         return statusList.isEmpty() ? List.of(Status.values()) : statusList;
+    }
+
+    public List<Priority> createPriorityList(boolean priorityUrgently, boolean priorityHigh,
+                                             boolean priorityMedium, boolean priorityLow) {
+        List<Priority> priorityList = new ArrayList<>();
+
+        if (priorityUrgently) {priorityList.add(Priority.URGENTLY);}
+        if (priorityHigh) {priorityList.add(Priority.HIGH);}
+        if (priorityMedium) {priorityList.add(Priority.MEDIUM);}
+        if (priorityLow) {priorityList.add(Priority.LOW);}
+
+        return priorityList.isEmpty() ? List.of(Priority.values()) : priorityList;
     }
 }

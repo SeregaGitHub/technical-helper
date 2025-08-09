@@ -13,5 +13,6 @@ public interface BreakageService {
     AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
-            boolean statusPaused, boolean statusRedirected, boolean statusCancelled);
+            boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
+            boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow);
 }

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
+import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -87,7 +88,9 @@ public class BreakageServiceImpl implements BreakageService {
     public AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
-            boolean statusPaused, boolean statusRedirected, boolean statusCancelled) {
+            boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
+            boolean priorityUrgently, boolean priorityHigh,
+            boolean priorityMedium, boolean priorityLow) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(breakagesDirection, sortBy);
@@ -101,15 +104,17 @@ public class BreakageServiceImpl implements BreakageService {
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
                 statusPaused, statusRedirected, statusCancelled);
+        List<Priority> priorityList = AppPageUtil.createPriorityList(priorityUrgently, priorityHigh,
+                priorityMedium, priorityLow);
 
         if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
             Page<BreakageDto> pageEmployeeBreakages =
-                    breakageRepository.getAllEmployeeBreakages(statusList, currentUserDepartmentId, pageRequest);
+                    breakageRepository.getAllEmployeeBreakages(statusList, priorityList, currentUserDepartmentId, pageRequest);
             return AppPageMapper.toAppPage(pageEmployeeBreakages);
         } else {
             Page<BreakageDto> pageBreakages =
-                    breakageRepository.getAllBreakages(statusList, pageRequest);
+                    breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
             return AppPageMapper.toAppPage(pageBreakages);
         }
     }
