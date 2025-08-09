@@ -1,5 +1,6 @@
 package ru.kraser.technical_helper.breakage_server.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,7 +11,6 @@ import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
@@ -43,10 +43,10 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     @Query(
             value = GET_ALL_BREAKAGES + " WHERE d.id = :currentUserDepartmentId"
     )
-    List<BreakageDto> getAllEmployeeBreakages(String currentUserDepartmentId, PageRequest pageRequest);
+    Page<BreakageDto> getAllEmployeeBreakages(String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
             value = GET_ALL_BREAKAGES
     )
-    List<BreakageDto> getAllBreakages(PageRequest pageRequest);
+    Page<BreakageDto> getAllBreakages(PageRequest pageRequest);
 }

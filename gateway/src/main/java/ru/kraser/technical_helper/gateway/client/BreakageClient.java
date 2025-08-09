@@ -4,10 +4,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
-
-import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -39,7 +37,7 @@ public class BreakageClient extends BaseClient {
         );
     }
 
-    public List<BreakageDto> getAllBreakages(
+    public AppPage getAllBreakages(
             String jwt, Integer pageSize, Integer pageIndex, String sortBy, String direction) {
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
@@ -48,7 +46,7 @@ public class BreakageClient extends BaseClient {
                 sortBy,
                 direction,
                 jwt,
-                ParameterizedTypeReference.forType(BreakageDto.class)
+                ParameterizedTypeReference.forType(AppPage.class)
         );
     }
 }

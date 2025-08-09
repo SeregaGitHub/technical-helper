@@ -5,10 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-
-import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -33,13 +31,13 @@ public class BreakageController {
 
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<BreakageDto> getAllBreakages(@RequestParam(value = "pageSize", defaultValue = "10")
+    public AppPage getAllBreakages(@RequestParam(value = "pageSize", defaultValue = "10")
                                                      Integer pageSize,
-                                             @RequestParam(value = "pageIndex", defaultValue = "0")
+                                   @RequestParam(value = "pageIndex", defaultValue = "0")
                                                      Integer pageIndex,
-                                             @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                   @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
-                                             @RequestParam(value = "direction", defaultValue = "DESC")
+                                   @RequestParam(value = "direction", defaultValue = "DESC")
                                                      String direction
     ) {
         return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction);

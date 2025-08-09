@@ -12,7 +12,8 @@ import ru.kraser.technical_helper.common_module.exception.ServerException;
 
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.AUTH_HEADER;
+import static ru.kraser.technical_helper.common_module.util.Constant.SERVER_ERROR;
 
 public abstract class BaseClient {
     protected final WebClient webClient;
@@ -105,9 +106,9 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T> List<T> getAllByPage(String url, Integer pageSize, Integer pageIndex, String sortBy, String direction,
+    protected <T> T getAllByPage(String url, Integer pageSize, Integer pageIndex, String sortBy, String direction,
                                        String jwt, ParameterizedTypeReference<T> typeReference) {
-        Mono<List<T>> getResponse = webClient
+        Mono<T> getResponse = webClient
                 .get()
                 .uri(url, uriBuilder ->
                         uriBuilder.queryParam("pageSize", pageSize)
@@ -120,8 +121,7 @@ public abstract class BaseClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
-                .bodyToFlux(typeReference)
-                .collectList();
+                .bodyToMono(typeReference);
 
         return getResponse.block();
     }

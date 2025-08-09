@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.breakage_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -9,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
+import ru.kraser.technical_helper.breakage_server.util.mapper.AppPageMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -20,7 +23,6 @@ import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 
@@ -80,7 +82,7 @@ public class BreakageServiceImpl implements BreakageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BreakageDto> getAllBreakages(
+    public AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
@@ -94,10 +96,15 @@ public class BreakageServiceImpl implements BreakageService {
         // length: count of all items (Angular: this.paginator.length)
         if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
-            return breakageRepository.getAllEmployeeBreakages(currentUserDepartmentId, pageRequest);
+            Page<BreakageDto> pageEmployeeBreakages =
+                    breakageRepository.getAllEmployeeBreakages(currentUserDepartmentId, pageRequest);
+            return AppPageMapper.toAppPage(pageEmployeeBreakages);
         } else {
-            return breakageRepository.getAllBreakages(pageRequest);
+            Page<BreakageDto> pageBreakages =
+                    breakageRepository.getAllBreakages(pageRequest);
+            return AppPageMapper.toAppPage(pageBreakages);
         }
     }
+    // breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
     // ?from=0&size=10&sortBy=room&direction=ASC
 }

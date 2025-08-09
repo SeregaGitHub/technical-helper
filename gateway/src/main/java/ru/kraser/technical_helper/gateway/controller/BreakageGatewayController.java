@@ -5,11 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
-
-import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -44,16 +42,16 @@ public class BreakageGatewayController {
 
     @GetMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<BreakageDto> getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
-                                             @RequestParam(value = "pageSize", defaultValue = "10")
+    public AppPage getAllBreakages(@RequestHeader(AUTH_HEADER) String jwt,
+                                   @RequestParam(value = "pageSize", defaultValue = "10")
                                                      Integer pageSize,
-                                             @RequestParam(value = "pageIndex", defaultValue = "0")
+                                   @RequestParam(value = "pageIndex", defaultValue = "0")
                                                      Integer pageIndex,
-                                             @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                   @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
                                                      String sortBy,
-                                             @RequestParam(value = "direction", defaultValue = "DESC")
+                                   @RequestParam(value = "direction", defaultValue = "DESC")
                                                      String direction) {
-        List<BreakageDto> employeeBreakageDtoList = breakageClient.getAllBreakages(
+        AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, pageSize, pageIndex, sortBy, direction);
 
         return employeeBreakageDtoList;

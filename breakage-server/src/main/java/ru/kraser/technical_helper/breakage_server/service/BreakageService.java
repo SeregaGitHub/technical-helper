@@ -1,10 +1,8 @@
 package ru.kraser.technical_helper.breakage_server.service;
 
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-
-import java.util.List;
 
 public interface BreakageService {
 
@@ -12,6 +10,6 @@ public interface BreakageService {
 
     ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId);
 
-    List<BreakageDto> getAllBreakages(
+    AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction);
 }
