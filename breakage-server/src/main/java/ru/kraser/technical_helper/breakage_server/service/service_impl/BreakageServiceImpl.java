@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
+import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
@@ -90,7 +91,8 @@ public class BreakageServiceImpl implements BreakageService {
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh,
-            boolean priorityMedium, boolean priorityLow) {
+            boolean priorityMedium, boolean priorityLow,
+            String executor) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(breakagesDirection, sortBy);
@@ -110,14 +112,36 @@ public class BreakageServiceImpl implements BreakageService {
         if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
             Page<BreakageDto> pageEmployeeBreakages =
-                    breakageRepository.getAllEmployeeBreakages(statusList, priorityList, currentUserDepartmentId, pageRequest);
+                    breakageRepository.getAllEmployeeBreakages(
+                            statusList, priorityList, currentUserDepartmentId, pageRequest);
             return AppPageMapper.toAppPage(pageEmployeeBreakages);
+
+        } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
+            String currentUserId = SecurityUtil.getCurrentUserId();
+            Page<BreakageDto> pageBreakages =
+                    breakageRepository.getAllBreakagesAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId);
+            return AppPageMapper.toAppPage(pageBreakages);
+
+        } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
+            String currentUserId = SecurityUtil.getCurrentUserId();
+            Page<BreakageDto> pageBreakages =
+                    breakageRepository.getAllBreakagesAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId);
+            return AppPageMapper.toAppPage(pageBreakages);
+
+        } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
+            Page<BreakageDto> pageBreakages =
+                    breakageRepository.getAllBreakagesNoAppointed(
+                            statusList, priorityList, pageRequest);
+            return AppPageMapper.toAppPage(pageBreakages);
+
         } else {
             Page<BreakageDto> pageBreakages =
                     breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
             return AppPageMapper.toAppPage(pageBreakages);
         }
     }
-    // breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
-    // ?from=0&size=10&sortBy=room&direction=ASC
+// breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
+// ?from=0&size=10&sortBy=room&direction=ASC
 }

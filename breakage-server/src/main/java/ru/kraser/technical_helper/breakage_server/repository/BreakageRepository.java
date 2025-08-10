@@ -51,6 +51,24 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
                                               String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id = :currentUserId"
+    )
+    Page<BreakageDto> getAllBreakagesAppointedToMe(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
+
+    @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id <> :currentUserId"
+    )
+    Page<BreakageDto> getAllBreakagesAppointedToOthers(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
+
+    @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id IS NULL"
+    )
+    Page<BreakageDto> getAllBreakagesNoAppointed(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
+
+    @Query(
             value = GET_ALL_BREAKAGES
     )
     Page<BreakageDto> getAllBreakages(List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
