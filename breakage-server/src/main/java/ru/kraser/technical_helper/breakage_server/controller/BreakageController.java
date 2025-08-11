@@ -8,7 +8,6 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
-import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -82,5 +81,11 @@ public class BreakageController {
     public ApiResponse updateBreakageComment(@RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
                                              @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
         return breakageService.updateBreakageComment(createBreakageCommentDto, breakageCommentId);
+    }
+
+    @DeleteMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse deleteBreakageComment(@RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId) {
+        return breakageService.deleteBreakageComment(breakageCommentId);
     }
 }

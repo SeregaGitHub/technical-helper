@@ -22,4 +22,6 @@ public interface BreakageService {
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
 
     ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageCommentId);
+
+    ApiResponse deleteBreakageComment(String breakageCommentId);
 }

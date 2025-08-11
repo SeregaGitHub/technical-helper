@@ -43,6 +43,29 @@ public abstract class BaseClient {
         return entityMono.block();
     }
 
+    protected <T, O> T post(String url, O obj, String entityHeaderName, String entityId,
+                            String jwt, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> entityMono = webClient
+                .post()
+                .uri(url)
+                .header(entityHeaderName, entityId)
+                .header(AUTH_HEADER, jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(obj)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+        return entityMono.block();
+    }
+
     protected <T, O> T patch(String url, O obj, String jwt, String entityHeaderName,
                              String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> patchResponse = webClient
@@ -161,7 +184,7 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T, O> T delete(String url, String jwt, String entityHeaderName,
+    protected <T> T delete(String url, String jwt, String entityHeaderName,
                               String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> deleteResponse = webClient
                 .patch()
@@ -169,6 +192,25 @@ public abstract class BaseClient {
                 .header(AUTH_HEADER, jwt)
                 .header(entityHeaderName, entityId)
                 .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return deleteResponse.block();
+    }
+
+    protected <T> T hardDelete(String url, String jwt, String entityHeaderName,
+                           String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> deleteResponse = webClient
+                .delete()
+                .uri(url)
+                .header(AUTH_HEADER, jwt)
+                .header(entityHeaderName, entityId)
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))

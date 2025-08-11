@@ -190,4 +190,16 @@ public class BreakageServiceImpl implements BreakageService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public ApiResponse deleteBreakageComment(String breakageCommentId) {
+        breakageCommentRepository.deleteById(breakageCommentId);
+        return ApiResponse.builder()
+                .message("Заявка на неисправность была успешно удалена.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+    }
+
 }

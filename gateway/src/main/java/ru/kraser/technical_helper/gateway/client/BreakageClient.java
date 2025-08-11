@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -50,6 +51,40 @@ public class BreakageClient extends BaseClient {
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor,
                 jwt,
                 ParameterizedTypeReference.forType(AppPage.class)
+        );
+    }
+
+    public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
+                                             String breakageHeaderName, String breakageId, String jwt) {
+        return super.post(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL,
+                createBreakageCommentDto,
+                breakageHeaderName,
+                breakageId,
+                jwt,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    public ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
+                                             String breakageCommentHeaderName, String breakageCommentId, String jwt) {
+        return super.patch(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL,
+                createBreakageCommentDto,
+                jwt,
+                breakageCommentHeaderName,
+                breakageCommentId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    public ApiResponse deleteBreakageComment(String breakageCommentHeaderName, String breakageCommentId, String jwt) {
+        return super.hardDelete(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL,
+                jwt,
+                breakageCommentHeaderName,
+                breakageCommentId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 }

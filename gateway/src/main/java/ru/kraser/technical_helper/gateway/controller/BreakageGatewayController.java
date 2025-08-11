@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -80,5 +81,36 @@ public class BreakageGatewayController {
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor);
 
         return employeeBreakageDtoList;
+    }
+
+    // BREAKAGE_COMMENT
+    @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse createBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
+                                             @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                             @Validated()  @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        ApiResponse response = breakageClient.createBreakageComment(createBreakageCommentDto,
+                BREAKAGE_ID_HEADER, breakageId, jwt);
+        return response;
+    }
+
+    @PatchMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse updateBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
+                                             @RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
+                                             @Validated()  @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        ApiResponse response = breakageClient.updateBreakageComment(createBreakageCommentDto,
+                BREAKAGE_COMMENT_ID_HEADER, breakageCommentId, jwt);
+
+        return response;
+    }
+
+    @DeleteMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse deleteBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
+                                             @RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId) {
+        ApiResponse response = breakageClient.deleteBreakageComment(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId, jwt);
+
+        return response;
     }
 }
