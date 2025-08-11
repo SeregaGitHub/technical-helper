@@ -7,23 +7,28 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.breakage_server.util.error_handler.ThrowBreakageServerException;
-import ru.kraser.technical_helper.common_module.enums.Executor;
-import ru.kraser.technical_helper.common_module.enums.Priority;
-import ru.kraser.technical_helper.common_module.util.AppPageMapper;
+import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageCommentMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
+import ru.kraser.technical_helper.common_module.enums.Executor;
+import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.model.Breakage;
+import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.common_module.util.AppPageUtil;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
+import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +39,7 @@ import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NO
 @RequiredArgsConstructor
 public class BreakageServiceImpl implements BreakageService {
     private final BreakageRepository breakageRepository;
+    private final BreakageCommentRepository breakageCommentRepository;
 
     @Override
     @Transactional
@@ -142,6 +148,46 @@ public class BreakageServiceImpl implements BreakageService {
             return AppPageMapper.toAppPage(pageBreakages);
         }
     }
-// breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
-// ?from=0&size=10&sortBy=room&direction=ASC
+    // breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
+    // ?from=0&size=10&sortBy=room&direction=ASC
+
+    // BREAKAGE_COMMENT
+    @Override
+    @Transactional
+    public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId) {
+        try {
+            Breakage breakage = breakageRepository.getReferenceById(breakageId);
+            breakageCommentRepository.saveAndFlush(BreakageCommentMapper.toBreakageComment(
+                    createBreakageCommentDto, breakage));
+        } catch (Exception e) {
+            throw new NotFoundException("Заявки на неисправность не существует !!!");
+        }
+
+        return ApiResponse.builder()
+                .message("Комментарий к заявке о неисправности - был успешно создан.")
+                .status(201)
+                .httpStatus(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
+                                             String breakageCommentId) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+
+        int response = breakageCommentRepository.updateBreakageComment(breakageCommentId,
+                    createBreakageCommentDto.comment(), SecurityUtil.getCurrentUserId(), now);
+
+        ThrowMainServerException.isExist(response, "запрос - невозможен. Эта заявка на неисправность");
+
+        return ApiResponse.builder()
+                .message("Заявка на неисправность была успешно обновлена.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+    }
+
 }

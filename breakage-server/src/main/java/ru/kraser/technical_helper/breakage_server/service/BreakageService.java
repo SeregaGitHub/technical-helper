@@ -3,6 +3,7 @@ package ru.kraser.technical_helper.breakage_server.service;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
 public interface BreakageService {
 
@@ -16,4 +17,9 @@ public interface BreakageService {
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
             String executor);
+
+    // BREAKAGE_COMMENT
+    ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
+
+    ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageCommentId);
 }

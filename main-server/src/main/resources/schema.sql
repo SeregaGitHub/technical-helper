@@ -67,12 +67,8 @@ CREATE TABLE IF NOT EXISTS breakage (
   CONSTRAINT fk_breakage_department            FOREIGN KEY (department)
         REFERENCES department (id),
   CONSTRAINT ch_breakage_status                CHECK (status IN (
-                                                        'NEW',
-                                                        'SOLVED',
-                                                        'IN_PROGRESS',
-                                                        'PAUSED',
-                                                        'REDIRECTED',
-                                                        'CANCELLED')
+                                                        'NEW', 'SOLVED', 'IN_PROGRESS',
+                                                        'PAUSED', 'REDIRECTED', 'CANCELLED')
                                                         ),
   CONSTRAINT ch_breakage_priority              CHECK (priority IN ('URGENTLY', 'HIGH', 'MEDIUM', 'LOW')),
   CONSTRAINT fk_breakage_executor              FOREIGN KEY (executor)
@@ -90,18 +86,18 @@ CREATE TABLE IF NOT EXISTS breakage_audit (
   department                 varchar(36)   NOT NULL,
   room                       varchar(128)  NOT NULL,
   breakage_topic             varchar(64)   NOT NULL,
-  breakage_text              varchar(1024) NOT NULL,
-  status                     varchar(15)   NOT NULL,
-  priority                   varchar(15)   NOT NULL,
+  breakage_text              varchar(2048) NOT NULL,
+  status                     varchar(11)   NOT NULL,
+  priority                   varchar(8)    NOT NULL,
   executor                   varchar(36),
   executor_appointed_by      varchar(36),
   last_updated_by            varchar(36)   NOT NULL,
   last_updated_date          timestamp     NOT NULL,
   CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
-  CONSTRAINT fk_breakage_audit_department            FOREIGN KEY (department)
-        REFERENCES department (id),
   CONSTRAINT fk_breakage_audit_breakage_id           FOREIGN KEY (breakage)
         REFERENCES breakage (id),
+  CONSTRAINT fk_breakage_audit_department            FOREIGN KEY (department)
+        REFERENCES department (id),
   CONSTRAINT fk_breakage_audit_executor              FOREIGN KEY (executor)
         REFERENCES users (id),
   CONSTRAINT fk_breakage_audit_executor_appointed_by FOREIGN KEY (executor_appointed_by)
@@ -114,11 +110,15 @@ CREATE TABLE IF NOT EXISTS breakage_comment (
   id                varchar(36) NOT NULL,
   breakage          varchar(36) NOT NULL,
   comment           text        NOT NULL,
+  created_by        varchar(36) NOT NULL,
+  created_date      timestamp   NOT NULL,
   last_updated_by   varchar(36) NOT NULL,
   last_updated_date timestamp   NOT NULL,
   CONSTRAINT pk_breakage_comment_id              PRIMARY KEY (id),
   CONSTRAINT fk_breakage_comment_breakage_id     FOREIGN KEY (breakage)
         REFERENCES breakage (id),
+  CONSTRAINT fk_breakage_comment_created_by      FOREIGN KEY (created_by)
+        REFERENCES users (id),
   CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
         REFERENCES users (id)
 );

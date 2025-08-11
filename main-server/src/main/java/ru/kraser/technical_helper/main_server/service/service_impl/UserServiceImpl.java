@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse createUser(CreateUserDto createUserDto) {
-        Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
         try {
+            Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
             userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
         } catch (Exception e) {
             ThrowMainServerException.userHandler(e.getMessage(), createUserDto.username());

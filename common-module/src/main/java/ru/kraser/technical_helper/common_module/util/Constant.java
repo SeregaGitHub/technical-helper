@@ -18,6 +18,7 @@ public class Constant {
     public static final String DEPARTMENT_URL = "/department";
     public static final String USER_URL = "/user";
     public static final String BREAKAGE_URL = "/breakage";
+    public static final String BREAKAGE_COMMENT_URL = "/comment";
     public static final String CURRENT_URL = "/current";
     public static final String ALL_URL = "/all";
     public static final String PASSWORD_URL = "/password";
@@ -28,6 +29,7 @@ public class Constant {
     public static final String DEPARTMENT_ID_HEADER = "X-Department-Id";
     public static final String DEPARTMENT_NAME_HEADER = "X-Department-Name";
     public static final String BREAKAGE_ID_HEADER = "X-Breakage-Id";
+    public static final String BREAKAGE_COMMENT_ID_HEADER = "X-BreakageComment-Id";
 
     public static final String SERVER_ERROR = "Ошибка на сервере. Попробуйте позже !!!";
     public static final String DEPARTMENT_NOT_EXIST = "Данного отдела не существует !!!";

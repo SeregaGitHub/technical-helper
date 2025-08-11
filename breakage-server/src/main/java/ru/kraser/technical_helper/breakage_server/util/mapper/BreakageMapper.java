@@ -15,6 +15,7 @@ public class BreakageMapper {
 
     public Breakage toBreakage(CreateBreakageDto createBreakageDto) {
         Breakage breakage = new Breakage();
+
         LocalDateTime now = LocalDateTime.now().withNano(0);
         Department currentUserDepartment = SecurityUtil.getCurrentUserDepartment();
         String currentUserId = SecurityUtil.getCurrentUserId();

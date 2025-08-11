@@ -12,7 +12,7 @@ import lombok.Setter;
 @Table(name = "breakage_comment")
 @NoArgsConstructor
 @AllArgsConstructor
-public class BreakageComment extends BaseEntityShot {
+public class BreakageComment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "breakage", nullable = false)
     private Breakage breakage;

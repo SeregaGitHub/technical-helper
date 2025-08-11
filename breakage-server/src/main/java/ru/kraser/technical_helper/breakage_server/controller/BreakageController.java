@@ -7,6 +7,8 @@ import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
+import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -65,5 +67,20 @@ public class BreakageController {
         return breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor);
+    }
+
+    // BREAKAGE_COMMENT
+    @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse createBreakageComment(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                             @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        return breakageService.createBreakageComment(createBreakageCommentDto, breakageId);
+    }
+
+    @PatchMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse updateBreakageComment(@RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
+                                             @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        return breakageService.updateBreakageComment(createBreakageCommentDto, breakageCommentId);
     }
 }
