@@ -33,7 +33,9 @@ import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 
@@ -93,7 +95,7 @@ public class BreakageServiceImpl implements BreakageService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true)  //TODO - check empty collection !!!
     public AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
@@ -156,16 +158,17 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional(readOnly = true)
     public BreakageFullDto getBreakage(String breakageId) {
-        BreakageDto breakageDto;
-        try {
-            breakageDto = breakageRepository.getBreakage(breakageId);
-        } catch (Exception e) {
-            throw new NotFoundException("Данная заявка на неисправность не существует.");
-        }
-        List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
+        BreakageDto breakageDto = breakageRepository.getBreakage(breakageId).orElseThrow(
+                () -> new NotFoundException("Данная заявка на неисправность не существует.")
+        );
 
-        BreakageFullDto breakageFullDto =
-                BreakageMapper.toBreakageFullDto(breakageDto, backComments);
+        BreakageFullDto breakageFullDto;
+        if (SecurityUtil.getCurrentUserRole().equals(Role.EMPLOYEE)) {
+            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, Collections.emptyList());
+        } else {
+            List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
+            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
+        }
 
         return breakageFullDto;
     }

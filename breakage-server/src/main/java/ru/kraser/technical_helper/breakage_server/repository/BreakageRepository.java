@@ -14,6 +14,7 @@ import ru.kraser.technical_helper.common_module.model.Breakage;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
@@ -77,6 +78,6 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     @Query(
             value = GET_BREAKAGE + " WHERE b.id = :breakageId"
     )
-    BreakageDto getBreakage(String breakageId);
+    Optional<BreakageDto> getBreakage(String breakageId);
 
 }
