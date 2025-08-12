@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -51,6 +52,16 @@ public class BreakageClient extends BaseClient {
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor,
                 jwt,
                 ParameterizedTypeReference.forType(AppPage.class)
+        );
+    }
+
+    public BreakageFullDto getBreakage(String jwt, String breakageHeaderName, String breakageId) {
+        return super.get(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL,
+                jwt,
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(BreakageFullDto.class)
         );
     }
 

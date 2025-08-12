@@ -16,7 +16,9 @@ import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
@@ -150,6 +152,23 @@ public class BreakageServiceImpl implements BreakageService {
     }
     // breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
     // ?from=0&size=10&sortBy=room&direction=ASC
+
+    @Override
+    @Transactional(readOnly = true)
+    public BreakageFullDto getBreakage(String breakageId) {
+        BreakageDto breakageDto;
+        try {
+            breakageDto = breakageRepository.getBreakage(breakageId);
+        } catch (Exception e) {
+            throw new NotFoundException("Данная заявка на неисправность не существует.");
+        }
+        List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
+
+        BreakageFullDto breakageFullDto =
+                BreakageMapper.toBreakageFullDto(breakageDto, backComments);
+
+        return breakageFullDto;
+    }
 
     // BREAKAGE_COMMENT
     @Override

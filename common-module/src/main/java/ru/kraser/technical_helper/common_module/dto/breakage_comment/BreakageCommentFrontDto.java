@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record BreakageCommentDto(
+public record BreakageCommentFrontDto(
         String id,
         String comment,
         @JsonProperty(value = "isActionEnabled")

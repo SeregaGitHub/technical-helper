@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -68,6 +69,13 @@ public class BreakageController {
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor);
     }
 
+    @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public BreakageFullDto getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+
+        return breakageService.getBreakage(breakageId);
+    }
+
     // BREAKAGE_COMMENT
     @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.CREATED)
@@ -78,14 +86,14 @@ public class BreakageController {
 
     @PatchMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse updateBreakageComment(@RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
+    public ApiResponse updateBreakageComment(@RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
                                              @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
         return breakageService.updateBreakageComment(createBreakageCommentDto, breakageCommentId);
     }
 
     @DeleteMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteBreakageComment(@RequestHeader (BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId) {
+    public ApiResponse deleteBreakageComment(@RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId) {
         return breakageService.deleteBreakageComment(breakageCommentId);
     }
 }

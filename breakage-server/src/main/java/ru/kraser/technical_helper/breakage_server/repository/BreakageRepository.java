@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
@@ -17,7 +18,7 @@ import java.util.List;
 @Repository
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
 
-    String GET_ALL_BREAKAGES = "SELECT new ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto " +
+    String GET_BREAKAGE = "SELECT new ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto " +
             "(b.id, d.id, d.name, b.room, b.breakageTopic, b.breakageText, b.status, b.priority, " +
             "COALESCE (ue.username, 'Не назначен') AS executor, " +
             "COALESCE (ua.username, 'Отсутствует') AS executorAppointedBy, " +
@@ -27,9 +28,9 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             "LEFT JOIN FETCH User as ua ON ua.id = b.executorAppointedBy.id " +
             "JOIN FETCH User as uc ON uc.id = b.createdBy " +
             "JOIN FETCH User as uu ON uu.id = b.lastUpdatedBy " +
-            "JOIN FETCH Department as d ON d.id = b.department.id " +
-            "WHERE status IN (?1) " +
-            "AND priority IN (?2)";
+            "JOIN FETCH Department as d ON d.id = b.department.id";
+
+    String GET_ALL_BREAKAGES = GET_BREAKAGE + " WHERE status IN (?1) AND priority IN (?2)";
 
     @Modifying
     @Query(
@@ -72,4 +73,10 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             value = GET_ALL_BREAKAGES
     )
     Page<BreakageDto> getAllBreakages(List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
+
+    @Query(
+            value = GET_BREAKAGE + " WHERE b.id = :breakageId"
+    )
+    BreakageDto getBreakage(String breakageId);
+
 }

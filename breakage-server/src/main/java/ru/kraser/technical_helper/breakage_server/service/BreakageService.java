@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.breakage_server.service;
 
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -24,4 +25,6 @@ public interface BreakageService {
     ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageCommentId);
 
     ApiResponse deleteBreakageComment(String breakageCommentId);
+
+    BreakageFullDto getBreakage(String breakageId);
 }
