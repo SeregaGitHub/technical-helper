@@ -1,4 +1,5 @@
 --------------------- only for develop mode
+--DROP TABLE IF EXISTS breakage_comment_audit;
 --DROP TABLE IF EXISTS breakage_comment;
 --DROP TABLE IF EXISTS breakage_audit;
 --DROP TABLE IF EXISTS breakage;
@@ -126,6 +127,20 @@ CREATE TABLE IF NOT EXISTS breakage_comment (
         REFERENCES users (id)
 );
 
+CREATE TABLE IF NOT EXISTS breakage_comment_audit (
+  operation         char(1)     NOT NULL,
+  breakage_comment  varchar(36) NOT NULL,
+  breakage          varchar(36) NOT NULL,
+  comment           text        NOT NULL,
+  last_updated_by   varchar(36) NOT NULL,
+  last_updated_date timestamp   NOT NULL,
+  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date),
+  CONSTRAINT fk_breakage_comment_audit_breakage_id FOREIGN KEY (breakage)
+        REFERENCES breakage (id),
+  CONSTRAINT fk_breakage_audit_last_updated_by     FOREIGN KEY (last_updated_by)
+        REFERENCES users (id)
+);
+
 
 CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
 
@@ -223,12 +238,37 @@ BEGIN
 END
 ' LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION audit_breakage_comment() RETURNS trigger AS '
+BEGIN
+    IF TG_OP = ''INSERT'' THEN
+	    INSERT INTO breakage_comment_audit
+	        SELECT ''I'', nt.id, nt.comment, nt.last_updated_by, nt.last_updated_date, nt.breakage
+	        FROM new_table AS nt;
+	ELSEIF TG_OP = ''UPDATE'' THEN
+	    INSERT INTO breakage_comment_audit
+	        SELECT ''U'', nt.id, nt.comment, nt.last_updated_by, nt.last_updated_date, nt.breakage
+        	FROM new_table AS nt;
+    ELSEIF TG_OP = ''DELETE'' THEN
+    	INSERT INTO breakage_comment_audit
+    	    SELECT ''D'', ot.id, ot.comment, ot.last_updated_by, NOW()::timestamp, ot.breakage
+            FROM old_table AS ot;
+    END IF;
+	RETURN NULL;
+END
+' LANGUAGE plpgsql;
+
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 
 DROP TRIGGER IF EXISTS audit_breakage_create ON breakage;
 
 DROP TRIGGER IF EXISTS audit_breakage_update ON breakage;
+
+DROP TRIGGER IF EXISTS audit_breakage_comment_create ON breakage_comment;
+
+DROP TRIGGER IF EXISTS audit_breakage_comment_update ON breakage_comment;
+
+DROP TRIGGER IF EXISTS audit_breakage_comment_delete ON breakage_comment;
 
 
 CREATE TRIGGER delete_all_users_from_department AFTER UPDATE OF enabled ON department
@@ -241,4 +281,16 @@ FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
 CREATE TRIGGER audit_breakage_update AFTER UPDATE ON breakage
 REFERENCING NEW TABLE AS new_table
 FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
+
+CREATE TRIGGER audit_breakage_comment_create AFTER INSERT ON breakage_comment
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+
+CREATE TRIGGER audit_breakage_comment_update AFTER UPDATE ON breakage_comment
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+
+CREATE TRIGGER audit_breakage_comment_delete AFTER DELETE ON breakage_comment
+REFERENCING OLD TABLE AS old_table
+FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
 

@@ -201,10 +201,10 @@ public class BreakageServiceImpl implements BreakageService {
         int response = breakageCommentRepository.updateBreakageComment(breakageCommentId,
                     createBreakageCommentDto.comment(), SecurityUtil.getCurrentUserId(), now);
 
-        ThrowMainServerException.isExist(response, "запрос - невозможен. Эта заявка на неисправность");
+        ThrowMainServerException.isExist(response, "комментарий к заявке на неисправность");
 
         return ApiResponse.builder()
-                .message("Заявка на неисправность была успешно обновлена.")
+                .message("Комментарий к заявке на неисправность был успешно обновлен.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now().withNano(0))
@@ -216,7 +216,7 @@ public class BreakageServiceImpl implements BreakageService {
     public ApiResponse deleteBreakageComment(String breakageCommentId) {
         breakageCommentRepository.deleteById(breakageCommentId);
         return ApiResponse.builder()
-                .message("Заявка на неисправность была успешно удалена.")
+                .message("Комментарий к заявке на неисправность был успешно удален.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now().withNano(0))
