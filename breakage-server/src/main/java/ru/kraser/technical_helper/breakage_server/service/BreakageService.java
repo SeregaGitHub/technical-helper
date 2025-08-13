@@ -4,6 +4,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -14,6 +15,8 @@ public interface BreakageService {
     ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId);
 
     ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus);
+
+    ApiResponse updateBreakagePriority(String breakageId, UpdateBreakagePriorityDto updateBreakagePriorityDto);
 
     AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,

@@ -8,6 +8,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -37,6 +38,13 @@ public class BreakageController {
     public ApiResponse updateBreakageStatus(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                             @RequestBody UpdateBreakageStatusDto updatedStatus) {
         return breakageService.updateBreakageStatus(breakageId, updatedStatus);
+    }
+
+    @PatchMapping(path = TECHNICIAN_URL + PRIORITY_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse updateBreakagePriority(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                              @RequestBody UpdateBreakagePriorityDto updateBreakagePriorityDto) {
+        return breakageService.updateBreakagePriority(breakageId, updateBreakagePriorityDto);
     }
 
     @GetMapping(path = EMPLOYEE_URL)

@@ -8,6 +8,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
@@ -50,6 +51,17 @@ public class BreakageGatewayController {
                                             @RequestBody UpdateBreakageStatusDto updatedStatus) {
         ApiResponse response = breakageClient.updateBreakageStatus(BREAKAGE_ID_HEADER, breakageId,
                 updatedStatus, jwt);
+
+        return response;
+    }
+
+    @PatchMapping(path = TECHNICIAN_URL + PRIORITY_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse updateBreakagePriority(@RequestHeader(AUTH_HEADER) String jwt,
+                                              @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                              @RequestBody UpdateBreakagePriorityDto updatedPriority) {
+        ApiResponse response = breakageClient.updateBreakagePriority(BREAKAGE_ID_HEADER, breakageId,
+                updatedPriority, jwt);
 
         return response;
     }

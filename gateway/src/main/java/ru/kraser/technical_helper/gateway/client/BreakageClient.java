@@ -7,6 +7,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
@@ -45,6 +46,18 @@ public class BreakageClient extends BaseClient {
         return super.patch(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + STATUS_URL,
                 updatedStatus,
+                jwt,
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    public ApiResponse updateBreakagePriority(String breakageHeaderName, String breakageId,
+                                              UpdateBreakagePriorityDto updatedPriority, String jwt) {
+        return super.patch(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + PRIORITY_URL,
+                updatedPriority,
                 jwt,
                 breakageHeaderName,
                 breakageId,

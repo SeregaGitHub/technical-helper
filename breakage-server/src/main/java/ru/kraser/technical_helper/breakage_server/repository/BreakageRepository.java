@@ -58,7 +58,22 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
                     WHERE id = :breakageId
                     """
     )
-    int updateBreakageStatus(String breakageId, Status updatedStatus, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
+    int updateBreakageStatus(
+            String breakageId, Status updatedStatus, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
+
+    @Modifying
+    @Query(
+            value = """
+                    UPDATE Breakage
+                    SET
+                    priority = :updatedPriority,
+                    lastUpdatedBy = :lastUpdatedBy,
+                    lastUpdatedDate = :lastUpdatedDate
+                    WHERE id = :breakageId
+                    """
+    )
+    int updateBreakagePriority(
+            String breakageId, Priority updatedPriority, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
 
     @Query(
             value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId"

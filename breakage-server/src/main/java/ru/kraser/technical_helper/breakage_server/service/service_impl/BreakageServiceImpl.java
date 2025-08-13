@@ -15,10 +15,7 @@ import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageCommentMap
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.enums.Executor;
@@ -98,7 +95,6 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        Role currentUserRole = SecurityUtil.getCurrentUserRole();
 
         int response;
         response = breakageRepository.updateBreakageStatus(
@@ -111,7 +107,30 @@ public class BreakageServiceImpl implements BreakageService {
             throw new NotFoundException(BREAKAGE_NOT_EXIST);
         }
         return ApiResponse.builder()
-                .message("Статус заявки на неисправность была успешно изменен на - ." + updatedStatus.status())
+                .message("Статус заявки на неисправность была успешно изменен на - " + updatedStatus.status())
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse updateBreakagePriority(String breakageId, UpdateBreakagePriorityDto updatedPriority) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+
+        int response;
+        response = breakageRepository.updateBreakagePriority(
+                breakageId,
+                updatedPriority.priority(),
+                SecurityUtil.getCurrentUserId(),
+                now
+        );
+        if (response != 1) {
+            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        }
+        return ApiResponse.builder()
+                .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(now)
