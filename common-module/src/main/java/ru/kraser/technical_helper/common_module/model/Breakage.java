@@ -8,6 +8,8 @@ import lombok.Setter;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -41,4 +43,7 @@ public class Breakage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "executor_appointed_by")
     private User executorAppointedBy;
+
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
 }

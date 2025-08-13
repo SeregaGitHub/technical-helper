@@ -31,6 +31,7 @@ public class BreakageMapper {
         breakage.setBreakageText(createBreakageDto.breakageText());
         breakage.setStatus(Status.NEW);
         breakage.setPriority(Priority.MEDIUM);
+        breakage.setDeadline(null);
         breakage.setCreatedBy(currentUserId);
         breakage.setCreatedDate(now);
         breakage.setLastUpdatedBy(currentUserId);

@@ -24,6 +24,8 @@ public record BreakageDto(
         LocalDateTime createdDate,
         String lastUpdatedBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime lastUpdatedDate
+        LocalDateTime lastUpdatedDate,
+        @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+        LocalDateTime deadline
 ) {
 }

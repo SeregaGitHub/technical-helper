@@ -35,7 +35,6 @@ import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServer
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 

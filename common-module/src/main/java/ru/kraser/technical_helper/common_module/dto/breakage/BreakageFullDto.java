@@ -27,6 +27,8 @@ public record BreakageFullDto(
         String lastUpdatedBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
         LocalDateTime lastUpdatedDate,
+        @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+        LocalDateTime deadline,
         List<BreakageCommentFrontDto> comments
 ) {
 }

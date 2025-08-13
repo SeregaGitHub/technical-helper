@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS breakage (
   priority                   varchar(8)    NOT NULL,
   executor                   varchar(36),
   executor_appointed_by      varchar(36),
+  deadline                   timestamp,
   created_by                 varchar(36)   NOT NULL,
   created_date               timestamp     NOT NULL,
   last_updated_by            varchar(36)   NOT NULL,
@@ -82,6 +83,7 @@ CREATE TABLE IF NOT EXISTS breakage (
 );
 
 CREATE TABLE IF NOT EXISTS breakage_audit (
+  operation                  char(1)       NOT NULL,
   breakage                   varchar(36)   NOT NULL,
   department                 varchar(36)   NOT NULL,
   room                       varchar(128)  NOT NULL,
@@ -91,6 +93,7 @@ CREATE TABLE IF NOT EXISTS breakage_audit (
   priority                   varchar(8)    NOT NULL,
   executor                   varchar(36),
   executor_appointed_by      varchar(36),
+  deadline                   timestamp,
   last_updated_by            varchar(36)   NOT NULL,
   last_updated_date          timestamp     NOT NULL,
   CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
@@ -205,10 +208,17 @@ END;
 
 CREATE OR REPLACE FUNCTION audit_breakage() RETURNS trigger AS '
 BEGIN
-	INSERT INTO breakage_audit
-	    SELECT nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
-	       nt.executor, nt.executor_appointed_by, nt.last_updated_by, nt.last_updated_date
-	    FROM new_table AS nt;
+    IF TG_OP = ''INSERT'' THEN
+	    INSERT INTO breakage_audit
+	        SELECT ''I'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
+	            nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
+	        FROM new_table AS nt;
+	ELSEIF TG_OP = ''UPDATE'' THEN
+	    INSERT INTO breakage_audit
+	        SELECT ''U'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
+        	    nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
+        	FROM new_table AS nt;
+    END IF;
 	RETURN NULL;
 END
 ' LANGUAGE plpgsql;
