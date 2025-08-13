@@ -18,6 +18,7 @@ import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.enums.Executor;
@@ -94,7 +95,31 @@ public class BreakageServiceImpl implements BreakageService {
     }
 
     @Override
-    @Transactional(readOnly = true)  //TODO - check empty collection !!!
+    @Transactional
+    public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+        Role currentUserRole = SecurityUtil.getCurrentUserRole();
+
+        int response;
+        response = breakageRepository.updateBreakageStatus(
+                breakageId,
+                updatedStatus.status(),
+                SecurityUtil.getCurrentUserId(),
+                now
+        );
+        if (response != 1) {
+            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        }
+        return ApiResponse.builder()
+                .message("Статус заявки на неисправность была успешно изменен на - ." + updatedStatus.status())
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,

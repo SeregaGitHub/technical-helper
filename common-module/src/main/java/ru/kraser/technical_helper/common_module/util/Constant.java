@@ -24,6 +24,8 @@ public class Constant {
     public static final String PASSWORD_URL = "/password";
     public static final String DELETE_URL = "/delete";
 
+    public static final String STATUS_URL = "/status";
+
     public static final String AUTH_HEADER = "Authorization";
     public static final String USER_ID_HEADER = "X-User-Id";
     public static final String DEPARTMENT_ID_HEADER = "X-Department-Id";

@@ -1,5 +1,6 @@
 package ru.kraser.technical_helper.breakage_server.repository;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,6 +47,19 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     )
     int cancelBreakage(String breakageId, Status status, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
 
+    @Modifying
+    @Query(
+            value = """
+                    UPDATE Breakage
+                    SET
+                    status = :updatedStatus,
+                    lastUpdatedBy = :lastUpdatedBy,
+                    lastUpdatedDate = :lastUpdatedDate
+                    WHERE id = :breakageId
+                    """
+    )
+    int updateBreakageStatus(String breakageId, Status updatedStatus, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
+
     @Query(
             value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId"
     )
@@ -79,5 +93,4 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             value = GET_BREAKAGE + " WHERE b.id = :breakageId"
     )
     Optional<BreakageDto> getBreakage(String breakageId);
-
 }
