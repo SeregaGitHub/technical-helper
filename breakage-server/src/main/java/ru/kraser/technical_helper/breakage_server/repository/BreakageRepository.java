@@ -1,6 +1,5 @@
 package ru.kraser.technical_helper.breakage_server.repository;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
@@ -34,18 +32,6 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
 
     String GET_ALL_BREAKAGES = GET_BREAKAGE + " WHERE status IN (?1) AND priority IN (?2)";
 
-    @Modifying
-    @Query(
-            value = """
-                    UPDATE Breakage
-                    SET
-                    status = :status,
-                    lastUpdatedBy = :lastUpdatedBy,
-                    lastUpdatedDate = :lastUpdatedDate
-                    WHERE id = :breakageId
-                    """
-    )
-    int cancelBreakage(String breakageId, Status status, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
 
     @Modifying
     @Query(

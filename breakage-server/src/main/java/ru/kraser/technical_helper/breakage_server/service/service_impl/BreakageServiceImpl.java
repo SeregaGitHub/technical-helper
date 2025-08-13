@@ -69,7 +69,7 @@ public class BreakageServiceImpl implements BreakageService {
         if (userDepartmentId.equals(breakageDepartmentId) ||
                 currentUserRole == Role.ADMIN || currentUserRole == Role.TECHNICIAN) {
             int response;
-            response = breakageRepository.cancelBreakage(
+            response = breakageRepository.updateBreakageStatus(
                     breakageId,
                     Status.CANCELLED,
                     SecurityUtil.getCurrentUserId(),
