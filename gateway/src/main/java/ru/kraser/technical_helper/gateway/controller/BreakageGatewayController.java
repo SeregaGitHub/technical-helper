@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +17,18 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 @RestController
 @RequestMapping(path = BASE_URL + BREAKAGE_URL)
 @RequiredArgsConstructor
+@Slf4j
 @Validated
 public class BreakageGatewayController {
     private final BreakageClient breakageClient;
 
     @PostMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@Validated() @RequestBody CreateBreakageDto createBreakageDto,
+    public ApiResponse createBreakage(@Validated() @RequestBody CreateBreakageDto createBreakageDto,
                                         @RequestHeader(AUTH_HEADER) String jwt) {
+        log.info("Creating Breakage with breakage topic - {}", createBreakageDto.breakageTopic());
         ApiResponse response = breakageClient.createBreakage(createBreakageDto, jwt);
-
+        log.info("Breakage with breakage topic - {}, successfully created", createBreakageDto.breakageTopic());
         return response;
     }
 
@@ -34,10 +37,11 @@ public class BreakageGatewayController {
     public ApiResponse cancelBreakage(@RequestHeader(AUTH_HEADER) String jwt,
                                       @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                       @RequestHeader(DEPARTMENT_ID_HEADER) String breakageDepartmentId) {
+        log.info("Canceling Breakage with Id={}", breakageId);
         ApiResponse response = breakageClient.cancelBreakage(BREAKAGE_ID_HEADER, breakageId,
                 DEPARTMENT_ID_HEADER, breakageDepartmentId,
                 jwt);
-
+        log.info("Breakage with Id={}, successfully created", breakageId);
         return response;
     }
 
@@ -46,9 +50,10 @@ public class BreakageGatewayController {
     public ApiResponse updateBreakageStatus(@RequestHeader(AUTH_HEADER) String jwt,
                                             @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                             @Validated() @RequestBody UpdateBreakageStatusDto updatedStatus) {
+        log.info("Updating Status of breakage with Id={}", breakageId);
         ApiResponse response = breakageClient.updateBreakageStatus(BREAKAGE_ID_HEADER, breakageId,
                 updatedStatus, jwt);
-
+        log.info("Status of breakage with Id={}, successfully updated", breakageId);
         return response;
     }
 
@@ -57,9 +62,10 @@ public class BreakageGatewayController {
     public ApiResponse updateBreakagePriority(@RequestHeader(AUTH_HEADER) String jwt,
                                               @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                               @Validated() @RequestBody UpdateBreakagePriorityDto updatedPriority) {
+        log.info("Updating Priority of breakage with Id={}", breakageId);
         ApiResponse response = breakageClient.updateBreakagePriority(BREAKAGE_ID_HEADER, breakageId,
                 updatedPriority, jwt);
-
+        log.info("Priority of breakage with Id={}, successfully updated", breakageId);
         return response;
     }
 
@@ -68,9 +74,10 @@ public class BreakageGatewayController {
     public ApiResponse addBreakageExecutor(@RequestHeader(AUTH_HEADER) String jwt,
                                            @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                            @Validated() @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
+        log.info("Adding executor and deadline of breakage with Id={}", breakageId);
         ApiResponse response = breakageClient.addBreakageExecutor(BREAKAGE_ID_HEADER, breakageId,
                 appointBreakageExecutorDto, jwt);
-
+        log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
         return response;
     }
 
@@ -110,11 +117,12 @@ public class BreakageGatewayController {
                                    @RequestParam(value = "deadline", defaultValue = "false")
                                        boolean deadline
     ) {
+        log.info("Getting Breakages");
         AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
-
+        log.info("Breakages received successfully");
         return employeeBreakageDtoList;
     }
 
@@ -122,8 +130,9 @@ public class BreakageGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public BreakageFullDto getBreakage(@RequestHeader(AUTH_HEADER) String jwt,
                                        @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Getting Breakage with Id={}", breakageId);
         BreakageFullDto response = breakageClient.getBreakage(jwt, BREAKAGE_ID_HEADER, breakageId);
-
+        log.info("Breakage with Id={}, received successfully", breakageId);
         return response;
     }
 
@@ -139,8 +148,9 @@ public class BreakageGatewayController {
                                           String sortBy,
                                       @RequestParam(value = "direction", defaultValue = "DESC")
                                           String direction) {
+        log.info("Getting Breakages by text");
         AppPage response = breakageClient.getBreakagesByText(jwt, text, pageIndex, pageSize, sortBy, direction);
-
+        log.info("Breakages contains text, received successfully");
         return response;
     }
 
@@ -150,8 +160,10 @@ public class BreakageGatewayController {
     public ApiResponse createBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
                                              @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                              @Validated() @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        log.info("Creating Comment with breakage Id={}", breakageId);
         ApiResponse response = breakageClient.createBreakageComment(createBreakageCommentDto,
                 BREAKAGE_ID_HEADER, breakageId, jwt);
+        log.info("Comment with breakage Id={}, successfully created", breakageId);
         return response;
     }
 
@@ -160,9 +172,10 @@ public class BreakageGatewayController {
     public ApiResponse updateBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
                                              @RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
                                              @Validated() @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
+        log.info("Updating Comment with Id={}", breakageCommentId);
         ApiResponse response = breakageClient.updateBreakageComment(createBreakageCommentDto,
                 BREAKAGE_COMMENT_ID_HEADER, breakageCommentId, jwt);
-
+        log.info("Comment with Id={}, successfully updated", breakageCommentId);
         return response;
     }
 
@@ -170,8 +183,9 @@ public class BreakageGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteBreakageComment(@RequestHeader(AUTH_HEADER) String jwt,
                                              @RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId) {
+        log.info("Deleting Comment with Id={}", breakageCommentId);
         ApiResponse response = breakageClient.deleteBreakageComment(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId, jwt);
-
+        log.info("Comment with Id={}, successfully deleted", breakageCommentId);
         return response;
     }
 }
