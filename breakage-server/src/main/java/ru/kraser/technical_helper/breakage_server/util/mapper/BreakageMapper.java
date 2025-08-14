@@ -63,6 +63,7 @@ public class BreakageMapper {
                 .createdDate(breakageDto.createdDate())
                 .lastUpdatedBy(breakageDto.lastUpdatedBy())
                 .lastUpdatedDate(breakageDto.lastUpdatedDate())
+                .deadline(breakageDto.deadline())
                 .comments(comments)
                 .build();
     }
