@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.main_server.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -16,6 +17,7 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + USER_URL)
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -23,38 +25,56 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createUser(@RequestBody CreateUserDto createUserDto) {
-        return userService.createUser(createUserDto);
+        log.info("Creating User with name - {}", createUserDto.username());
+        ApiResponse apiResponse = userService.createUser(createUserDto);
+        log.info("User with name - {}, successfully created", createUserDto.username());
+        return apiResponse;
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@RequestHeader (USER_ID_HEADER) String userId,
                              @RequestBody UpdateUserDto updateUserDto) {
-        return userService.updateUser(userId, updateUserDto);
+        log.info("Updating User with Id={}", userId);
+        ApiResponse apiResponse =  userService.updateUser(userId, updateUserDto);
+        log.info("User with Id={}, successfully updated", userId);
+        return apiResponse;
     }
 
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
                                      @RequestBody ChangeUserPasswordDto passwordDto) {
-        return userService.changeUserPassword(userId, passwordDto);
+        log.info("Change password of User with Id={}", userId);
+        ApiResponse apiResponse = userService.changeUserPassword(userId, passwordDto);
+        log.info("Password User with Id={}, successfully changed", userId);
+        return apiResponse;
     }
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+        log.info("Getting all Users");
+        List<UserDto> users =  userService.getAllUsers();
+        log.info("All Users received successfully");
+        return users;
     }
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@RequestHeader (USER_ID_HEADER) String userId) {
-        return userService.getUser(userId);
+        log.info("Getting User with Id={}", userId);
+        UserDto user = userService.getUser(userId);
+        log.info("User with Id={}, received successfully", userId);
+        return user;
     }
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
-        return userService.deleteUser(userId);
+        log.info("Deleting User with Id={}", userId);
+        ApiResponse apiResponse = userService.deleteUser(userId);
+        log.info("User with Id={}, successfully deleted", userId);
+        return apiResponse;
     }
 }

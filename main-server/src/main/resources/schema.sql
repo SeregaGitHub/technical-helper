@@ -144,16 +144,16 @@ CREATE TABLE IF NOT EXISTS breakage_comment_audit (
 
 CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
 
---CREATE EXTENSION pg_trgm;
---CREATE INDEX idx_breakage_breakage_text ON breakage USING gin (breakage_text gin_trgm_ops);
---
---CREATE INDEX IF NOT EXISTS idx_breakage_department ON breakage(breakage);
---
---CREATE INDEX IF NOT EXISTS idx_breakage_status ON breakage(status);
---
---CREATE INDEX IF NOT EXISTS idx_breakage_executor ON breakage(executor);
---
---CREATE INDEX IF NOT EXISTS idx_breakage_deadline ON breakage(deadline);
+CREATE EXTENSION pg_trgm;
+CREATE INDEX idx_breakage_breakage_text ON breakage USING gin (breakage_text gin_trgm_ops);
+
+CREATE INDEX IF NOT EXISTS idx_breakage_department ON breakage(breakage);
+
+CREATE INDEX IF NOT EXISTS idx_breakage_status ON breakage(status);
+
+CREATE INDEX IF NOT EXISTS idx_breakage_executor ON breakage(executor);
+
+CREATE INDEX IF NOT EXISTS idx_breakage_deadline ON breakage(deadline);
 
 
 ALTER TABLE department
