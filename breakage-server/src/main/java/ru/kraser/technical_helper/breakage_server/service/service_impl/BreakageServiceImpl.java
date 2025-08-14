@@ -181,20 +181,15 @@ public class BreakageServiceImpl implements BreakageService {
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh,
             boolean priorityMedium, boolean priorityLow,
-            String executor) {
+            String executor, boolean deadline) {
 
         Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(breakagesDirection, sortBy);
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize, sort);
-        // size: item on page (Angular: this.paginator.pageSize)
-
-        // from: pageNumber * size (Angular: this.paginator.pageSize * paginator.pageIndex)
-        // NOW - pageIndex (Angular: this.paginator.pageIndex)
-
-        // length: count of all items (Angular: this.paginator.length)
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
-                statusPaused, statusRedirected, statusCancelled);
+                statusPaused, statusRedirected, statusCancelled, deadline);
+
         List<Priority> priorityList = AppPageUtil.createPriorityList(priorityUrgently, priorityHigh,
                 priorityMedium, priorityLow);
 
@@ -207,32 +202,48 @@ public class BreakageServiceImpl implements BreakageService {
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages =
-                    breakageRepository.getAllBreakagesAppointedToMe(
-                            statusList, priorityList, pageRequest, currentUserId);
+            Page<BreakageDto> pageBreakages;
+            if (deadline) {
+                LocalDateTime now = LocalDateTime.now().withNano(0);
+                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToMe(
+                        statusList, priorityList, pageRequest, currentUserId, now);
+            } else {
+                pageBreakages = breakageRepository.getAllBreakagesAppointedToMe(
+                                statusList, priorityList, pageRequest, currentUserId);
+            }
             return AppPageMapper.toAppPage(pageBreakages);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages =
-                    breakageRepository.getAllBreakagesAppointedToOthers(
-                            statusList, priorityList, pageRequest, currentUserId);
+            Page<BreakageDto> pageBreakages;
+            if (deadline) {
+                LocalDateTime now = LocalDateTime.now().withNano(0);
+                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToOthers(
+                        statusList, priorityList, pageRequest, currentUserId, now);
+            } else {
+                pageBreakages = breakageRepository.getAllBreakagesAppointedToOthers(
+                                statusList, priorityList, pageRequest, currentUserId);
+            }
             return AppPageMapper.toAppPage(pageBreakages);
 
         } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
-            Page<BreakageDto> pageBreakages =
-                    breakageRepository.getAllBreakagesNoAppointed(
-                            statusList, priorityList, pageRequest);
+            Page<BreakageDto> pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
+                    statusList, priorityList, pageRequest);
             return AppPageMapper.toAppPage(pageBreakages);
 
         } else {
-            Page<BreakageDto> pageBreakages =
-                    breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+            Page<BreakageDto> pageBreakages;
+            if (deadline) {
+                LocalDateTime now = LocalDateTime.now().withNano(0);
+                pageBreakages =
+                        breakageRepository.getAllDeadlineExpiredBreakages(statusList, priorityList, pageRequest, now);
+            } else {
+                pageBreakages =
+                        breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+            }
             return AppPageMapper.toAppPage(pageBreakages);
         }
     }
-    // breakage/employee?pageIndex=1&pageSize=10&sortBy=lastUpdatedDate&direction=DESC
-    // ?from=0&size=10&sortBy=room&direction=ASC
 
     @Override
     @Transactional(readOnly = true)

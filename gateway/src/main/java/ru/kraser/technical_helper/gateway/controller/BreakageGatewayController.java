@@ -106,12 +106,14 @@ public class BreakageGatewayController {
                                    @RequestParam(value = "priorityLow", defaultValue = "true")
                                        boolean priorityLow,
                                    @RequestParam(value = "executor", required = false)
-                                       String executor
+                                       String executor,
+                                   @RequestParam(value = "deadline", defaultValue = "false")
+                                       boolean deadline
     ) {
         AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor);
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
 
         return employeeBreakageDtoList;
     }

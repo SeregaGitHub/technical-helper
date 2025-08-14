@@ -32,6 +32,8 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
 
     String GET_ALL_BREAKAGES = GET_BREAKAGE + " WHERE status IN (?1) AND priority IN (?2)";
 
+    String GET_ALL_DEADLINE_EXPIRED_BREAKAGES = GET_ALL_BREAKAGES + " AND b.deadline < :now";
+
 
     @Modifying
     @Query(
@@ -89,10 +91,24 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
 
     @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id = :currentUserId"
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakagesAppointedToMe(
+            List<Status> statusList, List<Priority> priorityList,
+            PageRequest pageRequest, String currentUserId, LocalDateTime now);
+
+    @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id <> :currentUserId"
     )
     Page<BreakageDto> getAllBreakagesAppointedToOthers(
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
+
+    @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id <> :currentUserId"
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakagesAppointedToOthers(
+            List<Status> statusList, List<Priority> priorityList,
+            PageRequest pageRequest, String currentUserId, LocalDateTime now);
 
     @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id IS NULL"
@@ -104,6 +120,12 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             value = GET_ALL_BREAKAGES
     )
     Page<BreakageDto> getAllBreakages(List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
+
+    @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakages(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, LocalDateTime now);
 
     @Query(
             value = GET_BREAKAGE + " WHERE b.id = :breakageId"

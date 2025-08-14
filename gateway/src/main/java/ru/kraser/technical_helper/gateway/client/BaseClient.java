@@ -133,7 +133,7 @@ public abstract class BaseClient {
                                  boolean statusNew, boolean statusSolved, boolean statusInProgress,
                                  boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
                                  boolean priorityUrgently, boolean priorityHigh,
-                                 boolean priorityMedium, boolean priorityLow, String executor,
+                                 boolean priorityMedium, boolean priorityLow, String executor, boolean deadline,
                                  String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
@@ -153,6 +153,7 @@ public abstract class BaseClient {
                                 .queryParam("priorityMedium", priorityMedium)
                                 .queryParam("priorityLow", priorityLow)
                                 .queryParam("executor", executor)
+                                .queryParam("deadline", deadline)
                                 .build())
                 .header(AUTH_HEADER, jwt)
                 .accept(MediaType.APPLICATION_JSON)

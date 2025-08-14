@@ -22,7 +22,7 @@ public interface BreakageService {
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
-            String executor);
+            String executor, boolean deadline);
 
     // BREAKAGE_COMMENT
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
