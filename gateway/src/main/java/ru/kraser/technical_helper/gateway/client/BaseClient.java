@@ -165,6 +165,26 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
+    protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
+                                 String sortBy, String direction, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> getResponse = webClient
+                .get()
+                .uri(url, uriBuilder ->
+                        uriBuilder.queryParam("pageSize", pageSize)
+                                .queryParam("pageIndex", pageIndex)
+                                .queryParam("sortBy", sortBy)
+                                .queryParam("direction", direction)
+                                .build())
+                .header(AUTH_HEADER, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToMono(typeReference);
+
+        return getResponse.block();
+    }
+
     protected <T> T get(String url, String jwt, String entityHeaderName,
                         String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient

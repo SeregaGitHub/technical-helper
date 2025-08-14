@@ -128,6 +128,11 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, LocalDateTime now);
 
     @Query(
+            value = GET_BREAKAGE + " WHERE b.breakageText ILIKE %?1%"
+    )
+    Page<BreakageDto> getBreakagesByText(String text, PageRequest pageRequest);
+
+    @Query(
             value = GET_BREAKAGE + " WHERE b.id = :breakageId"
     )
     Optional<BreakageDto> getBreakage(String breakageId);

@@ -1,6 +1,8 @@
 package ru.kraser.technical_helper.common_module.util;
 
 import lombok.experimental.UtilityClass;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 
@@ -40,5 +42,12 @@ public class AppPageUtil {
         if (priorityLow) {priorityList.add(Priority.LOW);}
 
         return priorityList.isEmpty() ? List.of(Priority.values()) : priorityList;
+    }
+
+    public PageRequest createPageRequest(Integer pageSize, Integer pageIndex, String sortBy, String direction) {
+        Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(breakagesDirection, sortBy);
+
+        return PageRequest.of(pageIndex, pageSize, sort);
     }
 }

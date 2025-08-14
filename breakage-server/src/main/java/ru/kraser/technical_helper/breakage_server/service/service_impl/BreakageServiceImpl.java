@@ -183,9 +183,7 @@ public class BreakageServiceImpl implements BreakageService {
             boolean priorityMedium, boolean priorityLow,
             String executor, boolean deadline) {
 
-        Sort.Direction breakagesDirection = direction.equals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(breakagesDirection, sortBy);
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize, sort);
+        PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
                 statusPaused, statusRedirected, statusCancelled, deadline);
@@ -243,6 +241,18 @@ public class BreakageServiceImpl implements BreakageService {
             }
             return AppPageMapper.toAppPage(pageBreakages);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AppPage getBreakagesByText(
+            String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
+
+        PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
+
+        Page<BreakageDto> pageBreakages = breakageRepository.getBreakagesByText(text, pageRequest);
+
+        return AppPageMapper.toAppPage(pageBreakages);
     }
 
     @Override

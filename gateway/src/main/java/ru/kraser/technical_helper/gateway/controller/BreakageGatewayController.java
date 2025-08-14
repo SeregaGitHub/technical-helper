@@ -127,6 +127,23 @@ public class BreakageGatewayController {
         return response;
     }
 
+    @GetMapping(path = EMPLOYEE_URL + "/{text}")
+    @ResponseStatus(HttpStatus.OK)
+    public AppPage getBreakagesByText(@RequestHeader(AUTH_HEADER) String jwt,
+                                      @PathVariable("text") String text,
+                                      @RequestParam(value = "pageSize", defaultValue = "10")
+                                          Integer pageSize,
+                                      @RequestParam(value = "pageIndex", defaultValue = "0")
+                                          Integer pageIndex,
+                                      @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                          String sortBy,
+                                      @RequestParam(value = "direction", defaultValue = "DESC")
+                                          String direction) {
+        AppPage response = breakageClient.getBreakagesByText(jwt, text, pageIndex, pageSize, sortBy, direction);
+
+        return response;
+    }
+
     // BREAKAGE_COMMENT
     @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.CREATED)

@@ -91,6 +91,21 @@ public class BreakageController {
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
     }
 
+    @GetMapping(path = EMPLOYEE_URL + "/{text}")
+    @ResponseStatus(HttpStatus.OK)
+    public AppPage getBreakagesByText(@PathVariable("text") String text,
+                                      @RequestParam(value = "pageSize", defaultValue = "10")
+                                      Integer pageSize,
+                                      @RequestParam(value = "pageIndex", defaultValue = "0")
+                                      Integer pageIndex,
+                                      @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
+                                      String sortBy,
+                                      @RequestParam(value = "direction", defaultValue = "DESC")
+                                      String direction
+    ) {
+        return breakageService.getBreakagesByText(text, pageIndex, pageSize, sortBy, direction);
+    }
+
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public BreakageFullDto getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {

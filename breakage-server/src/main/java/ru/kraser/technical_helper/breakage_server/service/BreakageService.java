@@ -24,6 +24,8 @@ public interface BreakageService {
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
             String executor, boolean deadline);
 
+    AppPage getBreakagesByText(String text, Integer pageIndex, Integer pageSize, String sortBy, String direction);
+
     // BREAKAGE_COMMENT
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
 
