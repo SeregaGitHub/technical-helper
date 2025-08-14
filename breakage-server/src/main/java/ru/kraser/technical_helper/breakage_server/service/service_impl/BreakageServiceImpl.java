@@ -28,12 +28,12 @@ import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.common_module.util.AppPageUtil;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
-import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_COMMENT_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 
 @Service
@@ -75,7 +75,6 @@ public class BreakageServiceImpl implements BreakageService {
                     SecurityUtil.getCurrentUserId(),
                     now
             );
-
             if (response != 1) {
                 throw new NotFoundException(BREAKAGE_NOT_EXIST);
             }
@@ -245,7 +244,9 @@ public class BreakageServiceImpl implements BreakageService {
         int response = breakageCommentRepository.updateBreakageComment(breakageCommentId,
                     createBreakageCommentDto.comment(), SecurityUtil.getCurrentUserId(), now);
 
-        ThrowMainServerException.isExist(response, "комментарий к заявке на неисправность");
+        if (response != 1) {
+            throw new NotFoundException(BREAKAGE_COMMENT_NOT_EXIST);
+        }
 
         return ApiResponse.builder()
                 .message("Комментарий к заявке на неисправность был успешно обновлен.")

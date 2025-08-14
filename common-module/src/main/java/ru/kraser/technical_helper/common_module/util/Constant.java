@@ -38,4 +38,5 @@ public class Constant {
     public static final String DEPARTMENT_NOT_EXIST = "Данного отдела не существует !!!";
     public static final String USER_NOT_EXIST = "Данный пользователь не существует !!!";
     public static final String BREAKAGE_NOT_EXIST = "Данная заявка на неисправность не существует !!!";
+    public static final String BREAKAGE_COMMENT_NOT_EXIST = "Данный комментарий к заявке на неисправность не существует !!!";
 }
