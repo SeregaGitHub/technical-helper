@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.main_server.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +15,16 @@ import static ru.kraser.technical_helper.common_module.util.Constant.BASE_URL;
 
 @RestController
 @RequestMapping(value = BASE_URL)
+@Slf4j
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService service;
 
     @PostMapping(value = AUTH_URL)
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(service.authenticate(request));
+        log.info("Authenticating User with name - {}", request.username());
+        ResponseEntity<AuthenticationResponse> response = ResponseEntity.ok(service.authenticate(request));
+        log.info("User with name - {}, successfully authenticated", request.username());
+        return response;
     }
 }
