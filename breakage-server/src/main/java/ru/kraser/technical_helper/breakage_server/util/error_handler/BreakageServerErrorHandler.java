@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
+import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 
@@ -43,5 +44,11 @@ public class BreakageServerErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<?> handleNotFound(NotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception);
+    }
+
+    @ExceptionHandler(NotCorrectParameter.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleNotCorrectParameter(NotCorrectParameter exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception);
     }
 }

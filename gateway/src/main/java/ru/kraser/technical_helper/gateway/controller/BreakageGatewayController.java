@@ -6,10 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.gateway.client.BreakageClient;
 
@@ -48,7 +45,7 @@ public class BreakageGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateBreakageStatus(@RequestHeader(AUTH_HEADER) String jwt,
                                             @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                            @RequestBody UpdateBreakageStatusDto updatedStatus) {
+                                            @Validated() @RequestBody UpdateBreakageStatusDto updatedStatus) {
         ApiResponse response = breakageClient.updateBreakageStatus(BREAKAGE_ID_HEADER, breakageId,
                 updatedStatus, jwt);
 
@@ -59,9 +56,20 @@ public class BreakageGatewayController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateBreakagePriority(@RequestHeader(AUTH_HEADER) String jwt,
                                               @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                              @RequestBody UpdateBreakagePriorityDto updatedPriority) {
+                                              @Validated() @RequestBody UpdateBreakagePriorityDto updatedPriority) {
         ApiResponse response = breakageClient.updateBreakagePriority(BREAKAGE_ID_HEADER, breakageId,
                 updatedPriority, jwt);
+
+        return response;
+    }
+
+    @PatchMapping(path = ADMIN_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse addBreakageExecutor(@RequestHeader(AUTH_HEADER) String jwt,
+                                           @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                           @Validated() @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
+        ApiResponse response = breakageClient.addBreakageExecutor(BREAKAGE_ID_HEADER, breakageId,
+                appointBreakageExecutorDto, jwt);
 
         return response;
     }

@@ -23,13 +23,16 @@ import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
+import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.common_module.util.AppPageUtil;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -130,6 +133,40 @@ public class BreakageServiceImpl implements BreakageService {
         }
         return ApiResponse.builder()
                 .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDate deadline = appointBreakageExecutorDto.deadline();
+
+        if (deadline.isBefore(now.toLocalDate())) {
+            throw new NotCorrectParameter("Необходимо указать корректный срок исполнения заявки на неисправность.");
+        } else {
+            int response;
+            try {
+                response = breakageRepository.addBreakageExecutor(
+                        breakageId,
+                        appointBreakageExecutorDto.executor(),
+                        LocalDateTime.of(deadline, LocalTime.of(23, 59, 59)),
+                        SecurityUtil.getCurrentUserId(),
+                        now
+                );
+            } catch (Exception e) {
+                throw new NotFoundException("Пользователь, который назначается исполнителем заявки на неисправность, " +
+                        "не существует.");
+            }
+            if (response != 1) {
+                throw new NotFoundException(BREAKAGE_NOT_EXIST);
+            }
+        }
+        return ApiResponse.builder()
+                .message("Исполнитель заявки на неисправность был успешно назначен.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(now)

@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -45,6 +42,13 @@ public class BreakageController {
     public ApiResponse updateBreakagePriority(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                               @RequestBody UpdateBreakagePriorityDto updateBreakagePriorityDto) {
         return breakageService.updateBreakagePriority(breakageId, updateBreakagePriorityDto);
+    }
+
+    @PatchMapping(path = ADMIN_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse addBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                           @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
+        return breakageService.addBreakageExecutor(breakageId, appointBreakageExecutorDto);
     }
 
     @GetMapping(path = EMPLOYEE_URL)
