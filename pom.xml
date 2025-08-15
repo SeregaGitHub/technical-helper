@@ -20,8 +20,9 @@
 	<modules>
 		<module>gateway</module>
 		<module>common-module</module>
-        <module>servers</module>
-    </modules>
+		<module>main-server</module>
+		<module>breakage-server</module>
+	</modules>
 
 	<properties>
 		<java.version>21</java.version>

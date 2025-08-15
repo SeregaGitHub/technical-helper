@@ -12,7 +12,8 @@ import ru.kraser.technical_helper.common_module.exception.ServerException;
 
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.AUTH_HEADER;
+import static ru.kraser.technical_helper.common_module.util.Constant.SERVER_ERROR;
 
 public abstract class BaseClient {
     protected final WebClient webClient;
@@ -25,6 +26,29 @@ public abstract class BaseClient {
         Mono<T> entityMono = webClient
                 .post()
                 .uri(url)
+                .header(AUTH_HEADER, jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(obj)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+        return entityMono.block();
+    }
+
+    protected <T, O> T post(String url, O obj, String entityHeaderName, String entityId,
+                            String jwt, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> entityMono = webClient
+                .post()
+                .uri(url)
+                .header(entityHeaderName, entityId)
                 .header(AUTH_HEADER, jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(obj)
@@ -66,6 +90,30 @@ public abstract class BaseClient {
         return patchResponse.block();
     }
 
+    protected <T, O> T patch(String url, String jwt, String entityHeaderName1, String entityId1,
+                             String entityHeaderName2, String entityId2, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> patchResponse = webClient
+                .patch()
+                .uri(url)
+                .header(AUTH_HEADER, jwt)
+                .header(entityHeaderName1, entityId1)
+                .header(entityHeaderName2, entityId2)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return patchResponse.block();
+    }
+
     protected <T> List<T> getAll(String url, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<List<T>> getResponse = webClient
                 .get()
@@ -77,6 +125,62 @@ public abstract class BaseClient {
                         clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
                 .bodyToFlux(typeReference)
                 .collectList();
+
+        return getResponse.block();
+    }
+
+    protected <T> T getAllByPage(String url, Integer pageSize, Integer pageIndex, String sortBy, String direction,
+                                 boolean statusNew, boolean statusSolved, boolean statusInProgress,
+                                 boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
+                                 boolean priorityUrgently, boolean priorityHigh,
+                                 boolean priorityMedium, boolean priorityLow, String executor, boolean deadline,
+                                 String jwt, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> getResponse = webClient
+                .get()
+                .uri(url, uriBuilder ->
+                        uriBuilder.queryParam("pageSize", pageSize)
+                                .queryParam("pageIndex", pageIndex)
+                                .queryParam("sortBy", sortBy)
+                                .queryParam("direction", direction)
+                                .queryParam("statusNew", statusNew)
+                                .queryParam("statusSolved", statusSolved)
+                                .queryParam("statusInProgress", statusInProgress)
+                                .queryParam("statusPaused", statusPaused)
+                                .queryParam("statusRedirected", statusRedirected)
+                                .queryParam("statusCancelled", statusCancelled)
+                                .queryParam("priorityUrgently", priorityUrgently)
+                                .queryParam("priorityHigh", priorityHigh)
+                                .queryParam("priorityMedium", priorityMedium)
+                                .queryParam("priorityLow", priorityLow)
+                                .queryParam("executor", executor)
+                                .queryParam("deadline", deadline)
+                                .build())
+                .header(AUTH_HEADER, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToMono(typeReference);
+
+        return getResponse.block();
+    }
+
+    protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
+                                 String sortBy, String direction, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> getResponse = webClient
+                .get()
+                .uri(url, uriBuilder ->
+                        uriBuilder.queryParam("pageSize", pageSize)
+                                .queryParam("pageIndex", pageIndex)
+                                .queryParam("sortBy", sortBy)
+                                .queryParam("direction", direction)
+                                .build())
+                .header(AUTH_HEADER, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToMono(typeReference);
 
         return getResponse.block();
     }
@@ -101,14 +205,33 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T, O> T delete(String url, String jwt, String entityHeaderName,
-                            String entityId, ParameterizedTypeReference<T> typeReference) {
+    protected <T> T delete(String url, String jwt, String entityHeaderName,
+                              String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> deleteResponse = webClient
                 .patch()
                 .uri(url)
                 .header(AUTH_HEADER, jwt)
                 .header(entityHeaderName, entityId)
                 .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return deleteResponse.block();
+    }
+
+    protected <T> T hardDelete(String url, String jwt, String entityHeaderName,
+                           String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> deleteResponse = webClient
+                .delete()
+                .uri(url)
+                .header(AUTH_HEADER, jwt)
+                .header(entityHeaderName, entityId)
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))

@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
-import ru.kraser.technical_helper.common_module.exception.AuthException;
-import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.exception.*;
 
 import java.net.ConnectException;
 import java.time.LocalDateTime;
@@ -48,6 +46,18 @@ public class GatewayErrorHandler {
     public ResponseEntity<?> handleNoAccess(WebClientResponseException exception) {
         ApiResponse error = ApiResponse.builder()
                 .message("У Вас нет прав доступа для данного ресурса.")
+                .status(HttpStatus.FORBIDDEN.value())
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNoAccess(ForbiddenException exception) {
+        ApiResponse error = ApiResponse.builder()
+                .message(exception.getMessage())
                 .status(HttpStatus.FORBIDDEN.value())
                 .httpStatus(HttpStatus.FORBIDDEN)
                 .timestamp(LocalDateTime.now().withNano(0))
@@ -120,5 +130,17 @@ public class GatewayErrorHandler {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(NotCorrectParameter.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleNotCorrectParameter(NotCorrectParameter exception) {
+        ApiResponse error = ApiResponse.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .build();
+        return ResponseEntity.badRequest().body(error);
     }
 }
