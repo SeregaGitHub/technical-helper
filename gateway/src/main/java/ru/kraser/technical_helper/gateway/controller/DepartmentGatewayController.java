@@ -56,10 +56,20 @@ public class DepartmentGatewayController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader(AUTH_HEADER) String jwt,
-                                       @RequestHeader(DEPARTMENT_NAME_HEADER) String departmentName) {
+    public DepartmentDto getDepartmentById(@RequestHeader(AUTH_HEADER) String jwt,
+                                           @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+        log.info("Getting Department with Id={}", departmentId);
+        DepartmentDto departmentDto = departmentClient.getDepartmentById(departmentId, jwt, DEPARTMENT_ID_HEADER);
+        log.info("Department with Id={}, received successfully", departmentId);
+        return departmentDto;
+    }
+
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public DepartmentDto getDepartmentByName(@RequestHeader(AUTH_HEADER) String jwt,
+                                             @RequestHeader(DEPARTMENT_NAME_HEADER) String departmentName) {
         log.info("Getting Department with name - {}", departmentName);
-        DepartmentDto departmentDto = departmentClient.getDepartment(departmentName, jwt, DEPARTMENT_NAME_HEADER);
+        DepartmentDto departmentDto = departmentClient.getDepartmentByName(departmentName, jwt, DEPARTMENT_NAME_HEADER);
         log.info("Department with name - {}, received successfully", departmentName);
         return departmentDto;
     }

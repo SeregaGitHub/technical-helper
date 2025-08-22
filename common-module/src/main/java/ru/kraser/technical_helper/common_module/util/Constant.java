@@ -4,11 +4,12 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constant {
-    public static final String FRONT_URL = "http://192.168.0.102:12345";
-    public static final String MAIN_SERVER_URL = "http://main-server:12333";
-    //public static final String MAIN_SERVER_URL = "http://localhost:12333";
-    public static final String BREAKAGE_SERVER_URL = "http://breakage-server:12301";
-    //public static final String BREAKAGE_SERVER_URL = "http://localhost:12301";
+    //public static final String FRONT_URL = "http://192.168.0.101:12345";
+    public static final String FRONT_URL = "http://localhost:12345";
+    //public static final String MAIN_SERVER_URL = "http://main-server:12333";
+    public static final String MAIN_SERVER_URL = "http://localhost:12333";
+    //public static final String BREAKAGE_SERVER_URL = "http://breakage-server:12301";
+    public static final String BREAKAGE_SERVER_URL = "http://localhost:12301";
 
     public static final String BASE_URL = "/api/v1";
     public static final String AUTH_URL = "/auth";

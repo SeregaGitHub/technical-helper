@@ -45,12 +45,22 @@ public class DepartmentClient extends BaseClient {
         );
     }
 
-    public DepartmentDto getDepartment(String departmentId, String jwt, String departmentHeaderName) {
+    public DepartmentDto getDepartmentById(String departmentId, String jwt, String departmentIdHeader) {
         return super.get(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL,
                 jwt,
-                departmentHeaderName,
+                departmentIdHeader,
                 departmentId,
+                ParameterizedTypeReference.forType(DepartmentDto.class)
+        );
+    }
+
+    public DepartmentDto getDepartmentByName(String departmentName, String jwt, String departmentNameHeader) {
+        return super.get(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
+                jwt,
+                departmentNameHeader,
+                departmentName,
                 ParameterizedTypeReference.forType(DepartmentDto.class)
         );
     }

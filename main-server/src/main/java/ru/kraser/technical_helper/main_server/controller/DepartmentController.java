@@ -50,9 +50,18 @@ public class DepartmentController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartment(@RequestHeader (DEPARTMENT_NAME_HEADER) String departmentName) {
+    public DepartmentDto getDepartmentById(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
+        log.info("Getting Department with Id={}", departmentId);
+        DepartmentDto department =  departmentService.getDepartment(DEPARTMENT_ID_HEADER, departmentId);
+        log.info("Department with Id={}, received successfully", departmentId);
+        return department;
+    }
+
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public DepartmentDto getDepartmentByName(@RequestHeader (DEPARTMENT_NAME_HEADER) String departmentName) {
         log.info("Getting Department with name - {}", departmentName);
-        DepartmentDto department =  departmentService.getDepartment(departmentName);
+        DepartmentDto department =  departmentService.getDepartment(DEPARTMENT_NAME_HEADER, departmentName);
         log.info("Department with name - {}, received successfully", departmentName);
         return department;
     }

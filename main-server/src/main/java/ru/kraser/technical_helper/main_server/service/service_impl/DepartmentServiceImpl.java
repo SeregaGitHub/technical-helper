@@ -18,7 +18,7 @@ import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
+import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -69,10 +69,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public DepartmentDto getDepartment(String departmentName) {
-        Department department = departmentRepository.findByNameAndEnabledTrue(departmentName).orElseThrow(
-                () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
-        );
+    public DepartmentDto getDepartment(String headerName, String dep) {
+        Department department;
+        if (headerName.equals(DEPARTMENT_NAME_HEADER)) {
+            department = departmentRepository.findByNameAndEnabledTrue(dep).orElseThrow(
+                    () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
+            );
+        } else if (headerName.equals(DEPARTMENT_ID_HEADER)) {
+            department = departmentRepository.findByIdAndEnabledTrue(dep).orElseThrow(
+                    () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
+            );
+        } else {
+            throw new NotFoundException(DEPARTMENT_NOT_EXIST);
+        }
         return DepartmentMapper.toDepartmentDto(department);
     }
 
