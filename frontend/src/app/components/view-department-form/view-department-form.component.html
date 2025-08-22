@@ -1,35 +1,35 @@
 <div class="flex justify-center blue-to-black-gradient w-96 h-auto">
 
-    <div class="min-w-80 max-w-80">
-        <div class="mb-8 flex justify-normal pt-4">
+    <div class="min-w-80 max-w-80 text-montserrat">
+        <div class="mb-6 flex justify-normal pt-4">
             <button 
                 type="button"
-                class="black-to-blue-gradient text-montserrat button-size btn mouse-enter" 
+                class="black-to-blue-gradient button-size btn mouse-enter" 
                 (click)="closeDialog()"
                 >Закрыть
             </button>
         </div>
-        <div class="flex justify-center mb-8">
+        <div class="flex justify-center text-2xl font-semibold tracking-wider text-center mb-6">
             <p>{{ data.departmentName }}</p>
         </div>
-        <div class="flex flex-col justify-start mb-4">
-            <p>Id: </p>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Id: </p>
             <p>{{ data.departmentId }}</p>
         </div>
-        <div class="flex flex-col justify-start mb-4">
-            <p>Создан: </p>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Создан: </p>
             <p>{{ data.createdBy }}</p>
         </div>
-        <div class="flex flex-col justify-start mb-4">
-            <p>Создано: </p>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Создано: </p>
             <p>{{ data.createdDate }}</p>
         </div>
-        <div class="flex flex-col justify-start mb-4">
-            <p>Обновлен: </p>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Обновлен: </p>
             <p>{{ data.lastUpdatedBy }}</p>
         </div>
-        <div class="flex flex-col justify-start mb-4">
-            <p>Обновлено: </p>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Обновлено: </p>
             <p>{{ data.lastUpdatedDate }}</p>
         </div>
     </div>
