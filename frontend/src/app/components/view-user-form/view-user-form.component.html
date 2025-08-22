@@ -10,11 +10,19 @@
             </button>
         </div>
         <div class="flex justify-center text-2xl font-semibold tracking-wider text-center mb-6">
-            <p>{{ data.departmentName }}</p>
+            <p>{{ data.username }}</p>
         </div>
         <div class="flex flex-col justify-start mb-4 border-b border-current">
             <p class="text-lg font-semibold">Id: </p>
-            <p>{{ data.departmentId }}</p>
+            <p>{{ data.userId }}</p>
+        </div>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Отдел: </p>
+            <p>{{ data.userDepartment }}</p>
+        </div>
+        <div class="flex flex-col justify-start mb-4 border-b border-current">
+            <p class="text-lg font-semibold">Роль: </p>
+            <p>{{ data.userRole }}</p>
         </div>
         <div class="flex flex-col justify-start mb-4 border-b border-current">
             <p class="text-lg font-semibold">Создан: </p>
@@ -35,4 +43,3 @@
     </div>
 
 </div>
-

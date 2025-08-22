@@ -1,23 +1,23 @@
 import { Component, Inject, OnInit } from '@angular/core';
+import { User } from '../../model/user/user';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Department } from '../../model/department/department';
 import { DATE_FORMAT } from '../../util/constant';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-view-department-form',
+  selector: 'app-view-user-form',
   imports: [
     CommonModule
   ],
-  templateUrl: './view-department-form.component.html',
-  styleUrl: './view-department-form.component.css'
+  templateUrl: './view-user-form.component.html',
+  styleUrl: './view-user-form.component.css'
 })
-export class ViewDepartmentFormComponent {
+export class ViewUserFormComponent {
 
-  department!: Department
+  user!: User
   dateFormat = DATE_FORMAT;
 
-  constructor(private _dialogRef: MatDialogRef<ViewDepartmentFormComponent>,
+  constructor(private _dialogRef: MatDialogRef<ViewUserFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   closeDialog() {

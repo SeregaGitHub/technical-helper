@@ -106,10 +106,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getUser(String userId) {
-        User user = userRepository.findByIdAndEnabledTrue(userId).orElseThrow(
+        return userRepository.getUserById(userId).orElseThrow(
                 () -> new NotFoundException(USER_NOT_EXIST)
         );
-        return UserMapper.toUserDto(user);
     }
 
     @Override

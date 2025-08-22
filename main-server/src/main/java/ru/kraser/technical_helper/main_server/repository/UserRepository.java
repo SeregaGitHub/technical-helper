@@ -15,6 +15,14 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
+    String GET_USER = "SELECT new ru.kraser.technical_helper.common_module.dto.user.UserDto " +
+            "(u.id, u.username, d.name AS department, u.role, " +
+            "uc.username AS createdBy, u.createdDate, uu.username AS lastUpdatedBy, u.lastUpdatedDate) " +
+            "FROM User AS u " +
+            "JOIN FETCH Department AS d ON d.id = u.department.id " +
+            "JOIN FETCH User AS uc ON uc.id = u.createdBy " +
+            "JOIN FETCH User AS uu ON uu.id = u.lastUpdatedBy ";
+
     Optional<User> findUserByUsername(String username);
 
     Optional<User> findUserByUsernameAndEnabledTrue(String username);
@@ -57,21 +65,14 @@ public interface UserRepository extends JpaRepository<User, String> {
     int changeUserPassword(String userId, String newPassword, String currentUserId, LocalDateTime lastUpdatedDate);
 
     @Query(
-            value = """
-                    SELECT new ru.kraser.technical_helper.common_module.dto.user.UserDto
-                    (u.id, u.username, d.name AS department, u.role,
-                    uc.username AS createdBy, u.createdDate, uu.username AS lastUpdatedBy, u.lastUpdatedDate)
-                    FROM User AS u
-                    JOIN FETCH Department AS d ON d.id = u.department.id
-                    JOIN FETCH User AS uc ON uc.id = u.createdBy
-                    JOIN FETCH User AS uu ON uu.id = u.lastUpdatedBy
-                    WHERE u.enabled = true
-                    ORDER BY u.username
-                    """
+            value = GET_USER + "WHERE u.enabled = true ORDER BY u.username"
     )
     List<UserDto> getAllUsers();
 
-    Optional<User> findByIdAndEnabledTrue(String userId);
+    @Query(
+            value = GET_USER + "WHERE u.id = :userId AND u.enabled = true"
+    )
+    Optional<UserDto> getUserById(String userId);
 
     @Modifying
     @Query(
