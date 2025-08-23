@@ -10,6 +10,11 @@ th {
     text-align: center;
 }
 
+p {
+    color: aquamarine;
+    font-family: michroma;
+}
+
 th, td {
     color: aquamarine;
     /* font-family: michroma; */
@@ -36,3 +41,9 @@ table, mat-paginator {
     width: 14%;
 }
 
+.mat-icon {
+    color: aquamarine;
+    font-size: xx-large;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+}
