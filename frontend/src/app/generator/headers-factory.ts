@@ -1,4 +1,5 @@
 import { HttpHeaders, HttpParams, HttpParamsOptions } from "@angular/common/http";
+import { Executor } from "../enum/executor.enum";
 
 export class HttpHeadersFactory {
     
@@ -16,7 +17,7 @@ export class HttpHeadersFactory {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: String, deadline: Date 
+        executor: Executor | null, deadline: boolean 
     ): HttpParams {
         
             const myObject: any = {

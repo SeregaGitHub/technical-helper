@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
 import { BASE_URL, BREAKAGE_URL, EMPLOYEE_URL, GATEWAY_URL } from '../util/constant';
+import { Executor } from '../enum/executor.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class BreakageService {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: String, deadline: Date
+        executor: Executor | null, deadline: boolean
   ): Observable<any> {
   
     const headers = HttpHeadersFactory.createPermanentHeaders();
