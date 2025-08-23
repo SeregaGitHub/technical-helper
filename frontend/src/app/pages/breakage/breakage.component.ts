@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BreakageService } from '../../services/breakage.service';
 
 @Component({
   selector: 'app-breakage',
@@ -8,4 +9,5 @@ import { Component } from '@angular/core';
 })
 export class BreakageComponent {
 
+  constructor (private _breakageService: BreakageService) { }
 }

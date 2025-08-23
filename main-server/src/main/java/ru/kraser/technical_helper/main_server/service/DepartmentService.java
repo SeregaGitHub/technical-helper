@@ -14,7 +14,7 @@ public interface DepartmentService {
 
     List<DepartmentDto> getAllDepartments();
 
-    DepartmentDto getDepartment(String departmentName);
+    DepartmentDto getDepartment(String headerName, String departmentName);
 
     ApiResponse deleteDepartment(String departmentId);
 }

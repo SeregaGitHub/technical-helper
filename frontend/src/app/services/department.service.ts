@@ -67,12 +67,30 @@ export class DepartmentService {
             );
     };
 
+    getDepById(id: string): Observable<any> {
+
+        let headers = HttpHeadersFactory.createPermanentHeaders();
+        headers = headers.append(DEPARTMENT_ID, id);
+
+        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
+            .pipe(
+                tap((dep) => {
+                    const currentState = this.departmentSubject.value;
+
+                    this.departmentSubject.next({...currentState, 
+                    departments:
+                    [dep, ...currentState.departments] 
+                  });
+                })
+            );
+    };
+
     getDep(name: string): Observable<any> {
 
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_NAME, name);
 
-        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
+        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
             .pipe(
                 tap((dep) => {
                     const currentState = this.departmentSubject.value;

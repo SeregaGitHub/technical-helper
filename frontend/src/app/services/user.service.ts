@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { CreateUserDto } from '../model/user/create-user-dto';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, ALL_URL, BASE_URL, DELETE_URL, GATEWAY_URL, USER_ID, USER_URL } from '../util/constant';
+import { ADMIN_URL, ALL_URL, BASE_URL, CURRENT_URL, DELETE_URL, GATEWAY_URL, USER_ID, USER_URL } from '../util/constant';
 import { UpdateUserDto } from '../model/user/update-user-dto';
 import { ChangeUserPasswordDto } from '../model/user/change-user-password-dto';
 
@@ -76,7 +76,24 @@ export class UserService {
                     }
                 )
             );
+    };
 
+    getUserById(id: string): Observable<any> {
+    
+        let headers = HttpHeadersFactory.createPermanentHeaders();
+        headers = headers.append(USER_ID, id);
+    
+        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL, {headers})
+            .pipe(
+                tap((user) => {
+                    const currentState = this.userSubject.value;
+    
+                    this.userSubject.next({...currentState, 
+                    users:
+                    [user, ...currentState.users] 
+                  });
+                })
+            );
     };
 
     deleteUser(id: string): Observable<any> {

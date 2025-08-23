@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Role } from '../../enum/role.enum';
+import { ViewUserFormComponent } from '../../components/view-user-form/view-user-form.component';
 
 @Component({
   selector: 'app-user',
@@ -48,6 +49,7 @@ export class UserComponent {
   
   dateFormat = DATE_FORMAT;
   users: any;
+  user!: User;
   getAllUsersError: ApiResponse;
 
   public displayedColumns: string[] = [
@@ -119,6 +121,30 @@ export class UserComponent {
           }
         })
   };
+
+  getUserById(id: string) {
+      this._userService
+        .getUserById(id)
+          .subscribe({
+            next: data => {
+              this.user = data;
+  
+              this.dialog.open(ViewUserFormComponent, {data: {
+                userId: this.user.id,
+                username: this.user.username,
+                userDepartment: this.user.department,
+                userRole: this.user.role,
+                createdBy: this.user.createdBy,
+                createdDate: this.user.createdDate,
+                lastUpdatedBy: this.user.lastUpdatedBy,
+                lastUpdatedDate: this.user.lastUpdatedDate
+              }});
+            },
+            error: err => {
+              this.getAllUsersError = err.error;
+            }
+          });
+    };
 
   deleteUser(id: string, username: string): void {
       const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 

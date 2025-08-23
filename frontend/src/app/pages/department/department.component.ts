@@ -15,6 +15,7 @@ import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form
 import { Action } from '../../enum/action.enum';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
+import { ViewDepartmentFormComponent } from '../../components/view-department-form/view-department-form.component';
 
 @Component({
   selector: 'app-department',
@@ -46,6 +47,7 @@ export class DepartmentComponent {
 
   dateFormat = DATE_FORMAT;
   departments: any;
+  department!: Department;
   getAllDepError: ApiResponse;
 
   public displayedColumns: string[] = [
@@ -114,6 +116,28 @@ export class DepartmentComponent {
             this.dataSource = new MatTableDataSource(this.departments);
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
+          },
+          error: err => {
+            this.getAllDepError = err.error;
+          }
+        })
+  };
+
+  getDepById(id: string) {
+    this._depService
+      .getDepById(id)
+        .subscribe({
+          next: data => {
+            this.department = data;
+
+            this.dialog.open(ViewDepartmentFormComponent, {data: {
+              departmentId: this.department.id,
+              departmentName: this.department.name,
+              createdBy: this.department.createdBy,
+              createdDate: this.department.createdDate,
+              lastUpdatedBy: this.department.lastUpdatedBy,
+              lastUpdatedDate: this.department.lastUpdatedDate
+            }});
           },
           error: err => {
             this.getAllDepError = err.error;

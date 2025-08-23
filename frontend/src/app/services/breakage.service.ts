@@ -1,0 +1,50 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { HttpHeadersFactory } from '../generator/headers-factory';
+import { BASE_URL, BREAKAGE_URL, EMPLOYEE_URL, GATEWAY_URL } from '../util/constant';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BreakageService {
+
+  constructor(private _http: HttpClient) { }
+
+  breakageSubject = new BehaviorSubject<any>({
+          breakages: [],
+          loading: false,
+          newBreakage: null
+      });
+
+
+  getAllBreakages(
+        pageIndex: number, pageSize: number, sortBy: String, direction: String, 
+        statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
+        statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
+        priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
+        executor: String, deadline: Date
+  ): Observable<any> {
+  
+    const headers = HttpHeadersFactory.createPermanentHeaders();
+    const httpParams = HttpHeadersFactory.createBreakageRequestParams(
+        pageIndex, pageSize, sortBy, direction, 
+        statusNew, statusSolved, statusInProgress, 
+        statusPaused, statusRedirected, statusCancelled,
+        priorityUrgently, priorityHigh, priorityMedium, priorityLow,
+        executor, deadline
+    );
+    const httpOptions = { params: httpParams, headers: headers };
+  
+    return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, httpOptions)
+      .pipe(
+          tap(
+            (breakages) => {
+              const currentState = this.breakageSubject.value;
+                this.breakageSubject.next({...currentState, breakages})
+            })
+      );
+  };
+
+
+}
