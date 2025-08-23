@@ -25,7 +25,7 @@ public class BreakageGatewayController {
     @PostMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createBreakage(@Validated() @RequestBody CreateBreakageDto createBreakageDto,
-                                        @RequestHeader(AUTH_HEADER) String jwt) {
+                                      @RequestHeader(AUTH_HEADER) String jwt) {
         log.info("Creating Breakage with breakage topic - {}", createBreakageDto.breakageTopic());
         ApiResponse response = breakageClient.createBreakage(createBreakageDto, jwt);
         log.info("Breakage with breakage topic - {}, successfully created", createBreakageDto.breakageTopic());

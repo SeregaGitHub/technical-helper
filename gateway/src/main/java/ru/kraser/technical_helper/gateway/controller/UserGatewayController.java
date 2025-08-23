@@ -38,8 +38,8 @@ public class UserGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@Validated() @RequestBody UpdateUserDto updateUserDto,
-                             @RequestHeader(AUTH_HEADER) String jwt,
-                             @RequestHeader(USER_ID_HEADER) String userId) {
+                                  @RequestHeader(AUTH_HEADER) String jwt,
+                                  @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Updating User with Id={}", userId);
         ApiResponse response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto, jwt);
         log.info("User with Id={}, successfully updated", userId);
@@ -49,8 +49,8 @@ public class UserGatewayController {
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@Validated() @RequestBody ChangeUserPasswordDto changeUserPasswordDto,
-                                     @RequestHeader(AUTH_HEADER) String jwt,
-                                     @RequestHeader(USER_ID_HEADER) String userId) {
+                                          @RequestHeader(AUTH_HEADER) String jwt,
+                                          @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Change password of User with Id={}", userId);
         ApiResponse response = userClient.changeUserPassword(USER_ID_HEADER, userId, changeUserPasswordDto, jwt);
         log.info("Password User with Id={}, successfully changed", userId);
@@ -79,7 +79,7 @@ public class UserGatewayController {
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteUser(@RequestHeader(AUTH_HEADER) String jwt,
-                             @RequestHeader(USER_ID_HEADER) String userId) {
+                                  @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Deleting User with Id={}", userId);
         ApiResponse response = userClient.deleteUser(USER_ID_HEADER, userId, jwt);
         log.info("User with Id={}, successfully deleted", userId);
