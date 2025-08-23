@@ -74,7 +74,7 @@ public class BreakageGatewayController {
     public ApiResponse addBreakageExecutor(@RequestHeader(AUTH_HEADER) String jwt,
                                            @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                            @Validated() @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
-        log.info("Adding executor and deadline of breakage with Id={}", breakageId);
+        log.info("Adding breakageExecutor and deadline of breakage with Id={}", breakageId);
         ApiResponse response = breakageClient.addBreakageExecutor(BREAKAGE_ID_HEADER, breakageId,
                 appointBreakageExecutorDto, jwt);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
@@ -112,7 +112,7 @@ public class BreakageGatewayController {
                                        boolean priorityMedium,
                                    @RequestParam(value = "priorityLow", defaultValue = "true")
                                        boolean priorityLow,
-                                   @RequestParam(value = "executor", required = false)
+                                   @RequestParam(value = "breakageExecutor", required = false)
                                        String executor,
                                    @RequestParam(value = "deadline", defaultValue = "false")
                                        boolean deadline

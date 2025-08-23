@@ -57,7 +57,7 @@ public class BreakageMapper {
                 .breakageText(breakageDto.breakageText())
                 .status(breakageDto.status())
                 .priority(breakageDto.priority())
-                .executor(breakageDto.executor())
+                .breakageExecutor(breakageDto.breakageExecutor())
                 .executorAppointedBy(breakageDto.executorAppointedBy())
                 .createdBy(breakageDto.createdBy())
                 .createdDate(breakageDto.createdDate())

@@ -152,7 +152,7 @@ public abstract class BaseClient {
                                 .queryParam("priorityHigh", priorityHigh)
                                 .queryParam("priorityMedium", priorityMedium)
                                 .queryParam("priorityLow", priorityLow)
-                                .queryParam("executor", executor)
+                                .queryParam("breakageExecutor", executor)
                                 .queryParam("deadline", deadline)
                                 .build())
                 .header(AUTH_HEADER, jwt)

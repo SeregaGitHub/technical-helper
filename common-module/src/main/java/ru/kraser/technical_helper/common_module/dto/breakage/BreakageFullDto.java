@@ -19,7 +19,7 @@ public record BreakageFullDto(
         String breakageText,
         Status status,
         Priority priority,
-        String executor,
+        String breakageExecutor,
         String executorAppointedBy,
         String createdBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")

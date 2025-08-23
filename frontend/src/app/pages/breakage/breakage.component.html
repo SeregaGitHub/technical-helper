@@ -1,1 +1,131 @@
-<p>breakage works!</p>
+<div class="flex-auto">
+    <mat-sidenav-container>
+      <mat-sidenav class="black-to-blue-gradient" [(opened)]="opened" mode="side">
+        <a>Filters</a>
+      </mat-sidenav>
+      <mat-sidenav-content class="bgi">
+        <button mat-icon-button (click)="opened = !opened" class="example-icon" aria-label="Example icon-button with menu icon">
+          <mat-icon>menu</mat-icon>
+        </button>
+        
+        
+<div class="flex">
+
+  <div class="grow ml-20 mr-36">
+
+    <mat-form-field class="!block">
+      <mat-label class="">Поиск</mat-label>
+      <input matInput (keyup)="applyFilter($event)" #input>
+    </mat-form-field>
+
+    <div [ngClass]="getAllBreakagesError.status < 400 ? 'hide' : 'pb-4' ">
+        <p class="text-center alert"> {{ getAllBreakagesError.message }} </p> 
+    </div>
+    
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <!-- number Column -->
+        <ng-container matColumnDef="number">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-10 min-w-10"> {{ number }} </th>
+          <td mat-cell *matCellDef="let element; let i = index" class="max-w-10 min-w-10 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ 
+          this.paginator.pageIndex == 
+            0 ? i + 1 : 1 + i + this.paginator.pageIndex * this.paginator.pageSize }} </td>
+        </ng-container>
+        
+        <!-- departmentName Column -->
+        <ng-container matColumnDef="departmentName">  
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-36 min-w-36"> {{ departmentName }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-36 min-w-36 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ element.departmentName }} </td>
+        </ng-container>
+
+        <!-- room Column -->
+        <ng-container matColumnDef="room">  
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ room }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ element.room }} </td>
+        </ng-container>
+
+        <!-- breakageTopic Column -->
+        <ng-container matColumnDef="breakageTopic">  
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ breakageTopic }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ element.breakageTopic }} </td>
+        </ng-container>
+
+        <!-- status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ status }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ element.status }} </td>
+        </ng-container>
+    
+        <!-- priority Column -->
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ priority }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
+              (click)="getBreakageById(element.id)"> {{ element.priority }} </td>
+        </ng-container>
+
+        <!-- breakageExecutor Column --> 
+        <ng-container matColumnDef="breakageExecutor">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ breakageExecutor }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
+              (click)="getBreakageById(element.id)"> {{ element.breakageExecutor }} </td>
+        </ng-container>
+    
+        <!-- createdBy Column -->
+        <ng-container matColumnDef="createdBy">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ createdBy }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
+              (click)="getBreakageById(element.id)"> {{ element.createdBy }} </td>
+        </ng-container>
+
+        <!-- createdDate Column -->
+        <ng-container matColumnDef="createdDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ createdDate }} </th>
+          <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
+              (click)="getBreakageById(element.id)"> {{ element.createdDate | date: dateFormat }} </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">Данные отсутствуют"{{input.value}}"</td>
+        </tr>
+      </table>
+    
+      <mat-paginator  
+                      [pageSizeOptions]="[10, 20, 50]"
+                      showFirstLastButtons
+                      aria-label="Select page of periodic elements" 
+                      class="text-montserrat">
+      </mat-paginator>
+    
+      <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator> -->
+    </div>
+  
+  </div>
+
+  <div class="fixed top-48 right-4">
+    <!-- <div class="float-right mt-20 mr-3"> -->
+    <button class="btn button-size black-to-blue-gradient text-montserrat mouse-enter" (click)="createBreakage()">
+      Создать
+    </button>
+  </div>
+
+</div>
+  
+  
+  
+  
+
+
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>

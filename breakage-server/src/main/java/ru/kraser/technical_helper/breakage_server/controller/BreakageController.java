@@ -62,7 +62,7 @@ public class BreakageController {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse addBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                            @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
-        log.info("Adding executor and deadline of breakage with Id={}", breakageId);
+        log.info("Adding breakageExecutor and deadline of breakage with Id={}", breakageId);
         ApiResponse response = breakageService.addBreakageExecutor(breakageId, appointBreakageExecutorDto);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
         return response;
@@ -98,7 +98,7 @@ public class BreakageController {
                                        boolean priorityMedium,
                                    @RequestParam(value = "priorityLow", defaultValue = "true")
                                        boolean priorityLow,
-                                   @RequestParam(value = "executor", required = false)
+                                   @RequestParam(value = "breakageExecutor", required = false)
                                        String executor,
                                    @RequestParam(value = "deadline", defaultValue = "false")
                                        boolean deadline
