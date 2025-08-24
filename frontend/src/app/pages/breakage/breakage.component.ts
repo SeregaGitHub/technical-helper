@@ -16,9 +16,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { Executor } from '../../enum/executor.enum';
-import { EnumView } from '../../util/appointed';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
+import { EnumView } from '../../util/enum-view';
 
 @Component({
   selector: 'app-breakage',
