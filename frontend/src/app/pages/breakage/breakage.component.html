@@ -15,10 +15,10 @@
             <p class="text-lg">В работе</p>
             <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusInProgress" (click)="getAllBreakages()"></mat-slide-toggle></p>
 
-            <p class="text-lg">Приостановлена</p>
+            <p class="text-lg">В ожидании</p>
             <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusPaused" (click)="getAllBreakages()"></mat-slide-toggle></p>
 
-            <p class="text-lg">Переадресована</p>
+            <p class="text-lg">Передана</p>
             <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusRedirected" (click)="getAllBreakages()"></mat-slide-toggle></p>
 
             <p class="text-lg">Отменена</p>
@@ -120,14 +120,14 @@
                     <ng-container matColumnDef="status">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ status }} </th>
                         <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
-                        (click)="getBreakageById(element.id)"> {{ element.status }} </td>
+                        (click)="getBreakageById(element.id)"> {{ statusMap.get(element.status) }} </td>
                     </ng-container>
     
                     <!-- priority Column -->
                     <ng-container matColumnDef="priority">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ priority }} </th>
                         <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20 one-long-line"
-                        (click)="getBreakageById(element.id)"> {{ element.priority }} </td>
+                        (click)="getBreakageById(element.id)"> {{ priorityMap.get(element.priority) }} </td>
                     </ng-container>
 
                     <!-- breakageExecutor Column --> 

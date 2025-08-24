@@ -19,6 +19,8 @@ import { Executor } from '../../enum/executor.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
 import { EnumView } from '../../util/enum-view';
+import { Status } from '../../enum/status.enum';
+import { Priority } from '../../enum/priority.enum';
 
 @Component({
   selector: 'app-breakage',
@@ -49,6 +51,22 @@ export class BreakageComponent {
     {value: Executor.AppointedToOthers, viewValue: 'На других'},
     {value: Executor.NoAppointed, viewValue: 'Не назначенные'},
   ];
+
+  statusMap = new Map<Status, string>([ 
+    [Status.New, 'Новая'],
+    [Status.Solved, 'Решена'],
+    [Status.InProgress, 'В работе'],
+    [Status.Paused, 'В ожидании'],
+    [Status.Redirected, 'Передана'],
+    [Status.Cancelled, 'Отменена']
+   ]);
+
+  priorityMap = new Map<Priority, string>([
+    [Priority.Urgently, 'Срочный'],
+    [Priority.High, 'Высокий'],
+    [Priority.Medium, 'Средний'],
+    [Priority.Low, 'Низкий']
+  ]);
 
   number = '№';
   departmentName = 'Отдел';
