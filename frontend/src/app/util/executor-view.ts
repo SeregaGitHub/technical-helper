@@ -1,4 +1,4 @@
-export interface EnumView {
+export interface ExecutorView {
     value: string;
     viewValue: string;
 }
