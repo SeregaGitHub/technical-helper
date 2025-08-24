@@ -17,6 +17,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { Executor } from '../../enum/executor.enum';
 import { EnumView } from '../../util/appointed';
+import { MatDialog } from '@angular/material/dialog';
+import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
 
 @Component({
   selector: 'app-breakage',
@@ -95,7 +97,7 @@ export class BreakageComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor (private _breakageService: BreakageService) { 
+  constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllBreakages();
    }
@@ -111,8 +113,13 @@ export class BreakageComponent {
   }
 
   createBreakage() {
-    console.log('createBreakage()...');
-  }
+    
+    const openDialog = this.dialog.open(BreakageFormComponent);
+    
+    openDialog.afterClosed().subscribe(() => {
+        this.getAllBreakages();
+    });
+  };
 
 
   getAllBreakages(): void {

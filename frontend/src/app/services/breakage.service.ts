@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
 import { BASE_URL, BREAKAGE_URL, EMPLOYEE_URL, GATEWAY_URL } from '../util/constant';
 import { Executor } from '../enum/executor.enum';
+import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,22 @@ export class BreakageService {
           newBreakage: null
       });
 
+  createBreakage(createBreakageDto: CreateBreakageDto): Observable<any> {
+  
+      const headers = HttpHeadersFactory.createPermanentHeaders();
+  
+      return this._http.post(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, createBreakageDto, {headers})
+          .pipe(
+              tap((newBreakage) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [newBreakage, ...currentState.breakages]
+                });
+              })
+          );
+  };    
 
   getAllBreakages(
         pageIndex: number, pageSize: number, sortBy: String, direction: String, 
@@ -40,9 +57,9 @@ export class BreakageService {
     return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, httpOptions)
       .pipe(
           tap(
-            (breakages) => {
+            (allBreakages) => {
               const currentState = this.breakageSubject.value;
-                this.breakageSubject.next({...currentState, breakages})
+                this.breakageSubject.next({...currentState, allBreakages})
             })
       );
   };
