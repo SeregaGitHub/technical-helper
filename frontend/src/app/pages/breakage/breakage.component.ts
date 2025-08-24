@@ -16,7 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { Executor } from '../../enum/executor.enum';
-import { Appointed } from '../../model/breakage/appointed';
+import { EnumView } from '../../util/appointed';
 
 @Component({
   selector: 'app-breakage',
@@ -41,11 +41,11 @@ export class BreakageComponent {
 
   opened = false;
 
-  executors: Appointed[] = [
-    {value: 'ALL', viewValue: 'Всех'},
-    {value: 'APPOINTED_TO_ME', viewValue: 'На меня'},
-    {value: 'APPOINTED_TO_OTHERS', viewValue: 'На других'},
-    {value: 'NO_APPOINTED', viewValue: 'Не назначенные'},
+  executors: EnumView[] = [
+    {value: Executor.All, viewValue: 'Всех'},
+    {value: Executor.AppointedToMe, viewValue: 'На меня'},
+    {value: Executor.AppointedToOthers, viewValue: 'На других'},
+    {value: Executor.NoAppointed, viewValue: 'Не назначенные'},
   ];
 
   number = '№';

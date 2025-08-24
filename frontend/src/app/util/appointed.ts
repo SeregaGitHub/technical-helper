@@ -1,4 +1,4 @@
-export interface Appointed {
+export interface EnumView {
     value: string;
     viewValue: string;
 }
