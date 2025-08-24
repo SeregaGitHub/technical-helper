@@ -1,5 +1,4 @@
 import { HttpHeaders, HttpParams, HttpParamsOptions } from "@angular/common/http";
-import { Executor } from "../enum/executor.enum";
 
 export class HttpHeadersFactory {
     
@@ -17,7 +16,7 @@ export class HttpHeadersFactory {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: Executor | null, deadline: boolean 
+        executor: String, deadline: boolean 
     ): HttpParams {
         
             const myObject: any = {
@@ -35,7 +34,7 @@ export class HttpHeadersFactory {
               priorityHigh: priorityHigh.toString(),
               priorityMedium: priorityMedium.toString(),
               priorityLow: priorityLow.toString(),
-              executor: executor,
+              breakageExecutor: executor,
               deadline: deadline.toString(),
         };
 

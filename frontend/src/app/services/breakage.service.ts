@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
@@ -24,7 +24,7 @@ export class BreakageService {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: Executor | null, deadline: boolean
+        executor: Executor, deadline: boolean
   ): Observable<any> {
   
     const headers = HttpHeadersFactory.createPermanentHeaders();
@@ -33,7 +33,7 @@ export class BreakageService {
         statusNew, statusSolved, statusInProgress, 
         statusPaused, statusRedirected, statusCancelled,
         priorityUrgently, priorityHigh, priorityMedium, priorityLow,
-        executor, deadline
+        executor.toString(), deadline
     );
     const httpOptions = { params: httpParams, headers: headers };
   

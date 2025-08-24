@@ -13,6 +13,10 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSelectModule } from '@angular/material/select';
+import { Executor } from '../../enum/executor.enum';
+import { Appointed } from '../../model/breakage/appointed';
 
 @Component({
   selector: 'app-breakage',
@@ -26,7 +30,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatSort, 
     MatSortModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatSelectModule
   ],
   templateUrl: './breakage.component.html',
   styleUrl: './breakage.component.css'
@@ -34,6 +40,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class BreakageComponent {
 
   opened = false;
+
+  executors: Appointed[] = [
+    {value: 'ALL', viewValue: 'Всех'},
+    {value: 'APPOINTED_TO_ME', viewValue: 'На меня'},
+    {value: 'APPOINTED_TO_OTHERS', viewValue: 'На других'},
+    {value: 'NO_APPOINTED', viewValue: 'Не назначенные'},
+  ];
 
   number = '№';
   departmentName = 'Отдел';
@@ -59,7 +72,7 @@ export class BreakageComponent {
   priorityHigh = true; 
   priorityMedium = true; 
   priorityLow = true;
-  executor = null;
+  executor = Executor.All; 
   deadline = false;
 
   dateFormat = DATE_FORMAT;
@@ -117,8 +130,6 @@ export class BreakageComponent {
             this.dataSource = new MatTableDataSource(this.breakages);
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
-
-            console.log(this.breakages);
           },
           error: err => {
             this.getAllBreakagesError = err.error;

@@ -1,20 +1,81 @@
 <div class="flex-auto">
 
     <mat-sidenav-container>
-      <mat-sidenav class="black-to-blue-gradient text-center" [(opened)]="opened" mode="side">
-        <p class="mt-2 text-xl">Параметры</p>
+      <mat-sidenav class="black-to-blue-gradient text-center flex flex-col" [(opened)]="opened" mode="side">
+
+        <p class="mt-2 text-2xl underline">Статус</p>
+
+        <div class="text-left ml-6 mb-4">
+            <p class="text-lg">Новая</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusNew" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Решена</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusSolved" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">В работе</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusInProgress" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Приостановлена</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusPaused" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Переадресована</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusRedirected" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Отменена</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusCancelled" (click)="getAllBreakages()"></mat-slide-toggle></p>
+        </div>
+        
+
+        <p class="mt-2 text-2xl underline">Приоритет</p>
+
+        <div class="text-left ml-6 mb-4">
+            <p class="text-lg">Срочно</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityUrgently" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Высокий</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityHigh" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Средний</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityMedium" (click)="getAllBreakages()"></mat-slide-toggle></p>
+
+            <p class="text-lg">Низкий</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" (click)="getAllBreakages()"></mat-slide-toggle></p>
+        </div>
+        
+        <p class="mt-2 text-2xl underline">Параметры</p>
+
+        <div class="text-left">
+            <p class="text-lg ml-6 mb-1">Назначенные на:</p>
+            <form>
+                <mat-form-field>
+                    <mat-select [(ngModel)]="executor" name="appointed">
+                        @for (executor of executors; track executor) {
+                            <mat-option [value]="executor.value" (click)="getAllBreakages()">{{executor.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </form>
+        </div>
+
+        <div class="text-left ml-6 mb-4">
+            <p class="text-lg">Просроченные</p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
+        </div>
+
       </mat-sidenav>
-        <mat-sidenav-content class="bgi">
-        <button mat-icon-button (click)="opened = !opened" class="example-icon" aria-label="Example icon-button with menu icon">
-          <mat-icon>menu</mat-icon>
-        </button>
+        
+    <mat-sidenav-content class="bgi">
+
+    <button mat-icon-button (click)="opened = !opened" class="example-icon" aria-label="Example icon-button with menu icon">
+        <mat-icon>menu</mat-icon>
+    </button>
         
     <div class="flex">
 
         <div class="grow ml-20 mr-36">
 
             <mat-form-field class="!block">
-                <mat-label class="">Поиск</mat-label>
+                <mat-label class="">Поиск по тексту заявки</mat-label>
                     <input matInput (keyup)="applyFilter($event)" #input>
             </mat-form-field>
 
@@ -95,7 +156,7 @@
     
                     <!-- Row shown when there is no matching data. -->
                     <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" colspan="4">Данные отсутствуют"{{input.value}}"</td>
+                    <td class="mat-cell" colspan="4">Данные отсутствуют</td>
                     </tr>
                 </table>
     
