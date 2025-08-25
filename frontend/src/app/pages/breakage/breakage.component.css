@@ -54,3 +54,27 @@ table, mat-paginator {
     margin-top: 0.5rem;
     margin-left: 0.5rem;
 }
+
+.colorRed {
+    color: red;
+}
+
+.colorLawngreen {
+    color: lawngreen;
+}
+
+.colorAqua {
+    color: aqua;
+}
+
+.colorFuchsia {
+    color: fuchsia;
+}
+
+.colorCoral {
+    color: coral;
+}
+
+.colorGreen {
+    color: green;
+}

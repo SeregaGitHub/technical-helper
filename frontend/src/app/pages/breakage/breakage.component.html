@@ -120,7 +120,12 @@
                     <ng-container matColumnDef="status">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ status }} </th>
                         <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
-                        (click)="getBreakageById(element.id)"> {{ statusMap.get(element.status) }} </td>
+                        (click)="getBreakageById(element.id)"
+                        [ngClass]="{
+                            'colorRed': element.status === 'NEW', 'colorLawngreen': element.status === 'SOLVED',
+                            'colorAqua': element.status === 'IN_PROGRESS', 'colorFuchsia': element.status === 'PAUSED',
+                            'colorCoral': element.status === 'REDIRECTED', 'colorGreen': element.status === 'CANCELLED'
+                            }"> {{ statusMap.get(element.status) }} </td>
                     </ng-container>
     
                     <!-- priority Column -->
