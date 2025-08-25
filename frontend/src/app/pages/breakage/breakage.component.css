@@ -48,11 +48,15 @@ table, mat-paginator {
     width: 15%;
 }
 
-.mat-icon {
+.mat-icon-sidenav {
     color: aquamarine;
     font-size: xx-large;
     margin-top: 0.5rem;
     margin-left: 0.5rem;
+}
+
+.mat-icon-priority {
+    transform: scale(0.5);
 }
 
 .colorRed {
@@ -71,8 +75,8 @@ table, mat-paginator {
     color: fuchsia;
 }
 
-.colorCoral {
-    color: coral;
+.colorGold {
+    color:gold;
 }
 
 .colorGreen {

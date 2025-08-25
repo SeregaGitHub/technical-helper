@@ -34,7 +34,7 @@ export class EnumViewFactory {
     public static getPriorityViews(): Map<Priority, string> {
 
         const priorityMap = new Map<Priority, string>([ 
-            [Priority.Urgently, 'Срочный'],
+            [Priority.Urgently, 'Важный'],
             [Priority.High, 'Высокий'],
             [Priority.Medium, 'Средний'],
             [Priority.Low, 'Низкий']

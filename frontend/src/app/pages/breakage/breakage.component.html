@@ -67,7 +67,7 @@
     <mat-sidenav-content class="bgi">
 
     <button mat-icon-button (click)="opened = !opened" class="example-icon fixed" aria-label="Example icon-button with menu icon">
-        <mat-icon>menu</mat-icon>
+        <mat-icon class="mat-icon-sidenav">menu</mat-icon>
     </button>
         
     <div class="flex">
@@ -124,7 +124,7 @@
                         [ngClass]="{
                             'colorRed': element.status === 'NEW', 'colorLawngreen': element.status === 'SOLVED',
                             'colorAqua': element.status === 'IN_PROGRESS', 'colorFuchsia': element.status === 'PAUSED',
-                            'colorCoral': element.status === 'REDIRECTED', 'colorGreen': element.status === 'CANCELLED'
+                            'colorGold': element.status === 'REDIRECTED', 'colorGreen': element.status === 'CANCELLED'
                             }"> {{ statusMap.get(element.status) }} </td>
                     </ng-container>
     
@@ -132,7 +132,13 @@
                     <ng-container matColumnDef="priority">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ priority }} </th>
                         <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20 one-long-line"
-                        (click)="getBreakageById(element.id)"> {{ priorityMap.get(element.priority) }} </td>
+                        (click)="getBreakageById(element.id)"> 
+                        <mat-icon class="mat-icon-priority"
+                        [ngClass]="{
+                            'colorRed': element.priority === 'URGENTLY', 'colorGold': element.priority === 'HIGH', 
+                            'colorLawngreen': element.priority === 'MEDIUM', 'colorAqua': element.priority === 'LOW'
+                            }"
+                        >turned_in</mat-icon> {{ priorityMap.get(element.priority) }} </td>
                     </ng-container>
 
                     <!-- breakageExecutor Column --> 

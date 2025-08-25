@@ -50,15 +50,6 @@ export class BreakageComponent {
 
   statusMap = EnumViewFactory.getStatusViews();
 
-  statusColor = new Map<Status, string>([ 
-            [Status.New, '#ff0000'],
-            [Status.Solved, 'Решена'],
-            [Status.InProgress, 'В работе'],
-            [Status.Paused, 'В ожидании'],
-            [Status.Redirected, 'Передана'],
-            [Status.Cancelled, 'Отменена']
-        ]);
-
   priorityMap = EnumViewFactory.getPriorityViews();
 
   number = '№';
