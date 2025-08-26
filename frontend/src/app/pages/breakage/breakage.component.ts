@@ -48,9 +48,7 @@ export class BreakageComponent {
   opened = false;
 
   executors = EnumViewFactory.getExecutorViews();
-
   statusMap = EnumViewFactory.getStatusViews();
-
   priorityMap = EnumViewFactory.getPriorityViews();
 
   number = '№';
@@ -63,8 +61,8 @@ export class BreakageComponent {
   createdBy = 'Создан';
   createdDate = 'Создано';
 
-  // pageIndex = 0;
-  //pageSize = 10;
+  pageIndex: number = 0;
+  pageSize: number = 10;
   totalElements: number = 0;
   pageEvent!: PageEvent;
 
@@ -72,11 +70,11 @@ export class BreakageComponent {
   direction = 'DESC';
 
   statusNew = true;
-  statusSolved = true;
+  statusSolved = false;
   statusInProgress = true; 
   statusPaused = true; 
   statusRedirected = true; 
-  statusCancelled = true; 
+  statusCancelled = false; 
   priorityUrgently = true; 
   priorityHigh = true; 
   priorityMedium = true; 
@@ -106,8 +104,7 @@ export class BreakageComponent {
 
   constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
-    console.log('constructor');
-    this.getAllBreakages(0, 10);
+    this.getAllBreakages();
    }
 
   // Need for updating
@@ -120,21 +117,13 @@ export class BreakageComponent {
     }
   }
 
-// https://yandex.ru/video/preview/10275455143653628593    paginator
-
   onPaginateChange(event: PageEvent) {
-    console.log('event:');
-    console.log(event);
-    console.log(event.pageIndex);
-    console.log(event.pageSize);
-    console.log('event:');
 
-    // this.pageIndex = event.pageIndex;
-    // this.pageSize = event.pageSize;
-    // this.totalElements = event.length;
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.totalElements = event.length;
 
-    //this.pageIndex = this.pageIndex + 1;
-    this.getAllBreakages(event.pageIndex, event.pageSize);
+    this.getAllBreakages();
   }
 
   createBreakage() {
@@ -142,18 +131,16 @@ export class BreakageComponent {
     const openDialog = this.dialog.open(BreakageFormComponent);
     
     openDialog.afterClosed().subscribe(() => {
-        this.getAllBreakages(0, 10);
+        this.getAllBreakages();
     });
   };
 
 
-  getAllBreakages(pageIndex: number, pageSize: number): void {
-
-    //console.log('getAllBreakages() start: this.paginator.length - ' + this.paginator.length);
+  getAllBreakages(): void {
 
     this._breakageService
       .getAllBreakages(
-        pageIndex, pageSize, this.sortBy, this.direction, 
+        this.pageIndex, this.pageSize, this.sortBy, this.direction, 
         this.statusNew, this.statusSolved, this.statusInProgress, 
         this.statusPaused, this.statusRedirected, this.statusCancelled,
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
@@ -165,28 +152,12 @@ export class BreakageComponent {
             this.dataSource = new MatTableDataSource(this.breakages);
             //this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
-
             this.totalElements = data.totalElements;
-            console.log(data.totalElements)
-            console.log(data.pageNumber)
-            console.log(data.pageSize)
-            // this.pageIndex = data.pageNumber;
-            //this.pageSize = data.pageSize;
-
-            // console.log('this.totalElements - ');
-            // console.log(this.totalElements)
-            // console.log('this.pageIndex - ');
-            // console.log(this.pageIndex)
-            // console.log('this.pageSize - ');
-            // console.log(this.pageSize)
-
           },
           error: err => {
             this.getAllBreakagesError = err.error;
           }
         })
-
-        //console.log('getAllBreakages() finish: this.paginator.length - ' + this.paginator.length);
   };
 
   getBreakageById(id: string) {

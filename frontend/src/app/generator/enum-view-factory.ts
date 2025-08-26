@@ -8,7 +8,7 @@ export class EnumViewFactory {
     public static getExecutorViews(): ExecutorView[] {
 
         const executors = [
-            {value: Executor.All, viewValue: 'Всех'},
+            {value: Executor.All, viewValue: 'Все заявки'},
             {value: Executor.AppointedToMe, viewValue: 'На меня'},
             {value: Executor.AppointedToOthers, viewValue: 'На других'},
             {value: Executor.NoAppointed, viewValue: 'Не назначенные'},
