@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { BreakageService } from '../../services/breakage.service';
 import { Breakage } from '../../model/breakage/breakage';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { DATE_FORMAT } from '../../util/constant';
 import { ApiResponse } from '../../model/response/api-response';
@@ -18,10 +18,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { Executor } from '../../enum/executor.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
-import { Status } from '../../enum/status.enum';
-import { Priority } from '../../enum/priority.enum';
-import { ExecutorView } from '../../util/executor-view';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
+import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginator-intl';
 
 @Component({
   selector: 'app-breakage',
@@ -40,7 +38,10 @@ import { EnumViewFactory } from '../../generator/enum-view-factory';
     MatSelectModule
   ],
   templateUrl: './breakage.component.html',
-  styleUrl: './breakage.component.css'
+  styleUrl: './breakage.component.css',
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomBreakagePaginatorIntl }
+  ]
 })
 export class BreakageComponent {
 
@@ -62,16 +63,20 @@ export class BreakageComponent {
   createdBy = 'Создан';
   createdDate = 'Создано';
 
-  pageIndex = 0;
-  pageSize = 10;
+  // pageIndex = 0;
+  //pageSize = 10;
+  totalElements: number = 0;
+  pageEvent!: PageEvent;
+
   sortBy = 'lastUpdatedDate';
   direction = 'DESC';
+
   statusNew = true;
-  statusSolved = false;
+  statusSolved = true;
   statusInProgress = true; 
   statusPaused = true; 
   statusRedirected = true; 
-  statusCancelled = false; 
+  statusCancelled = true; 
   priorityUrgently = true; 
   priorityHigh = true; 
   priorityMedium = true; 
@@ -101,7 +106,8 @@ export class BreakageComponent {
 
   constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
-    this.getAllBreakages();
+    console.log('constructor');
+    this.getAllBreakages(0, 10);
    }
 
   // Need for updating
@@ -114,20 +120,40 @@ export class BreakageComponent {
     }
   }
 
+// https://yandex.ru/video/preview/10275455143653628593    paginator
+
+  onPaginateChange(event: PageEvent) {
+    console.log('event:');
+    console.log(event);
+    console.log(event.pageIndex);
+    console.log(event.pageSize);
+    console.log('event:');
+
+    // this.pageIndex = event.pageIndex;
+    // this.pageSize = event.pageSize;
+    // this.totalElements = event.length;
+
+    //this.pageIndex = this.pageIndex + 1;
+    this.getAllBreakages(event.pageIndex, event.pageSize);
+  }
+
   createBreakage() {
     
     const openDialog = this.dialog.open(BreakageFormComponent);
     
     openDialog.afterClosed().subscribe(() => {
-        this.getAllBreakages();
+        this.getAllBreakages(0, 10);
     });
   };
 
 
-  getAllBreakages(): void {
+  getAllBreakages(pageIndex: number, pageSize: number): void {
+
+    //console.log('getAllBreakages() start: this.paginator.length - ' + this.paginator.length);
+
     this._breakageService
       .getAllBreakages(
-        this.pageIndex, this.pageSize, this.sortBy, this.direction, 
+        pageIndex, pageSize, this.sortBy, this.direction, 
         this.statusNew, this.statusSolved, this.statusInProgress, 
         this.statusPaused, this.statusRedirected, this.statusCancelled,
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
@@ -137,13 +163,30 @@ export class BreakageComponent {
           next: data => {
             this.breakages = data.content;
             this.dataSource = new MatTableDataSource(this.breakages);
-            this.dataSource.paginator = this.paginator;
+            //this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
+
+            this.totalElements = data.totalElements;
+            console.log(data.totalElements)
+            console.log(data.pageNumber)
+            console.log(data.pageSize)
+            // this.pageIndex = data.pageNumber;
+            //this.pageSize = data.pageSize;
+
+            // console.log('this.totalElements - ');
+            // console.log(this.totalElements)
+            // console.log('this.pageIndex - ');
+            // console.log(this.pageIndex)
+            // console.log('this.pageSize - ');
+            // console.log(this.pageSize)
+
           },
           error: err => {
             this.getAllBreakagesError = err.error;
           }
         })
+
+        //console.log('getAllBreakages() finish: this.paginator.length - ' + this.paginator.length);
   };
 
   getBreakageById(id: string) {
