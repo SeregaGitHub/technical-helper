@@ -152,11 +152,16 @@ export class BreakageComponent {
                   this.getAllBreakagesError = err.error;
                 }
               })
-          }, 2500);
-      } else {
+          }, 2000);
+      } else if (filterValue.length > 0) {
           this.inputTimer = setTimeout(() => {
-            this.inputError = true;
-          }, 2500);
+              this.inputError = true;
+          }, 2000);
+      } else {
+          clearTimeout(this.searchTimer);
+          clearTimeout(this.inputTimer);
+          this.inputError = false;
+          this.getAllBreakages();
       }
       
     }
