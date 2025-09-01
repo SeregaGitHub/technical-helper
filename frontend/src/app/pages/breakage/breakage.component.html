@@ -74,7 +74,16 @@
         <div class="grow ml-20 mr-36">
 
             <mat-form-field class="!block">
-                <mat-label class="">Поиск по тексту заявки</mat-label>
+                <mat-label class="">
+                    @if (inputError) {
+                        <div class="text-xl">
+                            <p>Текст заявки должен быть не менее трех символов !!!</p>
+                        </div>
+                    } @else {
+                        Поиск по тексту заявки
+                    }
+                    
+                </mat-label>
                     <input matInput (keyup)="applyFilter($event)" #input>
             </mat-form-field>
 

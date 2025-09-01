@@ -64,5 +64,19 @@ export class BreakageService {
       );
   };
 
+  getBreakagesByText(text: string): Observable<any> {
+
+      const headers = HttpHeadersFactory.createPermanentHeaders();
+
+      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + text, {headers})
+      .pipe(
+          tap(
+            (allBreakages) => {
+              const currentState = this.breakageSubject.value;
+                this.breakageSubject.next({...currentState, allBreakages})
+            })
+      );
+  }
+
 
 }
