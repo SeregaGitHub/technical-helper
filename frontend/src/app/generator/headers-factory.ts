@@ -16,7 +16,7 @@ export class HttpHeadersFactory {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: String, deadline: boolean 
+        executor: String, deadline: boolean, searchText: string | null
     ): HttpParams {
         
             const myObject: any = {
@@ -38,8 +38,13 @@ export class HttpHeadersFactory {
               deadline: deadline.toString(),
         };
 
-        const httpParams: HttpParamsOptions = { fromObject: myObject } as HttpParamsOptions;
+        const params: HttpParamsOptions = { fromObject: myObject } as HttpParamsOptions;
+        let httpParams = new HttpParams(params);
 
-        return new HttpParams(httpParams);
+        if (searchText != null) {
+            httpParams = httpParams.set('searchText', searchText)
+        }
+
+        return httpParams;
     };
 }

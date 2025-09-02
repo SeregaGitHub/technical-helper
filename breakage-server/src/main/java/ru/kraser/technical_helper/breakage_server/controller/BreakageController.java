@@ -101,17 +101,19 @@ public class BreakageController {
                                    @RequestParam(value = "breakageExecutor", required = false)
                                        String executor,
                                    @RequestParam(value = "deadline", defaultValue = "false")
-                                       boolean deadline
+                                       boolean deadline,
+                                   @RequestParam(value = "searchText", required = false)
+                                       String searchText
     ) {
         log.info("Getting Breakages");
         AppPage appPage = breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText);
         log.info("Breakages received successfully");
         return appPage;
     }
 
-    @GetMapping(path = EMPLOYEE_URL + "/{text}")
+    /*@GetMapping(path = EMPLOYEE_URL + "/{text}")
     @ResponseStatus(HttpStatus.OK)
     public AppPage getBreakagesByText(@PathVariable("text") String text,
                                       @RequestParam(value = "pageSize", defaultValue = "10")
@@ -127,7 +129,7 @@ public class BreakageController {
         AppPage appPage = breakageService.getBreakagesByText(text, pageIndex, pageSize, sortBy, direction);
         log.info("Breakages contains text, received successfully");
         return appPage;
-    }
+    }*/
 
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)

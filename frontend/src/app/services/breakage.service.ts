@@ -41,7 +41,7 @@ export class BreakageService {
         statusNew: boolean, statusSolved: boolean, statusInProgress: boolean, 
         statusPaused: boolean, statusRedirected: boolean, statusCancelled: boolean,
         priorityUrgently: boolean, priorityHigh: boolean, priorityMedium: boolean, priorityLow: boolean,
-        executor: Executor, deadline: boolean
+        executor: Executor, deadline: boolean, searchText: string | null
   ): Observable<any> {
   
     const headers = HttpHeadersFactory.createPermanentHeaders();
@@ -50,7 +50,7 @@ export class BreakageService {
         statusNew, statusSolved, statusInProgress, 
         statusPaused, statusRedirected, statusCancelled,
         priorityUrgently, priorityHigh, priorityMedium, priorityLow,
-        executor.toString(), deadline
+        executor.toString(), deadline, searchText
     );
     const httpOptions = { params: httpParams, headers: headers };
   
@@ -63,20 +63,5 @@ export class BreakageService {
             })
       );
   };
-
-  getBreakagesByText(text: string): Observable<any> {
-
-      const headers = HttpHeadersFactory.createPermanentHeaders();
-
-      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + text, {headers})
-      .pipe(
-          tap(
-            (allBreakages) => {
-              const currentState = this.breakageSubject.value;
-                this.breakageSubject.next({...currentState, allBreakages})
-            })
-      );
-  }
-
 
 }

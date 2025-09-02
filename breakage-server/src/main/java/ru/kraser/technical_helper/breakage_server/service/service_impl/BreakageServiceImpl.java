@@ -181,7 +181,7 @@ public class BreakageServiceImpl implements BreakageService {
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh,
             boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline) {
+            String executor, boolean deadline, String searchText) {
 
         PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
 
@@ -193,9 +193,14 @@ public class BreakageServiceImpl implements BreakageService {
 
         if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
-            Page<BreakageDto> pageEmployeeBreakages =
-                    breakageRepository.getAllEmployeeBreakages(
-                            statusList, priorityList, currentUserDepartmentId, pageRequest);
+            Page<BreakageDto> pageEmployeeBreakages;
+            if (searchText == null || searchText.length() < 3) {
+                pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakages(
+                                statusList, priorityList, currentUserDepartmentId, pageRequest);
+            } else {
+                pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakagesByText(
+                                statusList, priorityList, currentUserDepartmentId, pageRequest, searchText);
+            }
             return AppPageMapper.toAppPage(pageEmployeeBreakages);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
@@ -236,14 +241,19 @@ public class BreakageServiceImpl implements BreakageService {
                 pageBreakages =
                         breakageRepository.getAllDeadlineExpiredBreakages(statusList, priorityList, pageRequest, now);
             } else {
-                pageBreakages =
-                        breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages =
+                            breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+                } else {
+                    pageBreakages =
+                            breakageRepository.getAllBreakagesByText(statusList, priorityList, pageRequest, searchText);
+                }
             }
             return AppPageMapper.toAppPage(pageBreakages);
         }
     }
 
-    @Override
+    /*@Override
     @Transactional(readOnly = true)
     public AppPage getBreakagesByText(
             String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
@@ -253,7 +263,7 @@ public class BreakageServiceImpl implements BreakageService {
         Page<BreakageDto> pageBreakages = breakageRepository.getBreakagesByText(text, pageRequest);
 
         return AppPageMapper.toAppPage(pageBreakages);
-    }
+    }*/
 
     @Override
     @Transactional(readOnly = true)

@@ -79,18 +79,21 @@ public class BreakageClient extends BaseClient {
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline) {
+            String executor, boolean deadline, String searchText) {
+
+        System.out.println("BreakageClient, searchText - " + searchText);
+
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
                 pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline,
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText,
                 jwt,
                 ParameterizedTypeReference.forType(AppPage.class)
         );
     }
 
-    public AppPage getBreakagesByText(
+    /*public AppPage getBreakagesByText(
             String jwt, String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
         return super.getAllByText(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + text,
@@ -101,7 +104,7 @@ public class BreakageClient extends BaseClient {
                 direction,
                 ParameterizedTypeReference.forType(AppPage.class)
         );
-    }
+    }*/
 
     public BreakageFullDto getBreakage(String jwt, String breakageHeaderName, String breakageId) {
         return super.get(

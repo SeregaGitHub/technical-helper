@@ -134,7 +134,7 @@ public abstract class BaseClient {
                                  boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
                                  boolean priorityUrgently, boolean priorityHigh,
                                  boolean priorityMedium, boolean priorityLow, String executor, boolean deadline,
-                                 String jwt, ParameterizedTypeReference<T> typeReference) {
+                                 String searchText, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
                 .uri(url, uriBuilder ->
@@ -154,6 +154,7 @@ public abstract class BaseClient {
                                 .queryParam("priorityLow", priorityLow)
                                 .queryParam("breakageExecutor", executor)
                                 .queryParam("deadline", deadline)
+                                .queryParam("searchText", searchText)
                                 .build())
                 .header(AUTH_HEADER, jwt)
                 .accept(MediaType.APPLICATION_JSON)
@@ -165,7 +166,7 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
+    /*protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
                                  String sortBy, String direction, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
@@ -183,7 +184,7 @@ public abstract class BaseClient {
                 .bodyToMono(typeReference);
 
         return getResponse.block();
-    }
+    }*/
 
     protected <T> T get(String url, String jwt, String entityHeaderName,
                         String entityId, ParameterizedTypeReference<T> typeReference) {

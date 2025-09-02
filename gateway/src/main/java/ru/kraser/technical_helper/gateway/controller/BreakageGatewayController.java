@@ -115,13 +115,15 @@ public class BreakageGatewayController {
                                    @RequestParam(value = "breakageExecutor", required = false)
                                        String executor,
                                    @RequestParam(value = "deadline", defaultValue = "false")
-                                       boolean deadline
+                                       boolean deadline,
+                                   @RequestParam(value = "searchText", required = false)
+                                       String searchText
     ) {
         log.info("Getting Breakages");
         AppPage employeeBreakageDtoList = breakageClient.getAllBreakages(
                 jwt, pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText);
         log.info("Breakages received successfully");
         return employeeBreakageDtoList;
     }
@@ -136,7 +138,7 @@ public class BreakageGatewayController {
         return response;
     }
 
-    @GetMapping(path = EMPLOYEE_URL + "/{text}")
+/*    @GetMapping(path = EMPLOYEE_URL + "/{text}")
     @ResponseStatus(HttpStatus.OK)
     public AppPage getBreakagesByText(@RequestHeader(AUTH_HEADER) String jwt,
                                       @PathVariable("text") String text,
@@ -152,7 +154,7 @@ public class BreakageGatewayController {
         AppPage response = breakageClient.getBreakagesByText(jwt, text, pageIndex, pageSize, sortBy, direction);
         log.info("Breakages contains text, received successfully");
         return response;
-    }
+    }*/
 
     // BREAKAGE_COMMENT
     @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)

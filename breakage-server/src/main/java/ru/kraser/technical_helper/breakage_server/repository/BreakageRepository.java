@@ -85,6 +85,13 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
                                               String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
+            value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllEmployeeBreakagesByText(List<Status> statusList, List<Priority> priorityList,
+                                              String currentUserDepartmentId, PageRequest pageRequest,
+                                              String searchText);
+
+    @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id = :currentUserId"
     )
     Page<BreakageDto> getAllBreakagesAppointedToMe(
@@ -122,15 +129,21 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     Page<BreakageDto> getAllBreakages(List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
 
     @Query(
+            value = GET_ALL_BREAKAGES + " AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllBreakagesByText(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String searchText);
+
+    @Query(
             value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES
     )
     Page<BreakageDto> getAllDeadlineExpiredBreakages(
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, LocalDateTime now);
 
-    @Query(
+    /*@Query(
             value = GET_BREAKAGE + " WHERE b.breakageText ILIKE %?1%"
     )
-    Page<BreakageDto> getBreakagesByText(String text, PageRequest pageRequest);
+    Page<BreakageDto> getBreakagesByText(String text, PageRequest pageRequest);*/
 
     @Query(
             value = GET_BREAKAGE + " WHERE b.id = :breakageId"

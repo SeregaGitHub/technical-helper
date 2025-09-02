@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { BreakageService } from '../../services/breakage.service';
 import { Breakage } from '../../model/breakage/breakage';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -9,7 +9,7 @@ import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
-import { FormControl, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,8 +20,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginator-intl';
-import { debounceTime, distinctUntilChanged, filter, fromEvent, map, switchMap } from 'rxjs';
-import { TimeInterval } from 'rxjs/internal/operators/timeInterval';
 
 @Component({
   selector: 'app-breakage',
@@ -83,13 +81,12 @@ export class BreakageComponent {
   priorityLow = true;
   executor = Executor.All; 
   deadline = false;
+  searchText = '';
 
   dateFormat = DATE_FORMAT;
   breakages: any;
   getAllBreakagesError: ApiResponse;
 
-  // apiResponse: any;
-  // isSearching: boolean;
   searchTimer: any;
   inputTimer: any;
   inputError: boolean = false;
@@ -109,37 +106,32 @@ export class BreakageComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  // @ViewChild('movieSearchInput', { static: true })
-  // movieSearchInput!: ElementRef;
 
   constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllBreakages();
-
-    // this.isSearching = false;
-    // this.apiResponse = [];
    }
 
-  //  searchText: string = '';
-  //  timeout: any = null;
-  //  control = new FormControl();
-
-  
-  // Need for updating
   applyFilter(event: Event) {
 
     clearTimeout(this.searchTimer);
     clearTimeout(this.inputTimer);
     this.inputError = false;
+    this.searchText = '';
 
     if (event.type === 'keyup') {
       const value = (event.target as HTMLInputElement).value;
       const filterValue = value.trim().toLowerCase();
-      console.log(filterValue)
+      this.searchText = filterValue;
 
-      if (filterValue.length > 2) {
+      if (this.searchText.length > 2) {
           this.searchTimer = setTimeout(() => {
-            this._breakageService.getBreakagesByText(filterValue)
+            this._breakageService.getAllBreakages(
+              this.pageIndex, this.pageSize, this.sortBy, this.direction, 
+              this.statusNew, this.statusSolved, this.statusInProgress, 
+              this.statusPaused, this.statusRedirected, this.statusCancelled,
+              this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
+              this.executor, this.deadline, this.searchText)
               .subscribe({
                 next: data => {
                   this.breakages = data.content;
@@ -153,7 +145,7 @@ export class BreakageComponent {
                 }
               })
           }, 2000);
-      } else if (filterValue.length > 0) {
+      } else if (this.searchText.length > 0) {
           this.inputTimer = setTimeout(() => {
               this.inputError = true;
           }, 2000);
@@ -161,94 +153,12 @@ export class BreakageComponent {
           clearTimeout(this.searchTimer);
           clearTimeout(this.inputTimer);
           this.inputError = false;
+          this.searchText = '';
           this.getAllBreakages();
       }
       
     }
-    //   timer = setTimeout(() => {
-    //   const currentDate = new Date();  
-    //   console.log(currentDate + 'finish');
-    //   this._breakageService
-    //     .getBreakagesByText(filterValue)
-    //       .subscribe({
-    //         next: data => {
-    //           this.breakages = data.content;
-    //           this.dataSource = new MatTableDataSource(this.breakages);
-    //           this.dataSource.sort = this.sort;
-    //           this.totalElements = data.totalElements;
-    //         },
-    //         error: err => {
-    //           this.getAllBreakagesError = err.error;
-    //         }
-    //       });
-    // }, 5000);
-    //}
-    
-
-
-    
-
-  // applyFilter() {
-    // clearTimeout(this.timeout);
-    // this.timeout = setTimeout(() => {
-    //   this.onSearchChange(this.searchText);
-    // }, 5000);
-
-
-
-    // fromEvent(this.movieSearchInput.nativeElement, 'keyup')
-    //   .pipe(
-    //     map((event: any) => event.target.value),
-    //     filter((res) => res.length > 2),
-    //     debounceTime(5000),
-    //     distinctUntilChanged(),
-    //     switchMap((term: string) => {
-    //       this.isSearching = true;
-    //       return this.searchGetCall(term);
-    //     })
-    //   )
-
-
-
-    // let timer;
-
-    // const waitTime = 5000;
-
-    
-    
-
-    // const currentDate = new Date();  
-    // console.log(currentDate + 'start');
-    
-    // if (event.type === 'keyup') {
-    //   const value = (event.target as HTMLInputElement).value;
-    //   const filterValue = value.trim().toLowerCase();
-
-    //   clearTimeout(timer);
-
-    //   timer = setTimeout(() => {
-    //     console.log(filterValue);
-    //   }, waitTime)
-      
-
-
-
-  //   deleteResponseMessage() {
-  //   setTimeout(() => {
-  //     this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
-  //   }, 3000);
-  //  };
-
-    // this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    // if (this.dataSource.paginator) {
-    //   this.dataSource.paginator.firstPage();
-    // }
   }
-
-  // searchGetCall(term: string) {
-  //   console.log(term)
-  // }
 
   onPaginateChange(event: PageEvent) {
 
@@ -277,7 +187,7 @@ export class BreakageComponent {
         this.statusNew, this.statusSolved, this.statusInProgress, 
         this.statusPaused, this.statusRedirected, this.statusCancelled,
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
-        this.executor, this.deadline
+        this.executor, this.deadline, this.searchText
       )
         .subscribe({
           next: data => {

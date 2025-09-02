@@ -22,9 +22,9 @@ public interface BreakageService {
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline);
+            String executor, boolean deadline, String searchText);
 
-    AppPage getBreakagesByText(String text, Integer pageIndex, Integer pageSize, String sortBy, String direction);
+    //AppPage getBreakagesByText(String text, Integer pageIndex, Integer pageSize, String sortBy, String direction);
 
     // BREAKAGE_COMMENT
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
