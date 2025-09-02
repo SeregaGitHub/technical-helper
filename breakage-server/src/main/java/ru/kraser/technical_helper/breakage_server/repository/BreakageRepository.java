@@ -98,6 +98,13 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
 
     @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id = :currentUserId AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllBreakagesByTextAppointedToMe(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest,
+            String currentUserId, String searchText);
+
+    @Query(
             value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id = :currentUserId"
     )
     Page<BreakageDto> getAllDeadlineExpiredBreakagesAppointedToMe(
@@ -105,10 +112,25 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             PageRequest pageRequest, String currentUserId, LocalDateTime now);
 
     @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id = :currentUserId " +
+                    "AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakagesByTextAppointedToMe(
+            List<Status> statusList, List<Priority> priorityList,
+            PageRequest pageRequest, String currentUserId, LocalDateTime now, String searchText);
+
+    @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id <> :currentUserId"
     )
     Page<BreakageDto> getAllBreakagesAppointedToOthers(
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String currentUserId);
+
+    @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id <> :currentUserId AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllBreakagesByTextAppointedToOthers(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest,
+            String currentUserId, String searchText);
 
     @Query(
             value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id <> :currentUserId"
@@ -118,10 +140,24 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             PageRequest pageRequest, String currentUserId, LocalDateTime now);
 
     @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.executor.id <> :currentUserId " +
+                    "AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakagesByTextAppointedToOthers(
+            List<Status> statusList, List<Priority> priorityList,
+            PageRequest pageRequest, String currentUserId, LocalDateTime now, String searchText);
+
+    @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id IS NULL"
     )
     Page<BreakageDto> getAllBreakagesNoAppointed(
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest);
+
+    @Query(
+            value = GET_ALL_BREAKAGES + " AND b.executor.id IS NULL AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllBreakagesByTextNoAppointed(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, String searchText);
 
     @Query(
             value = GET_ALL_BREAKAGES
@@ -139,6 +175,13 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     )
     Page<BreakageDto> getAllDeadlineExpiredBreakages(
             List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest, LocalDateTime now);
+
+    @Query(
+            value = GET_ALL_DEADLINE_EXPIRED_BREAKAGES + " AND b.breakageText ILIKE %:searchText%"
+    )
+    Page<BreakageDto> getAllDeadlineExpiredBreakagesByText(
+            List<Status> statusList, List<Priority> priorityList, PageRequest pageRequest,
+            LocalDateTime now, String searchText);
 
     /*@Query(
             value = GET_BREAKAGE + " WHERE b.breakageText ILIKE %?1%"

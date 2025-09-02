@@ -208,11 +208,21 @@ public class BreakageServiceImpl implements BreakageService {
             Page<BreakageDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToMe(
-                        statusList, priorityList, pageRequest, currentUserId, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, now);
+                } else {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, now, searchText);
+                }
             } else {
-                pageBreakages = breakageRepository.getAllBreakagesAppointedToMe(
-                                statusList, priorityList, pageRequest, currentUserId);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllBreakagesAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId);
+                } else {
+                    pageBreakages = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, searchText);
+                }
             }
             return AppPageMapper.toAppPage(pageBreakages);
 
@@ -221,25 +231,48 @@ public class BreakageServiceImpl implements BreakageService {
             Page<BreakageDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToOthers(
-                        statusList, priorityList, pageRequest, currentUserId, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, now);
+                } else {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, now, searchText);
+                }
             } else {
-                pageBreakages = breakageRepository.getAllBreakagesAppointedToOthers(
-                                statusList, priorityList, pageRequest, currentUserId);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllBreakagesAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId);
+                } else {
+                    pageBreakages = breakageRepository.getAllBreakagesByTextAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, searchText);
+                }
             }
             return AppPageMapper.toAppPage(pageBreakages);
 
         } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
-            Page<BreakageDto> pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
-                    statusList, priorityList, pageRequest);
+            Page<BreakageDto> pageBreakages;
+            if (searchText == null || searchText.length() < 3) {
+                pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
+                        statusList, priorityList, pageRequest);
+            } else {
+                pageBreakages = breakageRepository.getAllBreakagesByTextNoAppointed(
+                        statusList, priorityList, pageRequest, searchText);
+            }
             return AppPageMapper.toAppPage(pageBreakages);
 
         } else {
             Page<BreakageDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages =
-                        breakageRepository.getAllDeadlineExpiredBreakages(statusList, priorityList, pageRequest, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages =
+                            breakageRepository.getAllDeadlineExpiredBreakages(
+                                    statusList, priorityList, pageRequest, now);
+                } else {
+                    pageBreakages =
+                            breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                                    statusList, priorityList, pageRequest, now, searchText);
+                }
             } else {
                 if (searchText == null || searchText.length() < 3) {
                     pageBreakages =
