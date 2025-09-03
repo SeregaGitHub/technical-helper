@@ -1,4 +1,4 @@
-<div class="flex-auto">
+<div appUserProfile #userProfile="userProfile" class="flex-auto">
 
     <mat-sidenav-container>
       <mat-sidenav class="black-to-blue-gradient text-center flex flex-col" [(opened)]="opened" mode="side">
@@ -41,25 +41,27 @@
             <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" (click)="getAllBreakages()"></mat-slide-toggle></p>
         </div>
         
-        <p class="mt-2 text-2xl underline">Параметры</p>
+        @if (!userProfile.getUserProfile().isEmployee()) {
+            <p class="mt-2 text-2xl underline">Параметры</p>
 
-        <div class="text-left">
-            <p class="text-lg ml-6 mb-1">Назначенные на:</p>
-            <form>
-                <mat-form-field>
-                    <mat-select [(ngModel)]="executor" name="appointed">
-                        @for (executor of executors; track executor) {
-                            <mat-option [value]="executor.value" (click)="getAllBreakages()">{{executor.viewValue}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </form>
-        </div>
+            <div class="text-left">
+                <p class="text-lg ml-6 mb-1">Назначенные на:</p>
+                <form>
+                    <mat-form-field>
+                        <mat-select [(ngModel)]="executor" name="appointed">
+                            @for (executor of executors; track executor) {
+                                <mat-option [value]="executor.value" (click)="getAllBreakages()">{{executor.viewValue}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </form>
+            </div>
 
-        <div class="text-left ml-6 mb-4">
-            <p class="text-lg">Просроченные</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
-        </div>
+            <div class="text-left ml-6 mb-4">
+                <p class="text-lg">Просроченные</p>
+                <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            </div>
+        }
 
       </mat-sidenav>
         

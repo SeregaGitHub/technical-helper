@@ -20,6 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakageFormComponent } from '../../components/breakage-form/breakage-form.component';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginator-intl';
+import { UserProfileDirective } from '../../directive/user-profile.directive';
 
 @Component({
   selector: 'app-breakage',
@@ -35,7 +36,8 @@ import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginato
     MatInputModule,
     MatFormFieldModule,
     MatSlideToggleModule,
-    MatSelectModule
+    MatSelectModule,
+    UserProfileDirective
   ],
   templateUrl: './breakage.component.html',
   styleUrl: './breakage.component.css',
