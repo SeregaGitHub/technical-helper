@@ -57,10 +57,12 @@
                 </form>
             </div>
 
-            <div class="text-left ml-6 mb-4">
-                <p class="text-lg">Просроченные</p>
-                <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
-            </div>
+            @if (executor !== 'NO_APPOINTED') {
+                <div class="text-left ml-6 mb-4">
+                    <p class="text-lg">Просроченные</p>
+                    <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
+                </div>
+            }
         }
 
       </mat-sidenav>
