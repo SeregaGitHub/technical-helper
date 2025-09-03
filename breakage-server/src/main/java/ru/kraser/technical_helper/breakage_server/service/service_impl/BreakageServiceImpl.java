@@ -183,15 +183,17 @@ public class BreakageServiceImpl implements BreakageService {
             boolean priorityMedium, boolean priorityLow,
             String executor, boolean deadline, String searchText) {
 
+        Role currentUserRole = SecurityUtil.getCurrentUserRole();
+
         PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
-                statusPaused, statusRedirected, statusCancelled, deadline);
+                statusPaused, statusRedirected, statusCancelled, deadline, currentUserRole, executor);
 
         List<Priority> priorityList = AppPageUtil.createPriorityList(priorityUrgently, priorityHigh,
                 priorityMedium, priorityLow);
 
-        if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
+        if (currentUserRole == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
             Page<BreakageDto> pageEmployeeBreakages;
             if (searchText == null || searchText.length() < 3) {

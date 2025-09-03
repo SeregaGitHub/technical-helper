@@ -3,7 +3,9 @@ package ru.kraser.technical_helper.common_module.util;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
+import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
 
 import java.util.ArrayList;
@@ -14,10 +16,10 @@ public class AppPageUtil {
 
     public List<Status> createStatusList(boolean statusNew, boolean statusSolved, boolean statusInProgress,
                                          boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
-                                         boolean deadline) {
+                                         boolean deadline, Role currentUserRole, String executor) {
         List<Status> statusList = new ArrayList<>();
 
-        if (deadline) {
+        if (deadline && currentUserRole != Role.EMPLOYEE && !executor.equals(Executor.NO_APPOINTED.name())) {
             statusList.add(Status.NEW);
             statusList.add(Status.IN_PROGRESS);
         } else {
