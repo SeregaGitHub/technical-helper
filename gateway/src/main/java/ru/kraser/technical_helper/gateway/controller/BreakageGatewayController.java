@@ -125,11 +125,6 @@ public class BreakageGatewayController {
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
                 priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText);
         log.info("Breakages received successfully");
-
-        System.out.println("==========================================================");
-        System.out.println(employeeBreakageDtoList.content());
-        System.out.println("==========================================================");
-
         return employeeBreakageDtoList;
     }
 

@@ -81,8 +81,6 @@ public class BreakageClient extends BaseClient {
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
             String executor, boolean deadline, String searchText) {
 
-        System.out.println("BreakageClient, searchText - " + searchText);
-
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
                 pageSize, pageIndex, sortBy, direction,

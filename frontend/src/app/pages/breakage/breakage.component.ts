@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BreakageService } from '../../services/breakage.service';
 import { Breakage } from '../../model/breakage/breakage';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -45,7 +45,7 @@ import { UserProfileDirective } from '../../directive/user-profile.directive';
     { provide: MatPaginatorIntl, useClass: CustomBreakagePaginatorIntl }
   ]
 })
-export class BreakageComponent {
+export class BreakageComponent implements OnInit, OnDestroy{
 
   opened = false;
 
@@ -68,7 +68,7 @@ export class BreakageComponent {
   totalElements: number = 0;
   pageEvent!: PageEvent;
 
-  sortBy = 'lastUpdatedDate';
+  sortBy = 'createdDate';
   direction = 'DESC';
 
   statusNew = true;
@@ -93,6 +93,8 @@ export class BreakageComponent {
   inputTimer: any;
   inputError: boolean = false;
 
+  intervalId: any;
+
   public displayedColumns: string[] = [
                                     'number', 
                                     'departmentName', 
@@ -111,8 +113,20 @@ export class BreakageComponent {
 
   constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
-    this.getAllBreakages();
+    //this.getAllBreakages();
    }
+
+  ngOnInit(): void {
+    this.getAllBreakages();
+
+    this.intervalId = setInterval(() => {
+      this.getAllBreakages();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalId);
+  }
 
   applyFilter(event: Event) {
 
@@ -141,7 +155,6 @@ export class BreakageComponent {
           this.searchText = '';
           this.getAllBreakages();
       }
-      
     }
   }
 

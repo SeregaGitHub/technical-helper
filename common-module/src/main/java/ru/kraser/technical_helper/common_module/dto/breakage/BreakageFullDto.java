@@ -11,19 +11,19 @@ import java.util.List;
 
 @Builder
 public record BreakageFullDto(
-        String id,
+        String id,                        // for employee
         String departmentId,
-        String departmentName,
-        String room,
-        String breakageTopic,
-        String breakageText,
-        Status status,
+        String departmentName,            // for employee
+        String room,                      // for employee
+        String breakageTopic,             // for employee
+        String breakageText,              // for employee
+        Status status,                    // for employee
         Priority priority,
         String breakageExecutor,
         String executorAppointedBy,
-        String createdBy,
+        String createdBy,                // for employee
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime createdDate,
+        LocalDateTime createdDate,       // for employee
         String lastUpdatedBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
         LocalDateTime lastUpdatedDate,
