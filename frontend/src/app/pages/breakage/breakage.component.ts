@@ -146,7 +146,6 @@ export class BreakageComponent {
   }
 
   sortData(event: Sort) {
-    console.log(event);                      // DELETE
     this.sortBy = event.active;
     this.direction = event.direction;
 
@@ -176,9 +175,11 @@ export class BreakageComponent {
 
     if (this.direction === '') {
       this.sortBy = 'lastUpdatedDate';
-    }
-    console.log('this.sortBy -' + this.sortBy);               // DELETE
-    console.log('this.direction -' + this.direction);         // DELETE
+    };
+
+    if (this.sortBy === 'departmentName') {
+      this.sortBy = 'department'
+    };
 
     this._breakageService
       .getAllBreakages(
@@ -192,8 +193,6 @@ export class BreakageComponent {
           next: data => {
             this.breakages = data.content;
             this.dataSource = new MatTableDataSource(this.breakages);
-            //this.dataSource.paginator = this.paginator;
-            //this.dataSource.sort = this.sort;               // ???
             this.totalElements = data.totalElements;
           },
           error: err => {
