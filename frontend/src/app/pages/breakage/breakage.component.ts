@@ -3,7 +3,7 @@ import { BreakageService } from '../../services/breakage.service';
 import { Breakage } from '../../model/breakage/breakage';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { DATE_FORMAT } from '../../util/constant';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
@@ -128,24 +128,7 @@ export class BreakageComponent {
 
       if (this.searchText.length > 2) {
           this.searchTimer = setTimeout(() => {
-            this._breakageService.getAllBreakages(
-              this.pageIndex, this.pageSize, this.sortBy, this.direction, 
-              this.statusNew, this.statusSolved, this.statusInProgress, 
-              this.statusPaused, this.statusRedirected, this.statusCancelled,
-              this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
-              this.executor, this.deadline, this.searchText)
-              .subscribe({
-                next: data => {
-                  this.breakages = data.content;
-                  this.dataSource = new MatTableDataSource(this.breakages);
-                  //this.dataSource.paginator = this.paginator;
-                  this.dataSource.sort = this.sort;
-                  this.totalElements = data.totalElements;
-                },
-                error: err => {
-                  this.getAllBreakagesError = err.error;
-                }
-              })
+            this.getAllBreakages();
           }, 2000);
       } else if (this.searchText.length > 0) {
           this.inputTimer = setTimeout(() => {
@@ -160,6 +143,14 @@ export class BreakageComponent {
       }
       
     }
+  }
+
+  sortData(event: Sort) {
+    console.log(event);                      // DELETE
+    this.sortBy = event.active;
+    this.direction = event.direction;
+
+    this.getAllBreakages();
   }
 
   onPaginateChange(event: PageEvent) {
@@ -183,9 +174,15 @@ export class BreakageComponent {
 
   getAllBreakages(): void {
 
+    if (this.direction === '') {
+      this.sortBy = 'lastUpdatedDate';
+    }
+    console.log('this.sortBy -' + this.sortBy);               // DELETE
+    console.log('this.direction -' + this.direction);         // DELETE
+
     this._breakageService
       .getAllBreakages(
-        this.pageIndex, this.pageSize, this.sortBy, this.direction, 
+        this.pageIndex, this.pageSize, this.sortBy, this.direction.toUpperCase(), 
         this.statusNew, this.statusSolved, this.statusInProgress, 
         this.statusPaused, this.statusRedirected, this.statusCancelled,
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
@@ -196,11 +193,14 @@ export class BreakageComponent {
             this.breakages = data.content;
             this.dataSource = new MatTableDataSource(this.breakages);
             //this.dataSource.paginator = this.paginator;
-            this.dataSource.sort = this.sort;
+            //this.dataSource.sort = this.sort;               // ???
             this.totalElements = data.totalElements;
           },
           error: err => {
             this.getAllBreakagesError = err.error;
+            setTimeout(() => {
+              this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
+            }, 3000);
           }
         })
   };
