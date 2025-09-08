@@ -12,10 +12,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { Priority } from '../../enum/priority.enum';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
+import { UserProfileDirective } from '../../directive/user-profile.directive';
 
 @Component({
   selector: 'app-current-breakage',
   imports: [
+    UserProfileDirective,
     CommonModule,
     MatInputModule,
     MatFormFieldModule,

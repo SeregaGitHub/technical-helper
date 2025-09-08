@@ -1,4 +1,4 @@
-<div>
+<div  appUserProfile #userProfile="userProfile">
     <div class="pl-8 pt-2">
         <div class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">
             <button (click)="backClicked()">Назад</button>
@@ -27,8 +27,9 @@
             </div> -->
 
             <div class="flex justify-between items-center w-4/12 h-16">
-                <!-- <div class="flex justify-between items-center"> -->
+                @if (userProfile.getUserProfile().isAdmin()) {
                     <p class="text-xl font-medium ml-3">Приоритет:</p>
+
                     <form>
                         <mat-form-field>
                             <mat-select [(ngModel)]="priority" name="priority">
@@ -39,9 +40,9 @@
                                     </mat-option>
                                 }
                             </mat-select>
-                    </mat-form-field>
+                        </mat-form-field>
                     </form>
-                <!-- </div> -->
+                }  
             </div>
 
             <div class="flex justify-center w-4/12 blue-to-black-gradient">
