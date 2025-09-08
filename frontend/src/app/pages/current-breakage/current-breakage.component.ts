@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BreakageService } from '../../services/breakage.service';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
+import { BreakageFullDto } from '../../model/breakage/breakage-full-dto';
 
 @Component({
   selector: 'app-current-breakage',
@@ -16,7 +17,7 @@ import { ApiResponseFactory } from '../../generator/api-response-factory';
 })
 export class CurrentBreakageComponent implements OnInit {
 
-  currentBreakage!: any;
+  currentBreakage: any;
   getBreakageError: ApiResponse;
   sub: any;
   breakageId: string = '';
