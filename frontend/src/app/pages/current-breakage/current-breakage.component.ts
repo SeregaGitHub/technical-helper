@@ -38,6 +38,7 @@ export class CurrentBreakageComponent implements OnInit {
   priorities = EnumViewFactory.getPriorities();
   status!: Status;
   statuses = EnumViewFactory.getStatuses();
+  employeeStatuses: any;
 
   constructor(private _location: Location, private _activatedRoute: ActivatedRoute, private _breakageService: BreakageService) {
     this.getBreakageError = ApiResponseFactory.createEmptyApiResponse();
@@ -55,6 +56,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.currentBreakage = data;
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
+              this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
             },
             error: err => {
               this.getBreakageError = err;

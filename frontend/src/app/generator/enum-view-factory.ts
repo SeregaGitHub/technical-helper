@@ -45,6 +45,16 @@ export class EnumViewFactory {
         return statuses;
     }
 
+    public static getEmployeeStatuses(status: Status): StatusView[] {
+
+        const statuses = [
+            {value: status, viewValue: EnumViewFactory.getStatusViews().get(status)},
+            {value: Status.Cancelled, viewValue: 'Отменена'},
+        ];
+
+        return statuses;
+    }
+
     public static getStatusViews(): Map<Status, string> {
 
         const statusMap = new Map<Status, string>([ 
