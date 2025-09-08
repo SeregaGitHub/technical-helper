@@ -21,6 +21,7 @@ import { BreakageFormComponent } from '../../components/breakage-form/breakage-f
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginator-intl';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-breakage',
@@ -111,9 +112,8 @@ export class BreakageComponent implements OnInit, OnDestroy{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor (private _breakageService: BreakageService, public dialog: MatDialog) { 
+  constructor (private _breakageService: BreakageService, public dialog: MatDialog, private _router: Router) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
-    //this.getAllBreakages();
    }
 
   ngOnInit(): void {
@@ -187,7 +187,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
   getAllBreakages(): void {
 
     if (this.direction === '') {
-      this.sortBy = 'lastUpdatedDate';
+      this.sortBy = 'createdDate';
     };
 
     if (this.sortBy === 'departmentName') {
@@ -218,8 +218,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
   };
 
   getBreakageById(id: string) {
-    console.log('getBreakageById() - Id=' + id)
+    this._router.navigate(["/breakage/" + id]);
   }
-
 
 }
