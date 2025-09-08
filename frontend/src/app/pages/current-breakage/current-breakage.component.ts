@@ -6,11 +6,21 @@ import { BreakageService } from '../../services/breakage.service';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { BreakageFullDto } from '../../model/breakage/breakage-full-dto';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { Priority } from '../../enum/priority.enum';
+import { EnumViewFactory } from '../../generator/enum-view-factory';
 
 @Component({
   selector: 'app-current-breakage',
   imports: [
-    CommonModule
+    CommonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    FormsModule
   ],
   templateUrl: './current-breakage.component.html',
   styleUrl: './current-breakage.component.css'
@@ -21,6 +31,8 @@ export class CurrentBreakageComponent implements OnInit {
   getBreakageError: ApiResponse;
   sub: any;
   breakageId: string = '';
+  priority!: Priority;
+  priorities = EnumViewFactory.getPriorities();
 
   constructor(private _location: Location, private _activatedRoute: ActivatedRoute, private _breakageService: BreakageService) {
     this.getBreakageError = ApiResponseFactory.createEmptyApiResponse();
@@ -36,6 +48,7 @@ export class CurrentBreakageComponent implements OnInit {
           .subscribe({
             next: data => {
               this.currentBreakage = data;
+              this.priority = this.currentBreakage.priority;
             },
             error: err => {
               this.getBreakageError = err;
@@ -43,6 +56,10 @@ export class CurrentBreakageComponent implements OnInit {
           });
     })
 
+  }
+
+  setPriority(priority: Priority) {
+    this.priority = priority;
   }
 
   backClicked() {

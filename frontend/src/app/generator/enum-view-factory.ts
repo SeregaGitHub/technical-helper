@@ -2,6 +2,7 @@ import { Executor } from "../enum/executor.enum";
 import { Priority } from "../enum/priority.enum";
 import { Status } from "../enum/status.enum";
 import { ExecutorView } from "../util/executor-view";
+import { PriorityView } from "../util/priority-view";
 
 export class EnumViewFactory {
 
@@ -16,6 +17,18 @@ export class EnumViewFactory {
         
         return executors;
     };
+
+    public static getPriorities(): PriorityView[] {
+
+        const priorities = [
+            {value: Priority.Urgently, viewValue: 'Важный'},
+            {value: Priority.High, viewValue: 'Высокий'},
+            {value: Priority.Medium, viewValue: 'Средний'},
+            {value: Priority.Low, viewValue: 'Низкий'}
+        ];
+
+        return priorities;
+    }
 
     public static getStatusViews(): Map<Status, string> {
 
