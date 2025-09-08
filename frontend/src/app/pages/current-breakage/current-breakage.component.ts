@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { Priority } from '../../enum/priority.enum';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
+import { Status } from '../../enum/status.enum';
 
 @Component({
   selector: 'app-current-breakage',
@@ -35,6 +36,8 @@ export class CurrentBreakageComponent implements OnInit {
   breakageId: string = '';
   priority!: Priority;
   priorities = EnumViewFactory.getPriorities();
+  status!: Status;
+  statuses = EnumViewFactory.getStatuses();
 
   constructor(private _location: Location, private _activatedRoute: ActivatedRoute, private _breakageService: BreakageService) {
     this.getBreakageError = ApiResponseFactory.createEmptyApiResponse();
@@ -51,6 +54,7 @@ export class CurrentBreakageComponent implements OnInit {
             next: data => {
               this.currentBreakage = data;
               this.priority = this.currentBreakage.priority;
+              this.status = this.currentBreakage.status;
             },
             error: err => {
               this.getBreakageError = err;
@@ -62,6 +66,10 @@ export class CurrentBreakageComponent implements OnInit {
 
   setPriority(priority: Priority) {
     this.priority = priority;
+  }
+
+  setStatus(status: Status) {
+    this.status = status;
   }
 
   backClicked() {

@@ -1,4 +1,4 @@
-<div  appUserProfile #userProfile="userProfile">
+<div appUserProfile #userProfile="userProfile">
     <div class="pl-8 pt-2">
         <div class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">
             <button (click)="backClicked()">Назад</button>
@@ -26,9 +26,9 @@
                 </div>
             </div> -->
 
-            <div class="flex justify-between items-center w-4/12 h-16">
+            <div class="flex justify-center items-center w-4/12 h-16">
                 @if (userProfile.getUserProfile().isAdmin()) {
-                    <p class="text-xl font-medium ml-3">Приоритет:</p>
+                    <p class="text-xl font-medium mr-3">Приоритет:</p>
 
                     <form>
                         <mat-form-field>
@@ -45,11 +45,38 @@
                 }  
             </div>
 
-            <div class="flex justify-center w-4/12 blue-to-black-gradient">
-                <div class="flex justify-evenly items-center">
-                    <p>Статус:</p>
-                    <p>qqqqqqqq</p>
-                </div>
+            <div class="flex justify-normal items-center w-4/12 h-16">
+                @if (!userProfile.getUserProfile().isEmployee()) {
+                    <p class="text-xl font-medium mr-3">Статус:</p>
+
+                    <form>
+                        <mat-form-field>
+                            <mat-select [(ngModel)]="status" name="status">
+                                @for (status of statuses; track status) {
+                                    <mat-option [value]="status.value" 
+                                                (click)="setStatus(status.value)"
+                                                >{{ status.viewValue }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </form>
+                } @else {
+                    <p class="text-xl font-medium mr-3">Статус:</p>
+
+                    <form>
+                        <mat-form-field>
+                            <mat-select [(ngModel)]="status" name="status">
+                                @for (status of statuses; track status) {
+                                    <mat-option [value]="status.value" 
+                                                (click)="setStatus(status.value)"
+                                                >{{ status.viewValue }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </form>
+                } 
             </div>
             
 

@@ -3,6 +3,7 @@ import { Priority } from "../enum/priority.enum";
 import { Status } from "../enum/status.enum";
 import { ExecutorView } from "../util/executor-view";
 import { PriorityView } from "../util/priority-view";
+import { StatusView } from "../util/status-view";
 
 export class EnumViewFactory {
 
@@ -28,6 +29,20 @@ export class EnumViewFactory {
         ];
 
         return priorities;
+    }
+
+    public static getStatuses(): StatusView[] {
+
+        const statuses = [
+            {value: Status.New, viewValue: 'Новая'},
+            {value: Status.Solved, viewValue: 'Решена'},
+            {value: Status.InProgress, viewValue: 'В работе'},
+            {value: Status.Paused, viewValue: 'В ожидании'},
+            {value: Status.Redirected, viewValue: 'Передана'},
+            {value: Status.Cancelled, viewValue: 'Отменена'},
+        ];
+
+        return statuses;
     }
 
     public static getStatusViews(): Map<Status, string> {
