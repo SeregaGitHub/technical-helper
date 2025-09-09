@@ -11,20 +11,10 @@
         </div>
 
         <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 overflow-hidden rounded text-xl font-semibold">
-            <!-- <p class="m-auto align-middle whitespace-nowrap">Не включается компьютер - Rabbit812 !</p> -->
             <p class="m-auto whitespace-nowrap">{{ currentBreakage.breakageTopic }}</p>
         </div>
 
         <div class="flex justify-around w-9/12 h-12 mt-4">
-
-            <!-- <div class="flex justify-around w-4/12 blue-to-black-gradient">
-                <div class="flex justify-center items-center">
-                    <p>Приоритет:</p>
-                </div>
-                <div class="flex justify-center items-center">
-                    <p>qqqqqqqq</p>
-                </div>
-            </div> -->
 
             <div class="flex justify-center items-center w-4/12 h-16">
                 @if (userProfile.getUserProfile().isAdmin()) {
@@ -79,6 +69,50 @@
                 } 
             </div>
             
+        </div>
+
+        <div class="flex justify-between w-9/12 h-80 mt-4">
+
+            <div class="blue-to-black-gradient h-80 w-1/2">
+                <textarea class="blue-to-black-gradient resize-none h-80 w-full px-4 pt-2 text-lg"
+                >{{ currentBreakage.breakageText }}</textarea>
+            </div>
+
+            <div class="h-80 w-1/2">
+                <div class="flex flex-col justify-center">
+                    <div class="flex justify-between border-b border-current mt-5 mb-4">
+                        <p class="text-xl font-medium ml-5">ID:</p>
+                        <p>{{ currentBreakage.id }}</p>
+                    </div>
+                    <div class="flex justify-between border-b border-current mb-4">
+                        <p class="text-xl font-medium ml-5">Отдел:</p>
+                        <p>{{ currentBreakage.departmentName }}</p>
+                    </div>
+                    <div class="flex justify-between border-b border-current mb-4">
+                        <p class="text-xl font-medium ml-5">Помещение:</p>
+                        <p>{{ currentBreakage.room }}</p>
+                    </div>
+                    <div class="flex justify-between border-b border-current mb-4">
+                        <p class="text-xl font-medium ml-5">Создана:</p>
+                        <p>{{ currentBreakage.createdBy }}</p>
+                    </div>
+                    <div class="flex justify-between border-b border-current mb-4">
+                        <p class="text-xl font-medium ml-5">Создано:</p>
+                        <p>{{ currentBreakage.createdDate | date: dateFormat }}</p>
+                    </div>
+                    @if (!userProfile.getUserProfile().isEmployee()) {
+                        <div class="flex justify-between border-b border-current mb-4">
+                            <p class="text-xl font-medium ml-5">Обновлена:</p>
+                            <p>{{ currentBreakage.lastUpdatedBy }}</p>
+                        </div>
+                        <div class="flex justify-between border-b border-current">
+                            <p class="text-xl font-medium ml-5">Обновлено:</p>
+                            <p>{{ currentBreakage.lastUpdatedDate | date: dateFormat }}</p>
+                        </div>
+                    }
+                </div>
+                
+            </div>
 
         </div>
 

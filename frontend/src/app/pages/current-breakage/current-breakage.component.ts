@@ -14,6 +14,7 @@ import { Priority } from '../../enum/priority.enum';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Status } from '../../enum/status.enum';
+import { DATE_FORMAT } from '../../util/constant';
 
 @Component({
   selector: 'app-current-breakage',
@@ -32,6 +33,7 @@ export class CurrentBreakageComponent implements OnInit {
 
   currentBreakage: any;
   getBreakageError: ApiResponse;
+  dateFormat = DATE_FORMAT;
   sub: any;
   breakageId: string = '';
   priority!: Priority;
