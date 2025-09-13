@@ -16,6 +16,7 @@ import { Status } from '../../enum/status.enum';
 import { DATE_FORMAT } from '../../util/constant';
 import { MatIconModule } from '@angular/material/icon';
 import { UpdateBreakagePriorityDto } from '../../model/breakage/update-breakage-priority-dto';
+import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-status-dto';
 
 @Component({
   selector: 'app-current-breakage',
@@ -78,7 +79,7 @@ export class CurrentBreakageComponent implements OnInit {
   setPriority(priority: Priority) {
     this.priority = priority;
     const updateBreakagePriorityDto = new UpdateBreakagePriorityDto(priority, this.status);
-    
+
     this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto).subscribe({
       next: response => {
         this.apiResponse = response;
@@ -92,6 +93,17 @@ export class CurrentBreakageComponent implements OnInit {
 
   setStatus(status: Status) {
     this.status = status;
+    const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
+
+    this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto).subscribe({
+      next: response => {
+        this.apiResponse = response;
+        this.deleteResponseMessage();
+      },
+      error: err => {
+        this.apiResponse = err.error;
+      }
+    });
   }
 
   deleteResponseMessage() {

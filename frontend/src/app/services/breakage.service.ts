@@ -2,12 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, EMPLOYEE_URL, GATEWAY_URL } from '../util/constant';
+import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, EMPLOYEE_URL, GATEWAY_URL, TECHNICIAN_URL } from '../util/constant';
 import { Executor } from '../enum/executor.enum';
 import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
-import { Priority } from '../enum/priority.enum';
-import { Status } from '../enum/status.enum';
 import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-priority-dto';
+import { UpdateBreakageStatusDto } from '../model/breakage/update-breakage-status-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -91,6 +90,24 @@ export class BreakageService {
       headers = headers.append(BREAKAGE_ID, id);
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', updateBreakagePriorityDto, {headers})
+          .pipe(
+              tap((updatedBreakage) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [updatedBreakage, ...currentState.breakages]
+                });
+              })
+          );
+  }
+
+  setStatus(id: string, updateBreakageStatusDto: UpdateBreakageStatusDto): Observable<any> {
+
+      let headers = HttpHeadersFactory.createPermanentHeaders();
+      headers = headers.append(BREAKAGE_ID, id);
+
+      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', updateBreakageStatusDto, {headers})
           .pipe(
               tap((updatedBreakage) => {
                   const currentState = this.breakageSubject.value;

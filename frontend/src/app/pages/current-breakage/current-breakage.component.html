@@ -49,38 +49,44 @@
                 }  
             </div>
 
-            <div class="flex justify-normal items-center w-4/12 h-16">
-                @if (!userProfile.getUserProfile().isEmployee()) {
-                    <p class="text-xl font-medium mr-3">Статус:</p>
-
-                    <form>
-                        <mat-form-field>
-                            <mat-select [(ngModel)]="status" name="status">
-                                @for (status of statuses; track status) {
-                                    <mat-option [value]="status.value" 
-                                                (click)="setStatus(status.value)"
-                                                >{{ status.viewValue }}
-                                    </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </form>
+            <div class="flex justify-normal items-center w-4/12 h-16">               
+                <p class="text-xl font-medium mr-3">Статус:</p>
+                @if (status === 'SOLVED' || status === 'CANCELLED') {
+                    <p class="text-xl font-medium mr-3"
+                        [ngClass]="{
+                        'colorLawngreen': status === 'SOLVED', 'colorGreen': status === 'CANCELLED'
+                        }"
+                    >{{ statusMap.get(status) }}</p>
                 } @else {
-                    <p class="text-xl font-medium mr-3">Статус:</p>
-
-                    <form>
-                        <mat-form-field>
-                            <mat-select [(ngModel)]="status" name="status">
-                                @for (status of employeeStatuses; track status) {
-                                    <mat-option [value]="status.value" 
-                                                (click)="setStatus(status.value)"
-                                                >{{ status.viewValue }}
-                                    </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </form>
-                } 
+                    @if (!userProfile.getUserProfile().isEmployee()) {
+                        <form>
+                            <mat-form-field>
+                                <mat-select [(ngModel)]="status" name="status">
+                                    @for (status of statuses; track status) {
+                                        <mat-option [value]="status.value" 
+                                                    (click)="setStatus(status.value)"
+                                                    >{{ status.viewValue }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    } @else {
+                        <form>
+                            <mat-form-field>
+                                <mat-select [(ngModel)]="status" name="status">
+                                    @for (status of employeeStatuses; track status) {
+                                        <mat-option [value]="status.value" 
+                                                    (click)="setStatus(status.value)"
+                                                    >{{ status.viewValue }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    }
+                }
+                 
             </div>
             
         </div>

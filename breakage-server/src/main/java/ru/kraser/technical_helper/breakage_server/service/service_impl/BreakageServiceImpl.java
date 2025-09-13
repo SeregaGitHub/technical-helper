@@ -97,22 +97,27 @@ public class BreakageServiceImpl implements BreakageService {
     public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
-        int response;
-        response = breakageRepository.updateBreakageStatus(
-                breakageId,
-                updatedStatus.status(),
-                SecurityUtil.getCurrentUserId(),
-                now
-        );
-        if (response != 1) {
-            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        if (updatedStatus.status() == Status.SOLVED || updatedStatus.status() == Status.CANCELLED) {
+            throw new NotCorrectParameter("Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
+                    " - не может быть изменена !!!");
+        } else {
+            int response;
+            response = breakageRepository.updateBreakageStatus(
+                    breakageId,
+                    updatedStatus.status(),
+                    SecurityUtil.getCurrentUserId(),
+                    now
+            );
+            if (response != 1) {
+                throw new NotFoundException(BREAKAGE_NOT_EXIST);
+            }
+            return ApiResponse.builder()
+                    .message("Статус заявки на неисправность был успешно изменен")
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("Статус заявки на неисправность была успешно изменен на - " + updatedStatus.status())
-                .status(200)
-                .httpStatus(HttpStatus.OK)
-                .timestamp(now)
-                .build();
     }
 
     @Override
@@ -121,7 +126,7 @@ public class BreakageServiceImpl implements BreakageService {
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
         if (updatedPriority.status() == Status.SOLVED || updatedPriority.status() == Status.CANCELLED) {
-            throw new NotCorrectParameter("Заявка на неисправность с приоритетом " + updatedPriority.priority() +
+            throw new NotCorrectParameter("Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
                     " - не может быть изменена !!!");
         } else {
             int response;
