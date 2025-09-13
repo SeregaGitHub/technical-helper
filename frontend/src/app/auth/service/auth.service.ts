@@ -52,8 +52,10 @@ export class AuthService {
   // }
 
   logout() {
-    //localStorage.clear();
+    // localStorage.clear();
     localStorage.removeItem('thJwt');
+
+    
     //localStorage.removeItem('thUn');
     //localStorage.removeItem('thUr');
     //this.username$.unsubscribe();

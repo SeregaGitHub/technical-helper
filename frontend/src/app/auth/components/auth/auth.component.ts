@@ -43,7 +43,8 @@ export class AuthComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    localStorage.removeItem('thJwt');
+    localStorage.clear();
+    //localStorage.removeItem('thJwt');
   };
 
   onSubmit() {
