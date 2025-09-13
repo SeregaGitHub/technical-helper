@@ -14,6 +14,7 @@ import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Status } from '../../enum/status.enum';
 import { DATE_FORMAT } from '../../util/constant';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-current-breakage',
@@ -23,7 +24,8 @@ import { DATE_FORMAT } from '../../util/constant';
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    FormsModule
+    FormsModule,
+    MatIconModule
   ],
   templateUrl: './current-breakage.component.html',
   styleUrl: './current-breakage.component.css'

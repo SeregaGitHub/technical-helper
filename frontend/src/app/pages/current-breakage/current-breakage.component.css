@@ -1,0 +1,27 @@
+.mat-icon-priority {
+    transform: scale(0.5);
+}
+
+.colorRed {
+    color: red;
+}
+
+.colorLawngreen {
+    color: lawngreen;
+}
+
+.colorAqua {
+    color: aqua;
+}
+
+.colorFuchsia {
+    color: fuchsia;
+}
+
+.colorGold {
+    color:gold;
+}
+
+.colorGreen {
+    color: green;
+}
