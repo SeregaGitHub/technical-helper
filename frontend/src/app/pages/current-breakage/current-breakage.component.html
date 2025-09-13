@@ -1,18 +1,19 @@
 <div appUserProfile #userProfile="userProfile">
-    <div class="pl-8 pt-2">
+    <div class="pl-8 pt-2 flex justify-between">
         <div class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">
             <button (click)="backClicked()">Назад</button>
         </div>
+        <div class="w-full text-montserrat text-xl font-semibold">
+            <div [ngClass]="apiResponse.status < 400 ? 'hide' : '' ">
+                @if (apiResponse.status === 201 || apiResponse.status === 200) {
+                    <p class="text-center successfully"> {{ apiResponse.message }} </p> 
+                } @else {
+                    <p class="text-center alert"> {{ apiResponse.message }} </p> 
+                }
+            </div>
+        </div>
     </div>
     <div class="flex flex-col items-center text-montserrat">
-
-        <div [ngClass]="apiResponse.status < 400 ? 'hide' : 'pb-4' ">
-            @if (apiResponse.status === 201 || apiResponse.status === 200) {
-              <p class="text-center successfully"> {{ apiResponse.message }} </p> 
-            } @else {
-              <p class="text-center alert"> {{ apiResponse.message }} </p> 
-            }
-        </div>
 
         <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 overflow-hidden rounded text-xl font-semibold">
             <p class="m-auto whitespace-nowrap">{{ currentBreakage.breakageTopic }}</p>
