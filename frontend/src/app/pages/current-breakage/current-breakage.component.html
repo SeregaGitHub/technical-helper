@@ -19,7 +19,15 @@
             <div class="flex justify-center items-center w-4/12 h-16">
                 @if (!userProfile.getUserProfile().isEmployee()) {
                     <p class="text-xl font-medium mr-3">Приоритет:</p>
-                    @if (userProfile.getUserProfile().isAdmin()) {
+                    @if ((userProfile.getUserProfile().isAdmin() && status === 'SOLVED') || 
+                         (userProfile.getUserProfile().isAdmin() && status === 'CANCELLED')) {
+                        <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
+                            [ngClass]="{
+                            'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
+                            'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
+                            }"
+                        >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>  
+                    } @else {
                         <form>
                             <mat-form-field>
                                 <mat-select [(ngModel)]="priority" name="priority">
@@ -32,13 +40,6 @@
                                 </mat-select>
                             </mat-form-field>
                         </form>
-                    } @else if (userProfile.getUserProfile().isTechnician()) {
-                        <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
-                            [ngClass]="{
-                            'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
-                            'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
-                            }"
-                        >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>
                     }
                 }  
             </div>

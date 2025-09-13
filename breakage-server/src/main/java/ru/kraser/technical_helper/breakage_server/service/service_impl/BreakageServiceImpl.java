@@ -120,22 +120,27 @@ public class BreakageServiceImpl implements BreakageService {
     public ApiResponse updateBreakagePriority(String breakageId, UpdateBreakagePriorityDto updatedPriority) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
-        int response;
-        response = breakageRepository.updateBreakagePriority(
-                breakageId,
-                updatedPriority.priority(),
-                SecurityUtil.getCurrentUserId(),
-                now
-        );
-        if (response != 1) {
-            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        if (updatedPriority.status() == Status.SOLVED || updatedPriority.status() == Status.CANCELLED) {
+            throw new NotCorrectParameter("Заявка на неисправность с приоритетом " + updatedPriority.priority() +
+                    " - не может быть изменена !!!");
+        } else {
+            int response;
+            response = breakageRepository.updateBreakagePriority(
+                    breakageId,
+                    updatedPriority.priority(),
+                    SecurityUtil.getCurrentUserId(),
+                    now
+            );
+            if (response != 1) {
+                throw new NotFoundException(BREAKAGE_NOT_EXIST);
+            }
+            return ApiResponse.builder()
+                    .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
-                .status(200)
-                .httpStatus(HttpStatus.OK)
-                .timestamp(now)
-                .build();
     }
 
     @Override

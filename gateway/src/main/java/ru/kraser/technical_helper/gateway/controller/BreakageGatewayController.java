@@ -57,7 +57,7 @@ public class BreakageGatewayController {
         return response;
     }
 
-    @PatchMapping(path = TECHNICIAN_URL + PRIORITY_URL)
+    @PatchMapping(path = ADMIN_URL + PRIORITY_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateBreakagePriority(@RequestHeader(AUTH_HEADER) String jwt,
                                               @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,

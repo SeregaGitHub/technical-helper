@@ -71,11 +71,13 @@ export class CurrentBreakageComponent implements OnInit {
             }
           });
     })
-
+        
   }
 
   setPriority(priority: Priority) {
     this.priority = priority;
+
+    //this._breakageService.setPriority(priority);
   }
 
   setStatus(status: Status) {

@@ -1,5 +1,5 @@
 .mat-icon-priority {
-    transform: scale(0.5);
+    transform: scale(0.8);
 }
 
 .colorRed {
@@ -14,14 +14,16 @@
     color: aqua;
 }
 
+/* - */
 .colorFuchsia {
-    color: fuchsia;
+    color: fuchsia; 
 }
 
 .colorGold {
     color:gold;
 }
 
+/* - */
 .colorGreen {
     color: green;
 }

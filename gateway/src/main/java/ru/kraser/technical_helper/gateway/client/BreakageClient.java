@@ -53,7 +53,7 @@ public class BreakageClient extends BaseClient {
     public ApiResponse updateBreakagePriority(String breakageHeaderName, String breakageId,
                                               UpdateBreakagePriorityDto updatedPriority, String jwt) {
         return super.patch(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + PRIORITY_URL,
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + PRIORITY_URL,
                 updatedPriority,
                 jwt,
                 breakageHeaderName,
