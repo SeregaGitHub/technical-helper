@@ -92,18 +92,20 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   setStatus(status: Status) {
-    this.status = status;
-    const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
+    if (status != Status.New) {
+      this.status = status;
+      const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
-    this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    });
+      this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto).subscribe({
+        next: response => {
+          this.apiResponse = response;
+          this.deleteResponseMessage();
+        },
+        error: err => {
+          this.apiResponse = err.error;
+        }
+      });
+    }
   }
 
   deleteResponseMessage() {
