@@ -17,21 +17,24 @@
         <div class="flex justify-around w-9/12 h-12 mt-4">
 
             <div class="flex justify-center items-center w-4/12 h-16">
-                @if (userProfile.getUserProfile().isAdmin()) {
+                @if (!userProfile.getUserProfile().isEmployee()) {
                     <p class="text-xl font-medium mr-3">Приоритет:</p>
-
-                    <form>
-                        <mat-form-field>
-                            <mat-select [(ngModel)]="priority" name="priority">
-                                @for (priority of priorities; track priority) {
-                                    <mat-option [value]="priority.value" 
-                                                (click)="setPriority(priority.value)"
-                                                >{{ priority.viewValue }}
-                                    </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </form>
+                    @if (userProfile.getUserProfile().isAdmin()) {
+                        <form>
+                            <mat-form-field>
+                                <mat-select [(ngModel)]="priority" name="priority">
+                                    @for (priority of priorities; track priority) {
+                                        <mat-option [value]="priority.value" 
+                                                    (click)="setPriority(priority.value)"
+                                                    >{{ priority.viewValue }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    } @else if (userProfile.getUserProfile().isTechnician()) {
+                        <p class="text-xl font-medium mr-3">{{ priorityMap.get(priority) }}</p>
+                    }
                 }  
             </div>
 

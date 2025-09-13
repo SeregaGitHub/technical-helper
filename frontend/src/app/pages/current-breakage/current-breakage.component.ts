@@ -30,6 +30,9 @@ import { DATE_FORMAT } from '../../util/constant';
 })
 export class CurrentBreakageComponent implements OnInit {
 
+  statusMap = EnumViewFactory.getStatusViews();
+  priorityMap = EnumViewFactory.getPriorityViews();
+
   currentBreakage: any;
   getBreakageError: ApiResponse;
   dateFormat = DATE_FORMAT;
