@@ -135,7 +135,7 @@ public class BreakageServiceImpl implements BreakageService {
                 throw new NotFoundException(BREAKAGE_NOT_EXIST);
             }
             return ApiResponse.builder()
-                    .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
+                    .message("Приоритет заявки на неисправность был успешно изменен")
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)

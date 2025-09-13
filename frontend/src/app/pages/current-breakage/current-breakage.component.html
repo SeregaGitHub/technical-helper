@@ -6,8 +6,12 @@
     </div>
     <div class="flex flex-col items-center text-montserrat">
 
-        <div [ngClass]="getBreakageError.status < 400 ? 'hide' : 'pb-4' ">
-            <p class="text-center alert"> {{ getBreakageError.message }} </p> 
+        <div [ngClass]="apiResponse.status < 400 ? 'hide' : 'pb-4' ">
+            @if (apiResponse.status === 201 || apiResponse.status === 200) {
+              <p class="text-center successfully"> {{ apiResponse.message }} </p> 
+            } @else {
+              <p class="text-center alert"> {{ apiResponse.message }} </p> 
+            }
         </div>
 
         <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 overflow-hidden rounded text-xl font-semibold">

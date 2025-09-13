@@ -15,6 +15,7 @@ import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Status } from '../../enum/status.enum';
 import { DATE_FORMAT } from '../../util/constant';
 import { MatIconModule } from '@angular/material/icon';
+import { UpdateBreakagePriorityDto } from '../../model/breakage/update-breakage-priority-dto';
 
 @Component({
   selector: 'app-current-breakage',
@@ -36,7 +37,6 @@ export class CurrentBreakageComponent implements OnInit {
   priorityMap = EnumViewFactory.getPriorityViews();
 
   currentBreakage: any;
-  getBreakageError: ApiResponse;
   dateFormat = DATE_FORMAT;
   sub: any;
   breakageId: string = '';
@@ -45,11 +45,12 @@ export class CurrentBreakageComponent implements OnInit {
   status!: Status;
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
+  apiResponse: ApiResponse;
 
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
               private _breakageService: BreakageService) {
-    this.getBreakageError = ApiResponseFactory.createEmptyApiResponse();
+    this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
   }
   
   ngOnInit(): void {
@@ -67,7 +68,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
             },
             error: err => {
-              this.getBreakageError = err;
+              this.apiResponse = err;
             }
           });
     })
@@ -76,13 +77,28 @@ export class CurrentBreakageComponent implements OnInit {
 
   setPriority(priority: Priority) {
     this.priority = priority;
-
-    //this._breakageService.setPriority(priority);
+    const updateBreakagePriorityDto = new UpdateBreakagePriorityDto(priority, this.status);
+    
+    this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto).subscribe({
+      next: response => {
+        this.apiResponse = response;
+        this.deleteResponseMessage();
+      },
+      error: err => {
+        this.apiResponse = err.error;
+      }
+    });
   }
 
   setStatus(status: Status) {
     this.status = status;
   }
+
+  deleteResponseMessage() {
+    setTimeout(() => {
+      this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
+    }, 3000);
+  };
 
   backClicked() {
     this._location.back();
