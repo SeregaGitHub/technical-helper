@@ -22,6 +22,7 @@ import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginator-intl';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Router } from '@angular/router';
+import { LocalStorageUtil } from '../../util/local-storage-util';
 
 @Component({
   selector: 'app-breakage',
@@ -77,13 +78,16 @@ export class BreakageComponent implements OnInit, OnDestroy{
   statusInProgress = true; 
   statusPaused = true; 
   statusRedirected = true; 
-  statusCancelled = false; 
+  statusCancelled = false;
+
   priorityUrgently = true; 
   priorityHigh = true; 
   priorityMedium = true; 
   priorityLow = true;
+
   executor = Executor.All; 
   deadline = false;
+
   searchText = '';
 
   dateFormat = DATE_FORMAT;
@@ -117,6 +121,34 @@ export class BreakageComponent implements OnInit, OnDestroy{
    }
 
   ngOnInit(): void {
+
+    if (localStorage.getItem('thOpened') != null) {
+      this.opened = LocalStorageUtil.stringToBoolean(localStorage.getItem('thOpened'));
+
+      this.pageIndex = LocalStorageUtil.stringToNumber(localStorage.getItem('thPageIndex'));
+      this.pageSize = LocalStorageUtil.stringToNumber(localStorage.getItem('thpageSize'));
+
+      this.sortBy = LocalStorageUtil.toParamString(localStorage.getItem('thSortBy'));
+      this.direction = LocalStorageUtil.toParamString(localStorage.getItem('thDirection')); 
+
+      this.statusNew = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusNew'));
+      this.statusSolved = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusSolved'));
+      this.statusInProgress = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusInProgress'));
+      this.statusPaused = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusPaused'));
+      this.statusRedirected = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusRedirected'));
+      this.statusCancelled = LocalStorageUtil.stringToBoolean(localStorage.getItem('thStatusCancelled'));
+
+      this.priorityUrgently = LocalStorageUtil.stringToBoolean(localStorage.getItem('thPriorityUrgently'));
+      this.priorityHigh = LocalStorageUtil.stringToBoolean(localStorage.getItem('thPriorityHigh'));
+      this.priorityMedium = LocalStorageUtil.stringToBoolean(localStorage.getItem('thPriorityMedium'));
+      this.priorityLow = LocalStorageUtil.stringToBoolean(localStorage.getItem('thPriorityLow'));
+
+      this.executor = LocalStorageUtil.stringToExecutor(localStorage.getItem('thExecutor'));
+      this.deadline = LocalStorageUtil.stringToBoolean(localStorage.getItem('thDeadline'));
+
+      this.searchText = LocalStorageUtil.toParamString(localStorage.getItem('thSearchText'));
+    }
+
     this.getAllBreakages();
 
     this.intervalId = setInterval(() => {
@@ -126,6 +158,31 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+    
+    localStorage.setItem('thOpened', LocalStorageUtil.booleanToString(this.opened));
+
+    localStorage.setItem('thPageIndex', LocalStorageUtil.numberToString(this.pageIndex));
+    localStorage.setItem('thpageSize', LocalStorageUtil.numberToString(this.pageSize));
+
+    localStorage.setItem('thSortBy', this.sortBy);
+    localStorage.setItem('thDirection', this.direction);
+    
+    localStorage.setItem('thStatusNew', LocalStorageUtil.booleanToString(this.statusNew));
+    localStorage.setItem('thStatusSolved', LocalStorageUtil.booleanToString(this.statusSolved));
+    localStorage.setItem('thStatusInProgress', LocalStorageUtil.booleanToString(this.statusInProgress));
+    localStorage.setItem('thStatusPaused', LocalStorageUtil.booleanToString(this.statusPaused));
+    localStorage.setItem('thStatusRedirected', LocalStorageUtil.booleanToString(this.statusRedirected));
+    localStorage.setItem('thStatusCancelled', LocalStorageUtil.booleanToString(this.statusCancelled));
+
+    localStorage.setItem('thPriorityUrgently', LocalStorageUtil.booleanToString(this.priorityUrgently));
+    localStorage.setItem('thPriorityHigh', LocalStorageUtil.booleanToString(this.priorityHigh));
+    localStorage.setItem('thPriorityMedium', LocalStorageUtil.booleanToString(this.priorityMedium));
+    localStorage.setItem('thPriorityLow', LocalStorageUtil.booleanToString(this.priorityLow));
+
+    localStorage.setItem('thExecutor', this.executor.toString());
+    localStorage.setItem('thDeadline', LocalStorageUtil.booleanToString(this.deadline));
+
+    localStorage.setItem('thSearchText', this.searchText);
   }
 
   applyFilter(event: Event) {
@@ -218,7 +275,8 @@ export class BreakageComponent implements OnInit, OnDestroy{
   };
 
   getBreakageById(id: string) {
+    
     this._router.navigate(["/breakage/" + id]);
-  }
+  };
 
 }

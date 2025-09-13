@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Location} from '@angular/common';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { BreakageService } from '../../services/breakage.service';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
-import { BreakageFullDto } from '../../model/breakage/breakage-full-dto';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -42,14 +41,16 @@ export class CurrentBreakageComponent implements OnInit {
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
 
-  constructor(private _location: Location, private _activatedRoute: ActivatedRoute, private _breakageService: BreakageService) {
+  constructor(private _location: Location, 
+              private _activatedRoute: ActivatedRoute, 
+              private _breakageService: BreakageService) {
     this.getBreakageError = ApiResponseFactory.createEmptyApiResponse();
   }
   
   ngOnInit(): void {
 
     this.sub = this._activatedRoute.params.subscribe(params => {
-      this.breakageId = params['id'];
+      this.breakageId = params['id'];      
       
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
