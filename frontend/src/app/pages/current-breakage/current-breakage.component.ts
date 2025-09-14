@@ -111,41 +111,32 @@ export class CurrentBreakageComponent implements OnInit {
           openDialog.afterClosed().subscribe(
             (confirmResult ) => {
               if (confirmResult) {
-                this.status = status;
-                const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
-
-                this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
-                  .subscribe({
-                    next: response => {
-                      this.apiResponse = response;
-                      this.deleteResponseMessage();
-                      this.bufferStatus = this.status;
-                    },
-                    error: err => {
-                      this.apiResponse = err.error;
-                    }
-                  });
+                this.setStatusToBackend(status);
               } else {
                 this.status = this.bufferStatus;
               };
           });
       } else {
-          this.status = status;
-          const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
-
-          this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
-            .subscribe({
-              next: response => {
-                this.apiResponse = response;
-                this.deleteResponseMessage();
-                this.bufferStatus = this.status;
-              },
-              error: err => {
-                this.apiResponse = err.error;
-              }
-            });
+          this.setStatusToBackend(status);
         }
     }
+  }
+
+  setStatusToBackend(status: Status) {
+      this.status = status;
+      const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
+
+      this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+            this.bufferStatus = this.status;
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
   }
 
   deleteResponseMessage() {
