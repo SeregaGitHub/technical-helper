@@ -57,7 +57,7 @@ export class CurrentBreakageComponent implements OnInit {
   ngOnInit(): void {
 
     this.sub = this._activatedRoute.params.subscribe(params => {
-      this.breakageId = params['id'];      
+      this.breakageId = params['id'];
       
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
@@ -67,14 +67,17 @@ export class CurrentBreakageComponent implements OnInit {
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
+              
+              if (this.status != Status.New) {
+                this.statuses.splice(0, 1);
+              }
             },
             error: err => {
               this.apiResponse = err;
             }
           });
     })
-        
-  }
+  };
 
   setPriority(priority: Priority) {
     this.priority = priority;
@@ -92,6 +95,7 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   setStatus(status: Status) {
+    
     if (status != Status.New) {
       this.status = status;
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
