@@ -44,6 +44,7 @@ export class CurrentBreakageComponent implements OnInit {
   priority!: Priority;
   priorities = EnumViewFactory.getPriorities();
   status!: Status;
+  bufferStatus!: Status;
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
   apiResponse: ApiResponse;
@@ -66,6 +67,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.currentBreakage = data;
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
+              this.bufferStatus = this.status;
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
               
               if (this.status != Status.New) {
@@ -96,7 +98,7 @@ export class CurrentBreakageComponent implements OnInit {
 
   setStatus(status: Status) {
     
-    if (status != Status.New) {
+    if (status != Status.New && status != this.bufferStatus) {
       this.status = status;
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
@@ -104,6 +106,7 @@ export class CurrentBreakageComponent implements OnInit {
         next: response => {
           this.apiResponse = response;
           this.deleteResponseMessage();
+          this.bufferStatus = this.status;
         },
         error: err => {
           this.apiResponse = err.error;
