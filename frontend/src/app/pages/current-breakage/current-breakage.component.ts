@@ -17,6 +17,8 @@ import { DATE_FORMAT } from '../../util/constant';
 import { MatIconModule } from '@angular/material/icon';
 import { UpdateBreakagePriorityDto } from '../../model/breakage/update-breakage-priority-dto';
 import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-status-dto';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 
 @Component({
   selector: 'app-current-breakage',
@@ -51,7 +53,8 @@ export class CurrentBreakageComponent implements OnInit {
 
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
-              private _breakageService: BreakageService) {
+              private _breakageService: BreakageService,
+              public dialog: MatDialog) {
     this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
   }
   
@@ -99,19 +102,49 @@ export class CurrentBreakageComponent implements OnInit {
   setStatus(status: Status) {
     
     if (status != Status.New && status != this.bufferStatus) {
-      this.status = status;
-      const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
-      this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto).subscribe({
-        next: response => {
-          this.apiResponse = response;
-          this.deleteResponseMessage();
-          this.bufferStatus = this.status;
-        },
-        error: err => {
-          this.apiResponse = err.error;
+      if (status === Status.Solved || status === Status.Cancelled) {
+          const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
+              status: this.statusMap.get(status) 
+          }});
+
+          openDialog.afterClosed().subscribe(
+            (confirmResult ) => {
+              if (confirmResult) {
+                this.status = status;
+                const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
+
+                this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
+                  .subscribe({
+                    next: response => {
+                      this.apiResponse = response;
+                      this.deleteResponseMessage();
+                      this.bufferStatus = this.status;
+                    },
+                    error: err => {
+                      this.apiResponse = err.error;
+                    }
+                  });
+              } else {
+                this.status = this.bufferStatus;
+              };
+          });
+      } else {
+          this.status = status;
+          const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
+
+          this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
+            .subscribe({
+              next: response => {
+                this.apiResponse = response;
+                this.deleteResponseMessage();
+                this.bufferStatus = this.status;
+              },
+              error: err => {
+                this.apiResponse = err.error;
+              }
+            });
         }
-      });
     }
   }
 

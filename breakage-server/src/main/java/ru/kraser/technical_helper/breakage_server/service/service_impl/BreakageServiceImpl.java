@@ -96,11 +96,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-
-        if (updatedStatus.status() == Status.SOLVED || updatedStatus.status() == Status.CANCELLED) {
-            throw new NotCorrectParameter("Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
-                    " - не может быть изменена !!!");
-        } else if (updatedStatus.status() == Status.NEW) {
+        if (updatedStatus.status() == Status.NEW) {
             throw new NotCorrectParameter("Заявка на неисправность не может изменить статус на - \"Новая\" !!!");
         } else {
             int response;
