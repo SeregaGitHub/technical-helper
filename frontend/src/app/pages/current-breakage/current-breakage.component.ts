@@ -49,6 +49,7 @@ export class CurrentBreakageComponent implements OnInit {
   bufferStatus!: Status;
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
+  breakageExecutor!: string;
   apiResponse: ApiResponse;
 
   constructor(private _location: Location, 
@@ -72,6 +73,9 @@ export class CurrentBreakageComponent implements OnInit {
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
+              this.breakageExecutor = this.currentBreakage.breakageExecutor;
+
+              console.log(this.currentBreakage);  // NEED FOR DELETE !!!
               
               if (this.status != Status.New) {
                 this.statuses.splice(0, 1);
