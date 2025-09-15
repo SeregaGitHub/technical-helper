@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.gateway.client.UserClient;
 
 import java.util.List;
@@ -64,6 +61,15 @@ public class UserGatewayController {
         List<UserDto> userDtoList = userClient.getAllUsers(jwt);
         log.info("All Users received successfully");
         return userDtoList;
+    }
+
+    @GetMapping(path = BREAKAGE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserShortDto> getAdminAndTechnicianList(@RequestHeader(AUTH_HEADER) String jwt) {
+        log.info("Getting admin and technician list");
+        List<UserShortDto> list = userClient.getAdminAndTechnicianList(jwt);
+        log.info("Admin and technician list received successfully");
+        return list;
     }
 
     @GetMapping(path = CURRENT_URL)

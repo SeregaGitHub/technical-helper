@@ -143,6 +143,14 @@ export class CurrentBreakageComponent implements OnInit {
         });
   }
 
+  clickExecutor() {
+    console.log('clickExecutor()');
+  }
+
+  setExecutor(executor: string) {
+    console.log('setExecutor(): ' + executor);
+  }
+
   deleteResponseMessage() {
     setTimeout(() => {
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();

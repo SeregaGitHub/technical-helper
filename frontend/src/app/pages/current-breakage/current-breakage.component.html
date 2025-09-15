@@ -138,47 +138,48 @@
 
         <!-- IN WRITE PROGRESS -->
         @if (!userProfile.getUserProfile().isEmployee()) {
-        <div class="flex justify-around w-9/12 h-12 mt-4">
+            <div class="flex justify-around w-9/12 h-12 mt-4">
 
-            <div id="111" class="flex justify-center items-center w-4/12 h-16">
-                <p class="text-xl font-medium mr-3">Исполнитель:</p>
+                <div id="111" class="flex justify-center items-center w-4/12 h-16">
+                    <p class="text-xl font-medium mr-3">Исполнитель:</p>
 
-                @if (userProfile.getUserProfile().isAdmin()) {
+                    @if (userProfile.getUserProfile().isAdmin()) {
                     
-                    @if (status === 'SOLVED' || status === 'CANCELLED') {
-                        <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
+                        @if (status === 'SOLVED' || status === 'CANCELLED') {
+                            <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
                             <!-- <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
                                 [ngClass]="{
                                 'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
                                 'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
                                 }"
                             >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>   -->
-                    } @else {
-                        <form>
-                            <mat-form-field>
-                                <mat-select [(ngModel)]="priority" name="priority">
-                                    @for (priority of priorities; track priority) {
-                                        <mat-option [value]="priority.value" 
-                                                    (click)="setPriority(priority.value)"
-                                                    >{{ priority.viewValue }}
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </form>
+                        } @else {
+                            <form>
+                                <mat-form-field>
+                                    <mat-select [(ngModel)]="breakageExecutor" name="breakageExecutor" (click)="clickExecutor()">
+                                        @for (priority of priorities; track priority) {
+                                            <mat-option [value]="priority.value" 
+                                                        (click)="setExecutor(priority.value)"
+                                                        >{{ priority.viewValue }}
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </form>
                         }
-                } @else {
-                    <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
+
+                    } @else {
+                        <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
                     }
-            </div>
+                </div>
 
-            <div class="flex justify-center items-center w-4/12 h-16">
+                <div class="flex justify-center items-center w-4/12 h-16">
 
-            </div>
+                </div>
 
-            <div class="flex justify-normal items-center w-4/12 h-16">               
-                <p class="text-xl font-medium mr-3">Назначивший:</p>
-                <p class="text-xl font-medium mr-3">{{ currentBreakage.executorAppointedBy }}</p>
+                <div class="flex justify-normal items-center w-4/12 h-16">               
+                    <p class="text-xl font-medium mr-3">Назначивший:</p>
+                    <p class="text-xl font-medium mr-3">{{ currentBreakage.executorAppointedBy }}</p>
                 <!-- @if (status === 'SOLVED' || status === 'CANCELLED') {
                     <p class="text-xl font-medium mr-3"
                         [ngClass]="{
@@ -215,9 +216,9 @@
                     }
                 } -->
                  
-            </div>
+                </div>
             
-        </div>
+            </div>
         }
         <!-- IN WRITE PROGRESS -->
 
