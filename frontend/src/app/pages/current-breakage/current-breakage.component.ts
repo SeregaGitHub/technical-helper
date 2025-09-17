@@ -127,6 +127,9 @@ export class CurrentBreakageComponent implements OnInit {
           });
       } else {
           this.setStatusToBackend(status);
+          if (this.bufferStatus === Status.New) {
+            this.statuses.splice(0, 1);
+          }
         }
     }
   }
