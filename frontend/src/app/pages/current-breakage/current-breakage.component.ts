@@ -50,6 +50,7 @@ export class CurrentBreakageComponent implements OnInit {
   bufferStatus!: Status;
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
+  breakageExecutorId!: string;
   breakageExecutor!: string;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
@@ -76,10 +77,11 @@ export class CurrentBreakageComponent implements OnInit {
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
+              this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
 
               console.log(this.currentBreakage);  // NEED FOR DELETE !!!
-              this.executors.push(new BreakageExecutor('', this.breakageExecutor));
+              this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
               
               if (this.status != Status.New) {
@@ -176,7 +178,12 @@ export class CurrentBreakageComponent implements OnInit {
     console.log('setExecutor(): ');
     const executor = new BreakageExecutor(id, username);
     console.log(executor);
+    this.breakageExecutorId = executor.id;
     this.breakageExecutor = executor.username;
+
+    if (this.breakageExecutorId != '') {
+      console.log('ready for send request to backend');
+    }
 
   }
   // IN WRITE PROGRESS
