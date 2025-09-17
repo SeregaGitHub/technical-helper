@@ -145,15 +145,7 @@
 
                     @if (userProfile.getUserProfile().isAdmin()) {
                     
-                        @if (status === 'SOLVED' || status === 'CANCELLED') {
-                            <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
-                            <!-- <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
-                                [ngClass]="{
-                                'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
-                                'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
-                                }"
-                            >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>   -->
-                        } @else {
+                        @if (status === 'NEW' || status === 'IN_PROGRESS') {
                             <form>
                                 <mat-form-field>
                                     <mat-select [(ngModel)]="breakageExecutor" name="breakageExecutor" (click)="clickExecutor()">
@@ -166,10 +158,19 @@
                                     </mat-select>
                                 </mat-form-field>
                             </form>
+                            <!-- <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
+                                [ngClass]="{
+                                'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
+                                'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
+                                }"
+                            >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>   -->
+                        } @else {
+                            <p class="text-xl font-medium mr-3">{{ breakageExecutor }}</p>
+                            
                         }
 
                     } @else {
-                        <p class="text-xl font-medium mr-3">{{ currentBreakage.breakageExecutor }}</p>
+                        <p class="text-xl font-medium mr-3">{{ breakageExecutor }}</p>
                     }
                 </div>
 
@@ -179,7 +180,7 @@
 
                 <div class="flex justify-normal items-center w-4/12 h-16">               
                     <p class="text-xl font-medium mr-3">Назначивший:</p>
-                    <p class="text-xl font-medium mr-3">{{ currentBreakage.executorAppointedBy }}</p>
+                    <p class="text-xl font-medium mr-3">{{ executorAppointedBy }}</p>
                 <!-- @if (status === 'SOLVED' || status === 'CANCELLED') {
                     <p class="text-xl font-medium mr-3"
                         [ngClass]="{

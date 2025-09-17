@@ -100,12 +100,21 @@ public class BreakageServiceImpl implements BreakageService {
             throw new NotCorrectParameter("Заявка на неисправность не может изменить статус на - \"Новая\" !!!");
         } else {
             int response;
-            response = breakageRepository.updateBreakageStatus(
-                    breakageId,
-                    updatedStatus.status(),
-                    SecurityUtil.getCurrentUserId(),
-                    now
-            );
+            if (updatedStatus.status() == Status.PAUSED || updatedStatus.status() == Status.REDIRECTED) {
+                response = breakageRepository.updateBreakageStatusAndResetExecutor(
+                        breakageId,
+                        updatedStatus.status(),
+                        SecurityUtil.getCurrentUserId(),
+                        now
+                );
+            } else {
+                response = breakageRepository.updateBreakageStatus(
+                        breakageId,
+                        updatedStatus.status(),
+                        SecurityUtil.getCurrentUserId(),
+                        now
+                );
+            }
             if (response != 1) {
                 throw new NotFoundException(BREAKAGE_NOT_EXIST);
             }

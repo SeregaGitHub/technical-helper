@@ -52,6 +52,7 @@ export class CurrentBreakageComponent implements OnInit {
   employeeStatuses: any;
   breakageExecutorId!: string;
   breakageExecutor!: string;
+  executorAppointedBy!: string;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
@@ -79,6 +80,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
               this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
+              this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
 
               console.log(this.currentBreakage);  // NEED FOR DELETE !!!
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
@@ -146,6 +148,13 @@ export class CurrentBreakageComponent implements OnInit {
             this.apiResponse = response;
             this.deleteResponseMessage();
             this.bufferStatus = this.status;
+            if (status === Status.Paused || status === Status.Redirected) {
+              this.breakageExecutorId = '';
+              this.breakageExecutor = 'Не назначен';
+              this.executorAppointedBy = 'Отсутствует';
+              this.executors.splice(0);
+              this.executors.push(new BreakageExecutor('', 'Не назначен'));
+            }
           },
           error: err => {
             this.apiResponse = err.error;
@@ -184,6 +193,7 @@ export class CurrentBreakageComponent implements OnInit {
     console.log(executor);
     this.breakageExecutorId = executor.id;
     this.breakageExecutor = executor.username;
+    //this.executorAppointedBy = 
 
     if (this.breakageExecutorId != '') {
       console.log('ready for send request to backend');
