@@ -160,10 +160,14 @@ export class CurrentBreakageComponent implements OnInit {
     this._breakageService.getAdminAndTechnicianList()
       .subscribe({
         next: data => {
-          if (this.executors.length === 1) {
+          if (this.executors.length === 1 && this.breakageExecutorId === '') {
             this.executors = [...this.executors, ...data];
-            console.log(this.executors);
+          } else {
+            this.executors.splice(0);
+            this.executors.push(new BreakageExecutor('', 'Не назначен'));
+            this.executors = [...this.executors, ...data];
           }
+          console.log(this.executors);
         },
         error: err => {
           this.apiResponse = err;
