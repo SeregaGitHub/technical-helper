@@ -158,6 +158,12 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional
     public ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto) {
+        if (appointBreakageExecutorDto.status() == Status.PAUSED ||
+            appointBreakageExecutorDto.status() == Status.REDIRECTED) {
+            throw new NotCorrectParameter("Заявке на неисправность со статусом \"В ожидании\" или " +
+                    "со статусом \"Передана\" - не может быть назначен исполнитель !!!");
+        }
+
         LocalDateTime now = LocalDateTime.now().withNano(0);
         LocalDate deadline = appointBreakageExecutorDto.deadline();
 
