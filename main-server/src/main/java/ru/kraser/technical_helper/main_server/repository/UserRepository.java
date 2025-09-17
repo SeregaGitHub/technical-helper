@@ -75,7 +75,7 @@ public interface UserRepository extends JpaRepository<User, String> {
                     SELECT new ru.kraser.technical_helper.common_module.dto.user.UserShortDto
                     (u.id, u.username)
                     FROM User AS u
-                    WHERE u.role = 'TECHNICIAN' OR u.role = 'ADMIN'
+                    WHERE u.enabled = true AND (u.role = 'TECHNICIAN' OR u.role = 'ADMIN')
                     ORDER BY u.role, u.username
                     """
     )
