@@ -19,6 +19,7 @@ import { UpdateBreakagePriorityDto } from '../../model/breakage/update-breakage-
 import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-status-dto';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
+import { BreakageExecutor } from '../../model/user/breakage-executor';
 
 @Component({
   selector: 'app-current-breakage',
@@ -50,6 +51,7 @@ export class CurrentBreakageComponent implements OnInit {
   statuses = EnumViewFactory.getStatuses();
   employeeStatuses: any;
   breakageExecutor!: string;
+  executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
   constructor(private _location: Location, 
@@ -57,6 +59,7 @@ export class CurrentBreakageComponent implements OnInit {
               private _breakageService: BreakageService,
               public dialog: MatDialog) {
     this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
+    this.executors = new Array;
   }
   
   ngOnInit(): void {
@@ -76,6 +79,8 @@ export class CurrentBreakageComponent implements OnInit {
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
 
               console.log(this.currentBreakage);  // NEED FOR DELETE !!!
+              this.executors.push(new BreakageExecutor('', this.breakageExecutor));
+              
               
               if (this.status != Status.New) {
                 this.statuses.splice(0, 1);
@@ -143,13 +148,35 @@ export class CurrentBreakageComponent implements OnInit {
         });
   }
 
-  clickExecutor() {
+  // IN WRITE PROGRESS
+  clickExecutor(): void {
     console.log('clickExecutor()');
+    
+    this._breakageService.getAdminAndTechnicianList()
+      .subscribe({
+        next: data => {
+          if (this.executors.length === 1) {
+            this.executors = [...this.executors, ...data];
+            console.log(this.executors);
+          }
+        },
+        error: err => {
+          this.apiResponse = err;
+            setTimeout(() => {
+              this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
+            }, 3000);
+          }
+      })
   }
 
-  setExecutor(executor: string) {
-    console.log('setExecutor(): ' + executor);
+  setExecutor(id: string, username: string) {
+    console.log('setExecutor(): ');
+    const executor = new BreakageExecutor(id, username);
+    console.log(executor);
+    this.breakageExecutor = executor.username;
+
   }
+  // IN WRITE PROGRESS
 
   deleteResponseMessage() {
     setTimeout(() => {

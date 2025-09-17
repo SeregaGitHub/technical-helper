@@ -157,10 +157,10 @@
                             <form>
                                 <mat-form-field>
                                     <mat-select [(ngModel)]="breakageExecutor" name="breakageExecutor" (click)="clickExecutor()">
-                                        @for (priority of priorities; track priority) {
-                                            <mat-option [value]="priority.value" 
-                                                        (click)="setExecutor(priority.value)"
-                                                        >{{ priority.viewValue }}
+                                        @for (executor of executors; track executor) {
+                                            <mat-option [value]="executor.username" 
+                                                        (click)="setExecutor(executor.id, executor.username)"
+                                                        >{{ executor.username }}
                                             </mat-option>
                                         }
                                     </mat-select>

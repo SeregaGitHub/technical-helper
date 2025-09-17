@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, EMPLOYEE_URL, GATEWAY_URL, TECHNICIAN_URL } from '../util/constant';
+import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, EMPLOYEE_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL } from '../util/constant';
 import { Executor } from '../enum/executor.enum';
 import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
 import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-priority-dto';
@@ -82,6 +82,19 @@ export class BreakageService {
                 });
               })
           );
+  };
+
+  getAdminAndTechnicianList(): Observable<any> {
+      const headers = HttpHeadersFactory.createPermanentHeaders();
+
+      return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL, {headers})
+        .pipe(
+          tap(
+            (list) => {
+              const currentState = this.breakageSubject.value;
+              this.breakageSubject.next({...currentState, list})
+            })
+      );
   };
 
   setPriority(id: string, updateBreakagePriorityDto: UpdateBreakagePriorityDto): Observable<any> {
