@@ -12,6 +12,7 @@ public record ApiResponse(
     int status,
     HttpStatus httpStatus,
     @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-    LocalDateTime timestamp
+    LocalDateTime timestamp,
+    Object data
 ) {
 }

@@ -98,12 +98,14 @@ export class CurrentBreakageComponent implements OnInit {
   };
 
   setPriority(priority: Priority) {
-    this.priority = priority;
     const updateBreakagePriorityDto = new UpdateBreakagePriorityDto(priority, this.status);
 
     this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto).subscribe({
       next: response => {
+        this.priority = priority;
         this.apiResponse = response;
+        this.currentBreakage.lastUpdatedBy = response.data;
+        this.currentBreakage.lastUpdatedDate = response.timestamp;
         this.deleteResponseMessage();
       },
       error: err => {

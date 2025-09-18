@@ -151,6 +151,7 @@ public class BreakageServiceImpl implements BreakageService {
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
                     .build();
         }
     }
