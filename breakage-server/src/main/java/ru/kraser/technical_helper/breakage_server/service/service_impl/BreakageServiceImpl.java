@@ -85,6 +85,7 @@ public class BreakageServiceImpl implements BreakageService {
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
                     .build();
         } else {
             throw new ForbiddenException("Только технический специалист или сотрудник отдела, " +
@@ -123,6 +124,7 @@ public class BreakageServiceImpl implements BreakageService {
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
                     .build();
         }
     }

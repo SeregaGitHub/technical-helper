@@ -141,15 +141,17 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   setStatusToBackend(status: Status) {
-      this.status = status;
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
       this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
         .subscribe({
           next: response => {
+            this.status = status;
             this.apiResponse = response;
             this.deleteResponseMessage();
             this.bufferStatus = this.status;
+            this.currentBreakage.lastUpdatedBy = response.data;
+            this.currentBreakage.lastUpdatedDate = response.timestamp;
             if (status === Status.Paused || status === Status.Redirected) {
               this.breakageExecutorId = '';
               this.breakageExecutor = 'Не назначен';
