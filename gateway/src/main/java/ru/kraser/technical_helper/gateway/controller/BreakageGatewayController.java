@@ -69,7 +69,7 @@ public class BreakageGatewayController {
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL)
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse addBreakageExecutor(@RequestHeader(AUTH_HEADER) String jwt,
                                            @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
@@ -78,6 +78,16 @@ public class BreakageGatewayController {
         ApiResponse response = breakageClient.addBreakageExecutor(BREAKAGE_ID_HEADER, breakageId,
                 appointBreakageExecutorDto, jwt);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
+        return response;
+    }
+
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + DELETE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse dropBreakageExecutor(@RequestHeader(AUTH_HEADER) String jwt,
+                                            @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Dropping breakageExecutor of breakage with Id={}", breakageId);
+        ApiResponse response = breakageClient.dropBreakageExecutor(BREAKAGE_ID_HEADER, breakageId, jwt);
+        log.info("Executor and deadline of breakage with Id={}, successfully dropped", breakageId);
         return response;
     }
 

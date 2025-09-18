@@ -58,13 +58,22 @@ public class BreakageController {
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL)
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse addBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                            @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
         log.info("Adding breakageExecutor and deadline of breakage with Id={}", breakageId);
         ApiResponse response = breakageService.addBreakageExecutor(breakageId, appointBreakageExecutorDto);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
+        return response;
+    }
+
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + DELETE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse dropBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Dropping breakageExecutor of breakage with Id={}", breakageId);
+        ApiResponse response = breakageService.dropBreakageExecutor(breakageId);
+        log.info("Executor and deadline of breakage with Id={}, successfully dropped", breakageId);
         return response;
     }
 

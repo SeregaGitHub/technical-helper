@@ -17,6 +17,8 @@ public interface BreakageService {
 
     ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto);
 
+    ApiResponse dropBreakageExecutor(String breakageId);
+
     AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,

@@ -196,6 +196,29 @@ public class BreakageServiceImpl implements BreakageService {
     }
 
     @Override
+    @Transactional
+    public ApiResponse dropBreakageExecutor(String breakageId) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+
+        int response = breakageRepository.dropBreakageExecutor(
+                    breakageId,
+                    SecurityUtil.getCurrentUserId(),
+                    now
+            );
+
+        if (response != 1) {
+            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        }
+
+        return ApiResponse.builder()
+                .message("Исполнитель заявки на неисправность был успешно удален.")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,

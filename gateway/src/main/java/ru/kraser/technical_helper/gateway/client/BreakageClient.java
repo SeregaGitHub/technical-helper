@@ -65,8 +65,18 @@ public class BreakageClient extends BaseClient {
     public ApiResponse addBreakageExecutor(String breakageHeaderName, String breakageId,
                                            AppointBreakageExecutorDto appointBreakageExecutorDto, String jwt) {
         return super.patch(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL,
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL,
                 appointBreakageExecutorDto,
+                jwt,
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    public ApiResponse dropBreakageExecutor(String breakageHeaderName, String breakageId, String jwt) {
+        return super.delete(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL,
                 jwt,
                 breakageHeaderName,
                 breakageId,

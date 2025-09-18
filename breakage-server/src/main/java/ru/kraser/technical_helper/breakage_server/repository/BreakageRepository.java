@@ -94,7 +94,23 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
                     WHERE id = :breakageId
                     """
     )
-    int addBreakageExecutor(String breakageId, String executor, LocalDateTime deadline, String currentUserId, LocalDateTime now);
+    int addBreakageExecutor(
+            String breakageId, String executor, LocalDateTime deadline, String currentUserId, LocalDateTime now);
+
+    @Modifying
+    @Query(
+            value = """
+                    UPDATE Breakage
+                    SET
+                    executor = null,
+                    executorAppointedBy = null,
+                    deadline = null,
+                    lastUpdatedBy = :lastUpdatedBy,
+                    lastUpdatedDate = :lastUpdatedDate
+                    WHERE id = :breakageId
+                    """
+    )
+    int dropBreakageExecutor(String breakageId, String lastUpdatedBy, LocalDateTime lastUpdatedDate);
 
     @Query(
             value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId"

@@ -197,6 +197,8 @@ export class CurrentBreakageComponent implements OnInit {
 
     if (this.breakageExecutorId != '') {
       console.log('ready for send request to backend');
+    } else {
+      console.log('resetExecutor');
     }
 
   }
