@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 
@@ -84,6 +85,9 @@ public abstract class BaseClient {
                 )
                 .onStatus(HttpStatus.NOT_FOUND::equals,
                         clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .onStatus(HttpStatus.BAD_REQUEST::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotCorrectParameter.class)
                 )
                 .bodyToMono(typeReference);
 
