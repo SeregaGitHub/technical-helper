@@ -82,9 +82,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
               this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
 
-              console.log(this.currentBreakage);  // NEED FOR DELETE !!!
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
-              
               
               if (this.status != Status.New) {
                 this.statuses.splice(0, 1);
@@ -110,6 +108,7 @@ export class CurrentBreakageComponent implements OnInit {
       },
       error: err => {
         this.apiResponse = err.error;
+        this.deleteResponseMessage();
       }
     });
   }
@@ -140,6 +139,42 @@ export class CurrentBreakageComponent implements OnInit {
     }
   }
 
+  cancelBreakage(status: Status) {
+    if (status === Status.Cancelled) {
+
+        const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
+              status: this.statusMap.get(status) 
+          }});
+
+          openDialog.afterClosed().subscribe(
+            (confirmResult ) => {
+              if (confirmResult) {
+                this.cancelBreakageToBackend(this.breakageId, this.currentBreakage.departmentId);
+              } else {
+                this.status = this.bufferStatus;
+              };
+          });
+    }
+  }
+
+  cancelBreakageToBackend(id: string, departmentId: string) {
+      this._breakageService.cancelBreakage(id, departmentId)
+        .subscribe({
+          next: response => {
+            this.status = Status.Cancelled;
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+            this.bufferStatus = this.status;
+            this.currentBreakage.lastUpdatedBy = response.data;
+            this.currentBreakage.lastUpdatedDate = response.timestamp;
+          },
+          error: err => {
+            this.apiResponse = err.error;
+            this.deleteResponseMessage();
+          }
+        });
+  }
+
   setStatusToBackend(status: Status) {
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
@@ -162,6 +197,7 @@ export class CurrentBreakageComponent implements OnInit {
           },
           error: err => {
             this.apiResponse = err.error;
+            this.deleteResponseMessage();
           }
         });
   }

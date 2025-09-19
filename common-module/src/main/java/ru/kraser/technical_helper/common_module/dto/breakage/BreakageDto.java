@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public record BreakageDto(
         String id,
+        String departmentId,
         String breakageExecutorId,
         String departmentName,
         String room,

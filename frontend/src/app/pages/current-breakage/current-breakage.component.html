@@ -78,7 +78,7 @@
                                 <mat-select [(ngModel)]="status" name="status">
                                     @for (status of employeeStatuses; track status) {
                                         <mat-option [value]="status.value" 
-                                                    (click)="setStatus(status.value)"
+                                                    (click)="cancelBreakage(status.value)"
                                                     >{{ status.viewValue }}
                                         </mat-option>
                                     }

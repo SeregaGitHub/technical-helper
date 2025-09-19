@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, EMPLOYEE_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL } from '../util/constant';
+import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
+         DEPARTMENT_ID, EMPLOYEE_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL 
+        } from '../util/constant';
 import { Executor } from '../enum/executor.enum';
 import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
 import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-priority-dto';
@@ -103,6 +105,25 @@ export class BreakageService {
       headers = headers.append(BREAKAGE_ID, id);
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', updateBreakagePriorityDto, {headers})
+          .pipe(
+              tap((updatedBreakage) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [updatedBreakage, ...currentState.breakages]
+                });
+              })
+          );
+  }
+
+  cancelBreakage(id: string, departmentId: string): Observable<any> {
+
+      let headers = HttpHeadersFactory.createPermanentHeaders();
+      headers = headers.append(BREAKAGE_ID, id);
+      headers = headers.append(DEPARTMENT_ID, departmentId);
+
+      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, null, {headers})
           .pipe(
               tap((updatedBreakage) => {
                   const currentState = this.breakageSubject.value;

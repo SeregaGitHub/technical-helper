@@ -50,6 +50,7 @@ public class BreakageMapper {
 
         return BreakageFullDto.builder()
                 .id(breakageDto.id())
+                .departmentId(breakageDto.departmentId())
                 .breakageExecutorId(breakageDto.breakageExecutorId())
                 .departmentName(breakageDto.departmentName())
                 .room(breakageDto.room())

@@ -19,7 +19,7 @@ import java.util.Optional;
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
 
     String GET_BREAKAGE = "SELECT new ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto " +
-            "(b.id, COALESCE (ue.id, '') AS breakageExecutorId, " +
+            "(b.id, d.id AS departmentId, COALESCE (ue.id, '') AS breakageExecutorId, " +
             "d.name, b.room, b.breakageTopic, b.breakageText, b.status, b.priority, " +
             "COALESCE (ue.username, 'Не назначен') AS breakageExecutor, " +
             "COALESCE (ua.username, 'Отсутствует') AS executorAppointedBy, " +

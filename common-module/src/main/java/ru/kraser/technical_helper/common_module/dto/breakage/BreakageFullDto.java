@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 public record BreakageFullDto(
         String id,                         // for employee +
+        String departmentId,
         String breakageExecutorId,
         String departmentName,             // for employee +
         String room,                       // for employee +
