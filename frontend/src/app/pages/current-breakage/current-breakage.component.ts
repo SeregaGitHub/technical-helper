@@ -62,6 +62,7 @@ export class CurrentBreakageComponent implements OnInit {
   breakageExecutorId!: string;
   breakageExecutor!: string;
   executorAppointedBy!: string;
+  deadline!: string | null;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
@@ -70,7 +71,7 @@ export class CurrentBreakageComponent implements OnInit {
   private readonly _currentDay = new Date().getDate();
   readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
-  selectedDate!: string | null;
+  
   //selectedDate = '2025-10-29';
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
@@ -108,6 +109,9 @@ export class CurrentBreakageComponent implements OnInit {
               this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
               this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
+              //this.deadline = this.currentBreakage.deadline
+              this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
+              console.log(this.deadline)
 
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
@@ -271,7 +275,8 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   onDateChange(event: MatDatepickerInputEvent<Date>) {
-    this.selectedDate = this._datePipe.transform(event.value, 'yyyy-MM-dd');
+    this.deadline = this._datePipe.transform(event.value, 'yyyy-MM-dd');
+    console.log(this.deadline)
   }
   // IN WRITE PROGRESS
 

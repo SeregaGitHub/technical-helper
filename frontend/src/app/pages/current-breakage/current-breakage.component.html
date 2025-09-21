@@ -184,14 +184,14 @@
                                    [max]="maxDate" 
                                    [matDatepicker]="picker" 
                                    (dateChange)="onDateChange($event)"
-                                   [(ngModel)]="selectedDate"
+                                   [(ngModel)]="deadline"
                                    />
                             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                             <mat-datepicker #picker></mat-datepicker>
                         </mat-form-field>
-                    } @else if (!userProfile.getUserProfile().isEmployee() && selectedDate != null) {
+                    } @else if (!userProfile.getUserProfile().isEmployee() && deadline != null) {
                         <p class="text-xl font-medium mr-3">Срок исполнения:</p>
-                        <p class="text-xl font-medium mr-3">{{ selectedDate | date: deadlineDateFormat }}</p>
+                        <p class="text-xl font-medium mr-3">{{ deadline | date: deadlineDateFormat }}</p>
                     }
                 </div>
 
