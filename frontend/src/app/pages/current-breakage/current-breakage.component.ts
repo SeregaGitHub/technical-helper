@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { BreakageService } from '../../services/breakage.service';
@@ -20,7 +20,7 @@ import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-st
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { BreakageExecutor } from '../../model/user/breakage-executor';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/datepicker';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
@@ -38,7 +38,8 @@ import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular
   templateUrl: './current-breakage.component.html',
   styleUrl: './current-breakage.component.css',
   providers: [
-    provideNativeDateAdapter()
+    provideNativeDateAdapter(),
+    DatePipe
   ],
   //changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -68,7 +69,7 @@ export class CurrentBreakageComponent implements OnInit {
   private readonly _currentDay = new Date().getDate();
   readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
-  // picker?: Date;
+  selectedDate!: string | null;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -76,6 +77,7 @@ export class CurrentBreakageComponent implements OnInit {
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
               private _breakageService: BreakageService,
+              private _datePipe: DatePipe,
               public dialog: MatDialog) {
     this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
     this.executors = new Array;
@@ -261,6 +263,10 @@ export class CurrentBreakageComponent implements OnInit {
       console.log('resetExecutor');
     }
 
+  }
+
+  onDateChange(event: MatDatepickerInputEvent<Date>) {
+    this.selectedDate = this._datePipe.transform(event.value, 'yyyy-MM-dd');
   }
   // IN WRITE PROGRESS
 
