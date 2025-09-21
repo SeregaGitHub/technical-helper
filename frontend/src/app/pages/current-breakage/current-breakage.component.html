@@ -92,37 +92,37 @@
             
         </div>
 
-        <div class="flex justify-between w-9/12 h-80 mt-4">
+        <div class="flex justify-between w-9/12 h-72 mt-4">
 
-            <div class="blue-to-black-gradient h-80 w-1/2">
-                <textarea class="blue-to-black-gradient resize-none h-80 w-full px-4 pt-2 text-lg"
+            <div class="blue-to-black-gradient h-72 w-1/2">
+                <textarea class="blue-to-black-gradient resize-none h-72 w-full px-4 pt-2 text-lg"
                 >{{ currentBreakage.breakageText }}</textarea>
             </div>
 
-            <div class="h-80 w-1/2">
+            <div class="h-72 w-1/2">
                 <div class="flex flex-col justify-center">
-                    <div class="flex justify-between border-b border-current mt-5 mb-4">
+                    <div class="flex justify-between border-b border-current mt-3 mb-3">
                         <p class="text-xl font-medium ml-5">ID:</p>
                         <p>{{ currentBreakage.id }}</p>
                     </div>
-                    <div class="flex justify-between border-b border-current mb-4">
+                    <div class="flex justify-between border-b border-current mb-3">
                         <p class="text-xl font-medium ml-5">Отдел:</p>
                         <p>{{ currentBreakage.departmentName }}</p>
                     </div>
-                    <div class="flex justify-between border-b border-current mb-4">
+                    <div class="flex justify-between border-b border-current mb-3">
                         <p class="text-xl font-medium ml-5">Помещение:</p>
                         <p>{{ currentBreakage.room }}</p>
                     </div>
-                    <div class="flex justify-between border-b border-current mb-4">
+                    <div class="flex justify-between border-b border-current mb-3">
                         <p class="text-xl font-medium ml-5">Создана:</p>
                         <p>{{ currentBreakage.createdBy }}</p>
                     </div>
-                    <div class="flex justify-between border-b border-current mb-4">
+                    <div class="flex justify-between border-b border-current mb-3">
                         <p class="text-xl font-medium ml-5">Создано:</p>
                         <p>{{ currentBreakage.createdDate | date: dateFormat }}</p>
                     </div>
                     @if (!userProfile.getUserProfile().isEmployee()) {
-                        <div class="flex justify-between border-b border-current mb-4">
+                        <div class="flex justify-between border-b border-current mb-3">
                             <p class="text-xl font-medium ml-5">Обновлена:</p>
                             <p>{{ currentBreakage.lastUpdatedBy }}</p>
                         </div>
@@ -141,7 +141,7 @@
         @if (!userProfile.getUserProfile().isEmployee() && status != 'PAUSED' && status != 'REDIRECTED') {
             <div class="flex justify-around w-9/12 h-12 mt-4">
 
-                <div id="111" class="flex justify-center items-center w-4/12 h-16">
+                <div id="111" class="flex justify-center items-center w-4/12 h-12">
                     <p class="text-xl font-medium mr-3">Исполнитель:</p>
 
                     @if (userProfile.getUserProfile().isAdmin()) {
@@ -175,11 +175,11 @@
                     }
                 </div>
 
-                <div class="flex justify-center items-center w-4/12 h-16">
+                <div class="flex justify-center items-center w-4/12 h-12">
 
                 </div>
 
-                <div class="flex justify-normal items-center w-4/12 h-16">               
+                <div class="flex justify-normal items-center w-4/12 h-12 overflow-hidden text-nowrap">               
                     <p class="text-xl font-medium mr-3">Назначивший:</p>
                     <p class="text-xl font-medium mr-3">{{ executorAppointedBy }}</p>
                 <!-- @if (status === 'SOLVED' || status === 'CANCELLED') {
