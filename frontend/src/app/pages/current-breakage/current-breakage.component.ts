@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -20,6 +20,8 @@ import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-st
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form.component';
 import { BreakageExecutor } from '../../model/user/breakage-executor';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-current-breakage',
@@ -30,10 +32,15 @@ import { BreakageExecutor } from '../../model/user/breakage-executor';
     MatFormFieldModule,
     MatSelectModule,
     FormsModule,
-    MatIconModule
+    MatIconModule,
+    MatDatepickerModule
   ],
   templateUrl: './current-breakage.component.html',
-  styleUrl: './current-breakage.component.css'
+  styleUrl: './current-breakage.component.css',
+  providers: [
+    provideNativeDateAdapter()
+  ],
+  //changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrentBreakageComponent implements OnInit {
 
@@ -56,12 +63,25 @@ export class CurrentBreakageComponent implements OnInit {
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
+  private readonly _currentYear = new Date().getFullYear();
+  private readonly _currentMonth = new Date().getMonth();
+  private readonly _currentDay = new Date().getDate();
+  readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
+  readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
+  // picker?: Date;
+
+  private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
+  private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
               private _breakageService: BreakageService,
               public dialog: MatDialog) {
     this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
     this.executors = new Array;
+
+    this._locale.set('ru');
+    this._adapter.setLocale(this._locale());
   }
   
   ngOnInit(): void {
