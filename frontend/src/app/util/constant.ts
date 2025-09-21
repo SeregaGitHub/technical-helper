@@ -14,6 +14,7 @@ export const DELETE_URL = '/delete';
 export const CURRENT_URL = '/current';
 
 export const DATE_FORMAT = 'dd-MM-yyyy HH:mm:ss';
+export const DEADLINE_DATE_FORMAT = 'dd-MM-yyyy';
 
 export const DEPARTMENT_ID = 'X-Department-Id';
 export const DEPARTMENT_NAME = 'X-Department-Name';

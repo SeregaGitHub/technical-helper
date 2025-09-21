@@ -13,7 +13,7 @@ import { Priority } from '../../enum/priority.enum';
 import { EnumViewFactory } from '../../generator/enum-view-factory';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Status } from '../../enum/status.enum';
-import { DATE_FORMAT } from '../../util/constant';
+import { DATE_FORMAT, DEADLINE_DATE_FORMAT } from '../../util/constant';
 import { MatIconModule } from '@angular/material/icon';
 import { UpdateBreakagePriorityDto } from '../../model/breakage/update-breakage-priority-dto';
 import { UpdateBreakageStatusDto } from '../../model/breakage/update-breakage-status-dto';
@@ -50,6 +50,7 @@ export class CurrentBreakageComponent implements OnInit {
 
   currentBreakage: any;
   dateFormat = DATE_FORMAT;
+  deadlineDateFormat = DEADLINE_DATE_FORMAT;
   sub: any;
   breakageId: string = '';
   priority!: Priority;
@@ -70,6 +71,7 @@ export class CurrentBreakageComponent implements OnInit {
   readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
   selectedDate!: string | null;
+  //selectedDate = '2025-10-29';
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -96,6 +98,9 @@ export class CurrentBreakageComponent implements OnInit {
           .subscribe({
             next: data => {
               this.currentBreakage = data;
+
+              console.log(this.currentBreakage)
+
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
