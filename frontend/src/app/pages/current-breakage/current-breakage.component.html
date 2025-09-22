@@ -1,5 +1,5 @@
 <div appUserProfile #userProfile="userProfile">
-    <div class="pl-8 pt-2 flex justify-between">
+    <div class="pl-8 pt-1 flex justify-between">
         <div class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">
             <button (click)="backClicked()">Назад</button>
         </div>
@@ -95,7 +95,8 @@
         <div class="flex justify-between w-9/12 h-72 mt-4">
 
             <div class="blue-to-black-gradient h-72 w-1/2">
-                <textarea class="blue-to-black-gradient resize-none h-72 w-full px-4 pt-2 text-lg"
+                <textarea class="blue-to-black-gradient resize-none h-72 w-full px-4 pt-2 text-lg" 
+                readonly
                 >{{ currentBreakage.breakageText }}</textarea>
             </div>
 
@@ -139,9 +140,9 @@
 
         <!-- IN WRITE PROGRESS -->
         @if (!userProfile.getUserProfile().isEmployee() && status != 'PAUSED' && status != 'REDIRECTED') {
-            <div class="flex justify-around w-9/12 h-12 mt-4">
+            <div class="flex justify-between w-9/12 h-12 mt-6">
 
-                <div class="flex justify-center items-center w-4/12 h-12">
+                <div class="flex justify-start items-center w-4/12 h-12">
                     <p class="text-xl font-medium mr-3">Исполнитель:</p>
 
                     @if (userProfile.getUserProfile().isAdmin()) {
@@ -159,17 +160,10 @@
                                     </mat-select>
                                 </mat-form-field>
                             </form>
-                            <!-- <p class="text-xl font-medium mr-3"><mat-icon class="mat-icon-priority"
-                                [ngClass]="{
-                                'colorRed': priority === 'URGENTLY', 'colorGold': priority === 'HIGH', 
-                                'colorLawngreen': priority === 'MEDIUM', 'colorAqua': priority === 'LOW'
-                                }"
-                            >turned_in</mat-icon>{{ priorityMap.get(priority) }}</p>   -->
                         } @else {
                             <p class="text-xl font-medium mr-3 overflow-hidden text-nowrap">{{ breakageExecutor }}</p>
-                            
                         }
-
+                        
                     } @else {
                         <p class="text-xl font-medium mr-3 overflow-hidden text-nowrap">{{ breakageExecutor }}</p>
                     }
@@ -195,62 +189,35 @@
                     }
                 </div>
 
-                <div class="flex justify-normal items-center w-4/12 h-12 overflow-hidden text-nowrap">               
-                    <p class="text-xl font-medium mr-3">Назначивший:</p>
-                    <p class="text-xl font-medium mr-3">{{ executorAppointedBy }}</p>
-                <!-- @if (status === 'SOLVED' || status === 'CANCELLED') {
-                    <p class="text-xl font-medium mr-3"
-                        [ngClass]="{
-                        'colorLawngreen': status === 'SOLVED', 'colorGreen': status === 'CANCELLED'
-                        }"
-                    >{{ statusMap.get(status) }}</p>
-                } @else {
-                    @if (!userProfile.getUserProfile().isEmployee()) {
-                        <form>
-                            <mat-form-field>
-                                <mat-select [(ngModel)]="status" name="status">
-                                    @for (status of statuses; track status) {
-                                        <mat-option [value]="status.value" 
-                                                    (click)="setStatus(status.value)"
-                                                    >{{ status.viewValue }}
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </form>
-                    } @else {
-                        <form>
-                            <mat-form-field>
-                                <mat-select [(ngModel)]="status" name="status">
-                                    @for (status of employeeStatuses; track status) {
-                                        <mat-option [value]="status.value" 
-                                                    (click)="setStatus(status.value)"
-                                                    >{{ status.viewValue }}
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </form>
-                    }
-                } -->
-                 
-                </div>
-            
+                @if (userProfile.getUserProfile().isAdmin() && (status === 'NEW' || status === 'IN_PROGRESS')) {
+                    <div class="flex w-4/12">
+                        <div class="mr-8">
+                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">Сбросить</button>
+                        </div>
+                        <div>
+                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">Назначить</button>
+                        </div>
+                    </div>
+                }
             </div>
         }
         <!-- IN WRITE PROGRESS -->
 
-        <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 mt-4 overflow-hidden rounded text-xl font-semibold">
-            <p class="m-auto whitespace-nowrap">Коментарии ( {{ commentsCount }} )</p>
-        </div>
-        <!-- <div>
+        @if (!userProfile.getUserProfile().isEmployee() && status != 'PAUSED' && status != 'REDIRECTED') {
+            <div class="flex justify-normal items-center w-9/12 h-12 overflow-hidden text-nowrap">               
+                <p class="text-xl font-medium mr-3">Назначивший:</p>
+                <p class="text-xl font-medium mr-3">{{ executorAppointedBy }}</p>
+            </div>
+        }
 
-        </div> -->
+        @if (!userProfile.getUserProfile().isEmployee()) {
+            <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 mt-2 overflow-hidden rounded text-xl font-semibold">
+                <p class="m-auto whitespace-nowrap">Коментарии ( {{ commentsCount }} )</p>
+            </div>
+        }
 
-        <!-- <div class="w-1/3 h-56 black-to-blue-gradient mt-20 flex justify-center items-center flex-col">
-            <p class="alert text-2xl">Данная страница не существует.</p>
-            <p class="alert text-2xl mt-3">Вернитесь назад !!!</p>
-        </div> -->
+
+        
     </div>
 </div>
 
