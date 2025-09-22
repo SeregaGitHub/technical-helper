@@ -12,6 +12,7 @@ export const BREAKAGE_URL = '/breakage';
 export const ALL_URL = '/all';
 export const DELETE_URL = '/delete';
 export const CURRENT_URL = '/current';
+export const EXECUTOR_URL = "/executor";
 
 export const DATE_FORMAT = 'dd-MM-yyyy HH:mm:ss';
 export const DEADLINE_DATE_FORMAT = 'dd-MM-yyyy';

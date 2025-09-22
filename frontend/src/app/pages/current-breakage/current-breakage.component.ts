@@ -277,6 +277,30 @@ export class CurrentBreakageComponent implements OnInit {
     this.deadline = this._datePipe.transform(event.value, 'yyyy-MM-dd');
     console.log(this.deadline)
   }
+
+  dropExecutor() {
+
+    this._breakageService.dropExecutor(this.breakageId)
+        .subscribe({
+          next: response => {
+            this.currentBreakage.breakageExecutor = 'Не назначен';
+            this.currentBreakage.breakageExecutorId = '';
+            this.currentBreakage.executorAppointedBy = 'Отсутствует';
+            this.breakageExecutor = 'Не назначен';
+            this.breakageExecutorId = '';
+            this.executorAppointedBy = 'Отсутствует';
+            this.deadline = null;
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+            this.currentBreakage.lastUpdatedBy = response.data;
+            this.currentBreakage.lastUpdatedDate = response.timestamp;
+          },
+          error: err => {
+            this.apiResponse = err.error;
+            this.deleteResponseMessage();
+          }
+        });
+  }
   // IN WRITE PROGRESS
 
   deleteResponseMessage() {

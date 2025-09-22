@@ -191,10 +191,11 @@ public class BreakageServiceImpl implements BreakageService {
             }
         }
         return ApiResponse.builder()
-                .message("Исполнитель заявки на неисправность был успешно назначен.")
+                .message("Исполнитель заявки на неисправность и срок исполнения были успешно назначены.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(now)
+                .data(SecurityUtil.getCurrentUsername())
                 .build();
     }
 
@@ -214,10 +215,11 @@ public class BreakageServiceImpl implements BreakageService {
         }
 
         return ApiResponse.builder()
-                .message("Исполнитель заявки на неисправность был успешно удален.")
+                .message("Исполнитель заявки на неисправность и срок исполнения были успешно удалены.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(now)
+                .data(SecurityUtil.getCurrentUsername())
                 .build();
     }
 

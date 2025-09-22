@@ -163,7 +163,7 @@
                         } @else {
                             <p class="text-xl font-medium mr-3 overflow-hidden text-nowrap">{{ breakageExecutor }}</p>
                         }
-                        
+
                     } @else {
                         <p class="text-xl font-medium mr-3 overflow-hidden text-nowrap">{{ breakageExecutor }}</p>
                     }
@@ -192,7 +192,10 @@
                 @if (userProfile.getUserProfile().isAdmin() && (status === 'NEW' || status === 'IN_PROGRESS')) {
                     <div class="flex w-4/12">
                         <div class="mr-8">
-                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">Сбросить</button>
+                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient" 
+                                    (click)="dropExecutor()"
+                                    >
+                                    Сбросить</button>
                         </div>
                         <div>
                             <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">Назначить</button>
