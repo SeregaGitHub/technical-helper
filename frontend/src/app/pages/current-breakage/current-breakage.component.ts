@@ -259,11 +259,8 @@ export class CurrentBreakageComponent implements OnInit {
 
   setExecutor(id: string, username: string) {
     console.log('setExecutor(): ');
-    const executor = new BreakageExecutor(id, username);
-    console.log(executor);
-    this.breakageExecutorId = executor.id;
-    this.breakageExecutor = executor.username;
-    //this.executorAppointedBy = 
+    this.breakageExecutorId = id;
+    this.breakageExecutor = username;
 
     if (this.breakageExecutorId != '') {
       console.log('ready for send request to backend');
@@ -280,16 +277,11 @@ export class CurrentBreakageComponent implements OnInit {
 
   dropExecutor() {
 
-    this._breakageService.dropExecutor(this.breakageId)
+    if (this.currentBreakage.breakageExecutorId != '') {
+      this._breakageService.dropExecutor(this.breakageId)
         .subscribe({
           next: response => {
-            this.currentBreakage.breakageExecutor = 'Не назначен';
-            this.currentBreakage.breakageExecutorId = '';
-            this.currentBreakage.executorAppointedBy = 'Отсутствует';
-            this.breakageExecutor = 'Не назначен';
-            this.breakageExecutorId = '';
-            this.executorAppointedBy = 'Отсутствует';
-            this.deadline = null;
+            this.dropExecutorVariables();
             this.apiResponse = response;
             this.deleteResponseMessage();
             this.currentBreakage.lastUpdatedBy = response.data;
@@ -300,10 +292,24 @@ export class CurrentBreakageComponent implements OnInit {
             this.deleteResponseMessage();
           }
         });
+    } else {
+        this.dropExecutorVariables();
+    }
   }
   // IN WRITE PROGRESS
 
-  deleteResponseMessage() {
+  private dropExecutorVariables() {
+      this.currentBreakage.breakageExecutor = 'Не назначен';
+      this.currentBreakage.breakageExecutorId = '';
+      this.currentBreakage.executorAppointedBy = 'Отсутствует';
+      this.currentBreakage.deadline = null;
+      this.breakageExecutor = 'Не назначен';
+      this.breakageExecutorId = '';
+      this.executorAppointedBy = 'Отсутствует';
+      this.deadline = null;
+  }
+
+  private deleteResponseMessage() {
     setTimeout(() => {
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
     }, 3000);

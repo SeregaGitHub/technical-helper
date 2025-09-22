@@ -161,42 +161,45 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional
     public ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto) {
-        if (appointBreakageExecutorDto.status() == Status.PAUSED ||
-            appointBreakageExecutorDto.status() == Status.REDIRECTED) {
-            throw new NotCorrectParameter("Заявке на неисправность со статусом \"В ожидании\" или " +
-                    "со статусом \"Передана\" - не может быть назначен исполнитель !!!");
-        }
+        if (appointBreakageExecutorDto.status() == Status.NEW ||
+            appointBreakageExecutorDto.status() == Status.IN_PROGRESS) {
 
-        LocalDateTime now = LocalDateTime.now().withNano(0);
-        LocalDate deadline = appointBreakageExecutorDto.deadline();
+            LocalDateTime now = LocalDateTime.now().withNano(0);
+            LocalDate deadline = appointBreakageExecutorDto.deadline();
 
-        if (deadline.isBefore(now.toLocalDate())) {
-            throw new NotCorrectParameter("Необходимо указать корректный срок исполнения заявки на неисправность.");
+            if (deadline.isBefore(now.toLocalDate())) {
+                throw new NotCorrectParameter("Необходимо указать корректный срок исполнения заявки на неисправность.");
+            } else {
+                int response;
+                try {
+                    response = breakageRepository.addBreakageExecutor(
+                            breakageId,
+                            appointBreakageExecutorDto.executor(),
+                            LocalDateTime.of(deadline, LocalTime.of(23, 59, 59)),
+                            SecurityUtil.getCurrentUserId(),
+                            now
+                    );
+                } catch (Exception e) {
+                    throw new NotFoundException("Пользователь, который назначается исполнителем заявки на неисправность, " +
+                            "не существует.");
+                }
+                if (response != 1) {
+                    throw new NotFoundException(BREAKAGE_NOT_EXIST);
+                }
+            }
+            return ApiResponse.builder()
+                    .message("Исполнитель заявки на неисправность и срок исполнения были успешно назначены.")
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
+                    .build();
         } else {
-            int response;
-            try {
-                response = breakageRepository.addBreakageExecutor(
-                        breakageId,
-                        appointBreakageExecutorDto.executor(),
-                        LocalDateTime.of(deadline, LocalTime.of(23, 59, 59)),
-                        SecurityUtil.getCurrentUserId(),
-                        now
-                );
-            } catch (Exception e) {
-                throw new NotFoundException("Пользователь, который назначается исполнителем заявки на неисправность, " +
-                        "не существует.");
-            }
-            if (response != 1) {
-                throw new NotFoundException(BREAKAGE_NOT_EXIST);
-            }
+            throw new NotCorrectParameter("Заявке на неисправность со статусами: \"В ожидании\", \"Передана\"" +
+                    ", \"Решена\" или \"Отменена\" - не может быть назначен исполнитель !!!");
         }
-        return ApiResponse.builder()
-                .message("Исполнитель заявки на неисправность и срок исполнения были успешно назначены.")
-                .status(200)
-                .httpStatus(HttpStatus.OK)
-                .timestamp(now)
-                .data(SecurityUtil.getCurrentUsername())
-                .build();
+
+
     }
 
     @Override
