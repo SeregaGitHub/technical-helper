@@ -176,7 +176,7 @@
                 </div>
 
                 <div class="flex justify-center items-center w-4/12 h-12">
-                    @if (userProfile.getUserProfile().isAdmin()) {
+                    @if (userProfile.getUserProfile().isAdmin() && (status === 'NEW' || status === 'IN_PROGRESS')) {
                         <mat-form-field class="example-full-width">
                             <mat-label>Срок исполнения</mat-label>
                             <input matInput 
@@ -240,7 +240,7 @@
         }
         <!-- IN WRITE PROGRESS -->
 
-        <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 overflow-hidden rounded text-xl font-semibold">
+        <div class="flex justify-center blue-to-black-gradient w-9/12 h-12 mt-4 overflow-hidden rounded text-xl font-semibold">
             <p class="m-auto whitespace-nowrap">Коментарии ( {{ commentsCount }} )</p>
         </div>
         <!-- <div>
