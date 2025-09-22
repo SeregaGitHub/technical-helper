@@ -41,7 +41,6 @@ import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular
     provideNativeDateAdapter(),
     DatePipe
   ],
-  //changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrentBreakageComponent implements OnInit {
 
@@ -71,8 +70,8 @@ export class CurrentBreakageComponent implements OnInit {
   private readonly _currentDay = new Date().getDate();
   readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
-  
-  //selectedDate = '2025-10-29';
+  comments!: [];
+  commentsCount!: number;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -100,7 +99,7 @@ export class CurrentBreakageComponent implements OnInit {
             next: data => {
               this.currentBreakage = data;
 
-              console.log(this.currentBreakage)
+              console.log(this.currentBreakage)  // NEED FOR DELETE
 
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
@@ -109,9 +108,9 @@ export class CurrentBreakageComponent implements OnInit {
               this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
               this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
-              //this.deadline = this.currentBreakage.deadline
+              this.comments = this.currentBreakage.comments;
+              this.commentsCount = this.comments.length;
               this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
-              console.log(this.deadline)
 
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
