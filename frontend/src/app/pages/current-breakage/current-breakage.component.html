@@ -193,12 +193,15 @@
                     <div class="flex w-4/12">
                         <div class="mr-8">
                             <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient" 
-                                    (click)="dropExecutor()"
+                                    (click)="dropBreakageExecutor()"
                                     >
                                     Сбросить</button>
                         </div>
                         <div>
-                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient">Назначить</button>
+                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient"
+                                    (click)="addBreakageExecutor()"
+                                    >
+                                    Назначить</button>
                         </div>
                     </div>
                 }

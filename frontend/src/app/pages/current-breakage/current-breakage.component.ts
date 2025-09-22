@@ -22,6 +22,7 @@ import { ConfirmFormComponent } from '../../components/confirm-form/confirm-form
 import { BreakageExecutor } from '../../model/user/breakage-executor';
 import { MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/datepicker';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { AppointBreakageExecutorDto } from '../../model/breakage/appoint-breakage-executor-dto';
 
 @Component({
   selector: 'app-current-breakage',
@@ -98,9 +99,6 @@ export class CurrentBreakageComponent implements OnInit {
           .subscribe({
             next: data => {
               this.currentBreakage = data;
-
-              console.log(this.currentBreakage)  // NEED FOR DELETE
-
               this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
@@ -111,7 +109,6 @@ export class CurrentBreakageComponent implements OnInit {
               this.comments = this.currentBreakage.comments;
               this.commentsCount = this.comments.length;
               this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
-
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
               if (this.status != Status.New) {
@@ -232,9 +229,7 @@ export class CurrentBreakageComponent implements OnInit {
         });
   }
 
-  // IN WRITE PROGRESS
   clickExecutor(): void {
-    console.log('clickExecutor()');
     
     this._breakageService.getAdminAndTechnicianList()
       .subscribe({
@@ -246,7 +241,6 @@ export class CurrentBreakageComponent implements OnInit {
             this.executors.push(new BreakageExecutor('', 'Не назначен'));
             this.executors = [...this.executors, ...data];
           }
-          console.log(this.executors);
         },
         error: err => {
           this.apiResponse = err;
@@ -258,30 +252,24 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   setExecutor(id: string, username: string) {
-    console.log('setExecutor(): ');
     this.breakageExecutorId = id;
     this.breakageExecutor = username;
-
-    if (this.breakageExecutorId != '') {
-      console.log('ready for send request to backend');
-    } else {
-      console.log('resetExecutor');
-    }
-
   }
 
   onDateChange(event: MatDatepickerInputEvent<Date>) {
     this.deadline = this._datePipe.transform(event.value, 'yyyy-MM-dd');
-    console.log(this.deadline)
   }
 
-  dropExecutor() {
+  addBreakageExecutor() {
 
-    if (this.currentBreakage.breakageExecutorId != '') {
-      this._breakageService.dropExecutor(this.breakageId)
+    if (this.breakageExecutorId != '' && this.deadline != null) {
+
+      const [year, month, day] = this.deadline.split('-');
+      const executor = new AppointBreakageExecutorDto(this.breakageExecutorId, new Date(+year, +month - 1, +day, 23, 59, 59), this.status);
+
+      this._breakageService.addBreakageExecutor(this.breakageId, executor)
         .subscribe({
           next: response => {
-            this.dropExecutorVariables();
             this.apiResponse = response;
             this.deleteResponseMessage();
             this.currentBreakage.lastUpdatedBy = response.data;
@@ -291,12 +279,27 @@ export class CurrentBreakageComponent implements OnInit {
             this.apiResponse = err.error;
             this.deleteResponseMessage();
           }
-        });
-    } else {
-        this.dropExecutorVariables();
+        })
     }
   }
-  // IN WRITE PROGRESS
+
+  dropBreakageExecutor() {
+
+    this._breakageService.dropExecutor(this.breakageId)
+      .subscribe({
+        next: response => {
+          this.dropExecutorVariables();
+          this.apiResponse = response;
+          this.deleteResponseMessage();
+          this.currentBreakage.lastUpdatedBy = response.data;
+          this.currentBreakage.lastUpdatedDate = response.timestamp;
+        },
+        error: err => {
+          this.apiResponse = err.error;
+          this.deleteResponseMessage();
+        }
+      });
+  }
 
   private dropExecutorVariables() {
       this.currentBreakage.breakageExecutor = 'Не назначен';

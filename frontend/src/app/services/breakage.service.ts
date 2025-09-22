@@ -10,6 +10,7 @@ import { Executor } from '../enum/executor.enum';
 import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
 import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-priority-dto';
 import { UpdateBreakageStatusDto } from '../model/breakage/update-breakage-status-dto';
+import { AppointBreakageExecutorDto } from '../model/breakage/appoint-breakage-executor-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -143,6 +144,24 @@ export class BreakageService {
       headers = headers.append(BREAKAGE_ID, id);
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', updateBreakageStatusDto, {headers})
+          .pipe(
+              tap((updatedBreakage) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [updatedBreakage, ...currentState.breakages]
+                });
+              })
+          );
+  }
+
+  addBreakageExecutor(breakageId: string, appointBreakageExecutorDto: AppointBreakageExecutorDto): Observable<any> {
+
+      let headers = HttpHeadersFactory.createPermanentHeaders();
+      headers = headers.append(BREAKAGE_ID, breakageId);
+
+      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL, appointBreakageExecutorDto, {headers})
           .pipe(
               tap((updatedBreakage) => {
                   const currentState = this.breakageSubject.value;
