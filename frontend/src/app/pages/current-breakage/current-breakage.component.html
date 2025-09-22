@@ -138,11 +138,14 @@
 
         </div>
 
-        <!-- IN WRITE PROGRESS -->
         @if (!userProfile.getUserProfile().isEmployee() && status != 'PAUSED' && status != 'REDIRECTED') {
             <div class="flex justify-between w-9/12 h-12 mt-6">
 
-                <div class="flex justify-start items-center w-4/12 h-12">
+                <div class="flex justify-start items-center h-12" 
+                     [ngClass]="userProfile.getUserProfile().isTechnician() || 
+                                status == 'SOLVED' || 
+                                status == 'CANCELLED' ? 'w-8/12' : 'w-4/12' "
+                     >
                     <p class="text-xl font-medium mr-3">Исполнитель:</p>
 
                     @if (userProfile.getUserProfile().isAdmin()) {
@@ -207,7 +210,6 @@
                 }
             </div>
         }
-        <!-- IN WRITE PROGRESS -->
 
         @if (!userProfile.getUserProfile().isEmployee() && status != 'PAUSED' && status != 'REDIRECTED') {
             <div class="flex justify-normal items-center w-9/12 h-12 overflow-hidden text-nowrap">               
