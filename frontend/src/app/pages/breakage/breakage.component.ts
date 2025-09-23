@@ -272,6 +272,8 @@ export class BreakageComponent implements OnInit, OnDestroy{
             this.breakages = data.content;
             this.dataSource = new MatTableDataSource(this.breakages);
             this.totalElements = data.totalElements;
+
+            console.log(data);
           },
           error: err => {
             this.getAllBreakagesError = err.error;

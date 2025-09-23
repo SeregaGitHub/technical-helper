@@ -246,7 +246,7 @@ public class BreakageServiceImpl implements BreakageService {
 
         if (currentUserRole == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
-            Page<BreakageDto> pageEmployeeBreakages;
+            Page<BreakageShortDto> pageEmployeeBreakages;
             if (searchText == null || searchText.length() < 3) {
                 pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakages(
                                 statusList, priorityList, currentUserDepartmentId, pageRequest);
@@ -258,7 +258,7 @@ public class BreakageServiceImpl implements BreakageService {
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
                 if (searchText == null || searchText.length() < 3) {
@@ -281,7 +281,7 @@ public class BreakageServiceImpl implements BreakageService {
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
                 if (searchText == null || searchText.length() < 3) {
@@ -303,7 +303,7 @@ public class BreakageServiceImpl implements BreakageService {
             return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (searchText == null || searchText.length() < 3) {
                 pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
                         statusList, priorityList, pageRequest);
@@ -314,7 +314,7 @@ public class BreakageServiceImpl implements BreakageService {
             return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else {
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
                 if (searchText == null || searchText.length() < 3) {
@@ -357,7 +357,6 @@ public class BreakageServiceImpl implements BreakageService {
         BreakageDto breakageDto = breakageRepository.getBreakage(breakageId).orElseThrow(
                 () -> new NotFoundException("Данная заявка на неисправность не существует.")
         );
-
         BreakageFullDto breakageFullDto;
         if (SecurityUtil.getCurrentUserRole().equals(Role.EMPLOYEE)) {
             breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, Collections.emptyList());
