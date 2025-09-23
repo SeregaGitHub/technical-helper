@@ -198,8 +198,6 @@ public class BreakageServiceImpl implements BreakageService {
             throw new NotCorrectParameter("Заявке на неисправность со статусами: \"В ожидании\", \"Передана\"" +
                     ", \"Решена\" или \"Отменена\" - не может быть назначен исполнитель !!!");
         }
-
-
     }
 
     @Override
@@ -256,7 +254,7 @@ public class BreakageServiceImpl implements BreakageService {
                 pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakagesByText(
                                 statusList, priorityList, currentUserDepartmentId, pageRequest, searchText);
             }
-            return AppPageMapper.toAppPage(pageEmployeeBreakages);
+            return AppPageMapper.toAppPage(pageEmployeeBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
@@ -279,7 +277,7 @@ public class BreakageServiceImpl implements BreakageService {
                             statusList, priorityList, pageRequest, currentUserId, searchText);
                 }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
@@ -302,7 +300,7 @@ public class BreakageServiceImpl implements BreakageService {
                             statusList, priorityList, pageRequest, currentUserId, searchText);
                 }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
             Page<BreakageDto> pageBreakages;
@@ -313,7 +311,7 @@ public class BreakageServiceImpl implements BreakageService {
                 pageBreakages = breakageRepository.getAllBreakagesByTextNoAppointed(
                         statusList, priorityList, pageRequest, searchText);
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else {
             Page<BreakageDto> pageBreakages;
@@ -337,7 +335,7 @@ public class BreakageServiceImpl implements BreakageService {
                             breakageRepository.getAllBreakagesByText(statusList, priorityList, pageRequest, searchText);
                 }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
         }
     }
 

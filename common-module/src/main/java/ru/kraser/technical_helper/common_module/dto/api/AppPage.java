@@ -14,6 +14,7 @@ public record AppPage(
         Integer pageSize,
         Long offset,
         boolean first,
-        boolean last
+        boolean last,
+        boolean isForEmployee
 ) {
 }

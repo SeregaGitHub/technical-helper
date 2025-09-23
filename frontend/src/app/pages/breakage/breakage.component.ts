@@ -100,17 +100,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
   intervalId: any;
 
-  public displayedColumns: string[] = [
-                                    'number', 
-                                    'departmentName', 
-                                    'room', 
-                                    'breakageTopic',
-                                    'status', 
-                                    'priority', 
-                                    'breakageExecutor', 
-                                    'createdBy',
-                                    'createdDate'
-                                  ];
+  public displayedColumns!: string[];
   public dataSource!: MatTableDataSource<Breakage>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -261,6 +251,24 @@ export class BreakageComponent implements OnInit, OnDestroy{
       )
         .subscribe({
           next: data => {
+
+            let displayedColumns: string[] = [
+                                    'number', 
+                                    'departmentName', 
+                                    'room', 
+                                    'breakageTopic',
+                                    'status', 
+                                    'priority', 
+                                    'breakageExecutor', 
+                                    'createdBy',
+                                    'createdDate'
+                                  ];
+
+            if (data.isForEmployee) {
+              displayedColumns.splice(5, 1);
+            }
+
+            this.displayedColumns = displayedColumns;
             this.breakages = data.content;
             this.dataSource = new MatTableDataSource(this.breakages);
             this.totalElements = data.totalElements;
