@@ -32,7 +32,6 @@ import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_COMMENT_NOT_EXIST;
@@ -339,17 +338,13 @@ public class BreakageServiceImpl implements BreakageService {
         }
     }
 
-    /*@Override
+    @Override
     @Transactional(readOnly = true)
-    public AppPage getBreakagesByText(
-            String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
-
-        PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
-
-        Page<BreakageDto> pageBreakages = breakageRepository.getBreakagesByText(text, pageRequest);
-
-        return AppPageMapper.toAppPage(pageBreakages);
-    }*/
+    public BreakageEmployeeDto getBreakageEmployee(String breakageId) {
+        return breakageRepository.getBreakageEmployee(breakageId).orElseThrow(
+                () -> new NotFoundException("Данная заявка на неисправность не существует.")
+        );
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -358,12 +353,9 @@ public class BreakageServiceImpl implements BreakageService {
                 () -> new NotFoundException("Данная заявка на неисправность не существует.")
         );
         BreakageFullDto breakageFullDto;
-        if (SecurityUtil.getCurrentUserRole().equals(Role.EMPLOYEE)) {
-            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, Collections.emptyList());
-        } else {
-            List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
-            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
-        }
+
+        List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
+        breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
 
         return breakageFullDto;
     }
@@ -420,5 +412,4 @@ public class BreakageServiceImpl implements BreakageService {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
     }
-
 }

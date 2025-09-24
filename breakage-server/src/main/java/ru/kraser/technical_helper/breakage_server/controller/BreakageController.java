@@ -122,25 +122,16 @@ public class BreakageController {
         return appPage;
     }
 
-    /*@GetMapping(path = EMPLOYEE_URL + "/{text}")
-    @ResponseStatus(HttpStatus.OK)
-    public AppPage getBreakagesByText(@PathVariable("text") String text,
-                                      @RequestParam(value = "pageSize", defaultValue = "10")
-                                      Integer pageSize,
-                                      @RequestParam(value = "pageIndex", defaultValue = "0")
-                                      Integer pageIndex,
-                                      @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
-                                      String sortBy,
-                                      @RequestParam(value = "direction", defaultValue = "DESC")
-                                      String direction
-    ) {
-        log.info("Getting Breakages by text");
-        AppPage appPage = breakageService.getBreakagesByText(text, pageIndex, pageSize, sortBy, direction);
-        log.info("Breakages contains text, received successfully");
-        return appPage;
-    }*/
-
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public BreakageEmployeeDto getBreakageEmployee(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Getting Breakage for Employee with Id={}", breakageId);
+        BreakageEmployeeDto breakageEmployeeDto = breakageService.getBreakageEmployee(breakageId);
+        log.info("Breakage for Employee with Id={}, received successfully", breakageId);
+        return breakageEmployeeDto;
+    }
+
+    @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public BreakageFullDto getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);

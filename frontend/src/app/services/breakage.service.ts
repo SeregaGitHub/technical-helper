@@ -93,7 +93,7 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
       
-      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
+      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL, {headers})
           .pipe(
               tap((breakage) => {
                   const currentState = this.breakageSubject.value;

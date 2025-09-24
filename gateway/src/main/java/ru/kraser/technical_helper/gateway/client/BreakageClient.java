@@ -101,22 +101,19 @@ public class BreakageClient extends BaseClient {
         );
     }
 
-    /*public AppPage getBreakagesByText(
-            String jwt, String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
-        return super.getAllByText(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + text,
+    public BreakageEmployeeDto getBreakageEmployee(String jwt, String breakageHeaderName, String breakageId) {
+        return super.get(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL,
                 jwt,
-                pageIndex,
-                pageSize,
-                sortBy,
-                direction,
-                ParameterizedTypeReference.forType(AppPage.class)
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(BreakageEmployeeDto.class)
         );
-    }*/
+    }
 
     public BreakageFullDto getBreakage(String jwt, String breakageHeaderName, String breakageId) {
         return super.get(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL,
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL,
                 jwt,
                 breakageHeaderName,
                 breakageId,

@@ -140,6 +140,16 @@ public class BreakageGatewayController {
 
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
+    public BreakageEmployeeDto getBreakageEmployee(@RequestHeader(AUTH_HEADER) String jwt,
+                                       @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Getting Breakage by Employee with Id={}", breakageId);
+        BreakageEmployeeDto response = breakageClient.getBreakageEmployee(jwt, BREAKAGE_ID_HEADER, breakageId);
+        log.info("Breakage for Employee with Id={}, received successfully", breakageId);
+        return response;
+    }
+
+    @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
+    @ResponseStatus(HttpStatus.OK)
     public BreakageFullDto getBreakage(@RequestHeader(AUTH_HEADER) String jwt,
                                        @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);
@@ -147,24 +157,6 @@ public class BreakageGatewayController {
         log.info("Breakage with Id={}, received successfully", breakageId);
         return response;
     }
-
-/*    @GetMapping(path = EMPLOYEE_URL + "/{text}")
-    @ResponseStatus(HttpStatus.OK)
-    public AppPage getBreakagesByText(@RequestHeader(AUTH_HEADER) String jwt,
-                                      @PathVariable("text") String text,
-                                      @RequestParam(value = "pageSize", defaultValue = "10")
-                                          Integer pageSize,
-                                      @RequestParam(value = "pageIndex", defaultValue = "0")
-                                          Integer pageIndex,
-                                      @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
-                                          String sortBy,
-                                      @RequestParam(value = "direction", defaultValue = "DESC")
-                                          String direction) {
-        log.info("Getting Breakages by text");
-        AppPage response = breakageClient.getBreakagesByText(jwt, text, pageIndex, pageSize, sortBy, direction);
-        log.info("Breakages contains text, received successfully");
-        return response;
-    }*/
 
     // BREAKAGE_COMMENT
     @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
