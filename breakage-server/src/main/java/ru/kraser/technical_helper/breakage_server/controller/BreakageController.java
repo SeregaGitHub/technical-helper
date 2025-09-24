@@ -133,11 +133,11 @@ public class BreakageController {
 
     @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public BreakageFullDto getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+    public ApiResponse getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);
-        BreakageFullDto breakageFullDto = breakageService.getBreakage(breakageId);
+        ApiResponse response = breakageService.getBreakage(breakageId);
         log.info("Breakage with Id={}, received successfully", breakageId);
-        return breakageFullDto;
+        return response;
     }
 
     // BREAKAGE_COMMENT

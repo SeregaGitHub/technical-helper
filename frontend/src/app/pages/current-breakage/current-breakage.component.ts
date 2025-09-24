@@ -66,6 +66,7 @@ export class CurrentBreakageComponent implements OnInit {
   breakageExecutor!: string;
   executorAppointedBy!: string;
   deadline!: string | null;
+  now!: string | null;
   isOverdue: boolean = false;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
@@ -126,8 +127,8 @@ export class CurrentBreakageComponent implements OnInit {
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
           .subscribe({
-            next: data => {
-              this.currentBreakage = data;
+            next: response => {
+              this.currentBreakage = response.data;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
@@ -138,6 +139,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.comments = this.currentBreakage.comments;
               this.commentsCount = this.comments.length;
               this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
+              this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
               if (this.status != Status.New) {
@@ -362,19 +364,22 @@ export class CurrentBreakageComponent implements OnInit {
   };
 
   private isBreakageOverdue() {
-    if (this.breakageExecutorId != '' && this.deadline != null && (this.status === Status.New || this.status === Status.InProgress)) {
-      const now = new Date();
-      const [year, month, day] = this.deadline.substring(0, 10).split('-');
-      const deadline = new Date(+year, +month - 1, +day, 23, 59, 59);
+    if (this.breakageExecutorId != '' && 
+        this.deadline != null && 
+        this.now != null && 
+        (this.status === Status.New || this.status === Status.InProgress)) {
+
+      const [nowYear, nowMonth, nowDay] = this.now.substring(0, 10).split('-');
+      const now = new Date(+nowYear, +nowMonth - 1, +nowDay, 23, 59, 59);
+
+      const [deadlineyear, deadlineMonth, deadlineDay] = this.deadline.substring(0, 10).split('-');
+      const deadline = new Date(+deadlineyear, +deadlineMonth - 1, +deadlineDay, 23, 59, 59);
+
       if (deadline < now) {
         this.isOverdue = true;
       } else {
         this.isOverdue = false;
       }
-      console.log('=====================================================');
-      console.log(deadline);
-      console.log(deadline < now);
-      console.log('=====================================================');
     }
   }
 

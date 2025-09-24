@@ -150,10 +150,10 @@ public class BreakageGatewayController {
 
     @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public BreakageFullDto getBreakage(@RequestHeader(AUTH_HEADER) String jwt,
+    public ApiResponse getBreakage(@RequestHeader(AUTH_HEADER) String jwt,
                                        @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);
-        BreakageFullDto response = breakageClient.getBreakage(jwt, BREAKAGE_ID_HEADER, breakageId);
+        ApiResponse response = breakageClient.getBreakage(jwt, BREAKAGE_ID_HEADER, breakageId);
         log.info("Breakage with Id={}, received successfully", breakageId);
         return response;
     }

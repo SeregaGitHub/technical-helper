@@ -111,13 +111,13 @@ public class BreakageClient extends BaseClient {
         );
     }
 
-    public BreakageFullDto getBreakage(String jwt, String breakageHeaderName, String breakageId) {
+    public ApiResponse getBreakage(String jwt, String breakageHeaderName, String breakageId) {
         return super.get(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL,
                 jwt,
                 breakageHeaderName,
                 breakageId,
-                ParameterizedTypeReference.forType(BreakageFullDto.class)
+                ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 

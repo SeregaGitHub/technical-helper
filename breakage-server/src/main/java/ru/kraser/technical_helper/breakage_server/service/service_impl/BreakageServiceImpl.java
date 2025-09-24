@@ -348,7 +348,7 @@ public class BreakageServiceImpl implements BreakageService {
 
     @Override
     @Transactional(readOnly = true)
-    public BreakageFullDto getBreakage(String breakageId) {
+    public ApiResponse getBreakage(String breakageId) {
         BreakageDto breakageDto = breakageRepository.getBreakage(breakageId).orElseThrow(
                 () -> new NotFoundException("Данная заявка на неисправность не существует.")
         );
@@ -357,7 +357,13 @@ public class BreakageServiceImpl implements BreakageService {
         List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
         breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
 
-        return breakageFullDto;
+        return ApiResponse.builder()
+                .message("Заявка на неисправность с ID=" + breakageId + ", получена успешно")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .data(breakageFullDto)
+                .build();
     }
 
     // BREAKAGE_COMMENT

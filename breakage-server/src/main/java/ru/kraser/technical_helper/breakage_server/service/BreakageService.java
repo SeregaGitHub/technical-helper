@@ -28,7 +28,7 @@ public interface BreakageService {
 
     BreakageEmployeeDto getBreakageEmployee(String breakageId);
 
-    BreakageFullDto getBreakage(String breakageId);
+    ApiResponse getBreakage(String breakageId);
 
     // BREAKAGE_COMMENT
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
