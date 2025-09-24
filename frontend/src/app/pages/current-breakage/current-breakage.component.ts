@@ -48,10 +48,13 @@ export class CurrentBreakageComponent implements OnInit {
   statusMap = EnumViewFactory.getStatusViews();
   priorityMap = EnumViewFactory.getPriorityViews();
 
+  sub: any;
+  emplSub: any;
+  isEmployee!: boolean;
+
   currentBreakage: any;
   dateFormat = DATE_FORMAT;
   deadlineDateFormat = DEADLINE_DATE_FORMAT;
-  sub: any;
   breakageId: string = '';
   priority!: Priority;
   priorities = EnumViewFactory.getPriorities();
@@ -93,18 +96,41 @@ export class CurrentBreakageComponent implements OnInit {
 
     this.sub = this._activatedRoute.params.subscribe(params => {
       this.breakageId = params['id'];
-      
+
+    this.emplSub = this._activatedRoute.queryParams.subscribe(queryParams => {
+      this.isEmployee = queryParams['isEmployee'];
+    })
+
+    if (this.isEmployee) {
+
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
           .subscribe({
             next: data => {
               this.currentBreakage = data;
-              this.priority = this.currentBreakage.priority;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
-              this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
-              this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
               this.breakageExecutor = this.currentBreakage.breakageExecutor;
+              
+              this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
+            },
+            error: err => {
+              this.apiResponse = err;
+            }
+          });
+    } else {
+
+      this.currentBreakage = this._breakageService
+        .getBreakageById(this.breakageId)
+          .subscribe({
+            next: data => {
+              this.currentBreakage = data;
+              this.status = this.currentBreakage.status;
+              this.bufferStatus = this.status;
+              this.breakageExecutor = this.currentBreakage.breakageExecutor;
+              
+              this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
+              this.priority = this.currentBreakage.priority;
               this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
               this.comments = this.currentBreakage.comments;
               this.commentsCount = this.comments.length;
@@ -119,6 +145,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.apiResponse = err;
             }
           });
+    } 
     })
   };
 

@@ -284,8 +284,10 @@ export class BreakageComponent implements OnInit, OnDestroy{
         })
   };
 
-  getBreakageById(id: string) {
-    this._router.navigate(["/breakage/" + id]);
+  getBreakageById(id: string, isEmpl: boolean) {
+    this._router.navigate(["/breakage/" + id], {
+      queryParams: { isEmployee: isEmpl ? 'true' : 'false' }
+    });
   };
 
 }
