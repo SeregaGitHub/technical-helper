@@ -66,7 +66,7 @@ export class CurrentBreakageComponent implements OnInit {
   breakageExecutor!: string;
   executorAppointedBy!: string;
   deadline!: string | null;
-  //isOverdue: boolean = false;
+  isOverdue: boolean = false;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
@@ -143,6 +143,8 @@ export class CurrentBreakageComponent implements OnInit {
               if (this.status != Status.New) {
                 this.statuses.splice(0, 1);
               }
+
+              this.isBreakageOverdue();
             },
             error: err => {
               this.apiResponse = err;
@@ -218,6 +220,7 @@ export class CurrentBreakageComponent implements OnInit {
         .subscribe({
           next: response => {
             this.status = Status.Cancelled;
+            this.isOverdue = false;
             this.apiResponse = response;
             this.deleteResponseMessage();
             this.bufferStatus = this.status;
@@ -244,11 +247,15 @@ export class CurrentBreakageComponent implements OnInit {
             this.currentBreakage.lastUpdatedBy = response.data;
             this.currentBreakage.lastUpdatedDate = response.timestamp;
             if (status === Status.Paused || status === Status.Redirected) {
+              this.isOverdue = false;
+              this.deadline = null;
               this.breakageExecutorId = '';
               this.breakageExecutor = 'Не назначен';
               this.executorAppointedBy = 'Отсутствует';
               this.executors.splice(0);
               this.executors.push(new BreakageExecutor('', 'Не назначен'));
+            } else if (status === Status.Solved || status === Status.Cancelled) {
+                this.isOverdue = false;
             }
           },
           error: err => {
@@ -302,6 +309,7 @@ export class CurrentBreakageComponent implements OnInit {
         .subscribe({
           next: response => {
             this.apiResponse = response;
+            this.isOverdue = false;
             this.deleteResponseMessage();
             this.currentBreakage.lastUpdatedBy = response.data;
             this.currentBreakage.lastUpdatedDate = response.timestamp;
@@ -342,6 +350,7 @@ export class CurrentBreakageComponent implements OnInit {
       this.executorAppointedBy = 'Отсутствует';
       this.deadline = null;
       this.readyForAppoint = false;
+      this.isOverdue = false;
   }
 
   private setReadyForAppoint() {
@@ -351,6 +360,23 @@ export class CurrentBreakageComponent implements OnInit {
       this.readyForAppoint = false;
     }
   };
+
+  private isBreakageOverdue() {
+    if (this.breakageExecutorId != '' && this.deadline != null && (this.status === Status.New || this.status === Status.InProgress)) {
+      const now = new Date();
+      const [year, month, day] = this.deadline.substring(0, 10).split('-');
+      const deadline = new Date(+year, +month - 1, +day, 23, 59, 59);
+      if (deadline < now) {
+        this.isOverdue = true;
+      } else {
+        this.isOverdue = false;
+      }
+      console.log('=====================================================');
+      console.log(deadline);
+      console.log(deadline < now);
+      console.log('=====================================================');
+    }
+  }
 
   private deleteResponseMessage() {
     setTimeout(() => {

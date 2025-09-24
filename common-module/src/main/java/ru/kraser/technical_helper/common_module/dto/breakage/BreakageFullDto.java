@@ -11,25 +11,25 @@ import java.util.List;
 
 @Builder
 public record BreakageFullDto(
-        String id,                         // for employee +
+        String id,
         String departmentId,
         String breakageExecutorId,
-        String departmentName,             // for employee +
-        String room,                       // for employee +
-        String breakageTopic,              // for employee +
-        String breakageText,               // for employee +
-        Status status,                     // for employee +
-        Priority priority,                 // +
-        String breakageExecutor,           // +
-        String executorAppointedBy,        // +
-        String createdBy,                  // for employee +
+        String departmentName,
+        String room,
+        String breakageTopic,
+        String breakageText,
+        Status status,
+        Priority priority,
+        String breakageExecutor,
+        String executorAppointedBy,
+        String createdBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime createdDate,         // for employee +
-        String lastUpdatedBy,              // +
+        LocalDateTime createdDate,
+        String lastUpdatedBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime lastUpdatedDate,     // +
+        LocalDateTime lastUpdatedDate,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime deadline,            // +
-        List<BreakageCommentFrontDto> comments  // +
+        LocalDateTime deadline,
+        List<BreakageCommentFrontDto> comments
 ) {
 }

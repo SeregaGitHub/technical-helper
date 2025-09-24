@@ -146,7 +146,7 @@
                                 status == 'SOLVED' || 
                                 status == 'CANCELLED' ? 'w-8/12' : 'w-4/12' "
                      >
-                    <p class="text-xl font-medium mr-3">Исполнитель:</p>
+                    <p class="text-xl font-medium mr-3" [ngClass]="{'colorRed': isOverdue}">Исполнитель:</p>
 
                     @if (userProfile.getUserProfile().isAdmin()) {
                     
@@ -175,7 +175,7 @@
                 <div class="flex justify-center items-center w-4/12 h-12">
                     @if (userProfile.getUserProfile().isAdmin() && (status === 'NEW' || status === 'IN_PROGRESS')) {
                         <mat-form-field class="example-full-width">
-                            <mat-label>Срок исполнения</mat-label>
+                            <mat-label [ngClass]="{'colorRed': isOverdue}">Срок исполнения</mat-label>
                             <input matInput 
                                    [min]="minDate" 
                                    [max]="maxDate" 
@@ -187,7 +187,7 @@
                             <mat-datepicker #picker></mat-datepicker>
                         </mat-form-field>
                     } @else if (!userProfile.getUserProfile().isEmployee() && deadline != null) {
-                        <p class="text-xl font-medium mr-3">Срок исполнения:</p>
+                        <p class="text-xl font-medium mr-3" [ngClass]="{'colorRed': isOverdue}">Срок исполнения:</p>
                         <p class="text-xl font-medium mr-3">{{ deadline | date: deadlineDateFormat }}</p>
                     }
                 </div>
