@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @SuperBuilder
 @Data
-public class BreakageShortDto {
+public class BreakageEmployeeDto {
     private String id;
     private String departmentId;
     private String departmentName;

@@ -70,6 +70,24 @@ export class BreakageService {
       );
   };
 
+  getBreakageEmployeeById(id: string): Observable<any> {
+      
+      let headers = HttpHeadersFactory.createPermanentHeaders();
+      headers = headers.append(BREAKAGE_ID, id);
+      
+      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
+          .pipe(
+              tap((breakage) => {
+                  const currentState = this.breakageSubject.value;
+      
+                  this.breakageSubject.next({...currentState, 
+                  breakages:
+                  [breakage, ...currentState.breakages] 
+                });
+              })
+          );
+  };
+
   getBreakageById(id: string): Observable<any> {
       
       let headers = HttpHeadersFactory.createPermanentHeaders();

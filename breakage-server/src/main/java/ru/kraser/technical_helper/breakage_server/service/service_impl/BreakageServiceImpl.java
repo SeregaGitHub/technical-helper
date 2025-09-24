@@ -246,7 +246,7 @@ public class BreakageServiceImpl implements BreakageService {
 
         if (currentUserRole == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
-            Page<BreakageShortDto> pageEmployeeBreakages;
+            Page<BreakageEmployeeDto> pageEmployeeBreakages;
             if (searchText == null || searchText.length() < 3) {
                 pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakages(
                                 statusList, priorityList, currentUserDepartmentId, pageRequest);

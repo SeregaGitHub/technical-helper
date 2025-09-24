@@ -90,21 +90,22 @@ export class CurrentBreakageComponent implements OnInit {
 
     this._locale.set('ru');
     this._adapter.setLocale(this._locale());
+
+    this.sub = this._activatedRoute.params.subscribe(params => {
+      this.breakageId = params['id'];
+    });
+
+    this.emplSub = this._activatedRoute.queryParams.subscribe(queryParams => {
+      this.isEmployee = JSON.parse(queryParams['isEmployee'].toLowerCase());
+    });
   }
   
   ngOnInit(): void {
 
-    this.sub = this._activatedRoute.params.subscribe(params => {
-      this.breakageId = params['id'];
-
-    this.emplSub = this._activatedRoute.queryParams.subscribe(queryParams => {
-      this.isEmployee = queryParams['isEmployee'];
-    })
-
     if (this.isEmployee) {
 
       this.currentBreakage = this._breakageService
-        .getBreakageById(this.breakageId)
+        .getBreakageEmployeeById(this.breakageId)
           .subscribe({
             next: data => {
               this.currentBreakage = data;
@@ -146,7 +147,6 @@ export class CurrentBreakageComponent implements OnInit {
             }
           });
     } 
-    })
   };
 
   setPriority(priority: Priority) {

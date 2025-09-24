@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.BreakageShortDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageEmployeeDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageTechDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Repository
 public interface BreakageRepository extends JpaRepository<Breakage, String> {
 
-    String GET_EMPLOYEE_BREAKAGE = "SELECT new ru.kraser.technical_helper.common_module.dto.breakage.BreakageShortDto " +
+    String GET_EMPLOYEE_BREAKAGE = "SELECT new ru.kraser.technical_helper.common_module.dto.breakage.BreakageEmployeeDto " +
             "(b.id, d.id AS departmentId, " +
             "d.name, b.room, b.breakageTopic, b.breakageText, b.status, " +
             "COALESCE (ue.username, 'Не назначен') AS breakageExecutor, " +
@@ -144,8 +144,8 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     @Query(
             value = GET_ALL_EMPLOYEE_BREAKAGES + " AND d.id = :currentUserDepartmentId"
     )
-    Page<BreakageShortDto> getAllEmployeeBreakages(List<Status> statusList, List<Priority> priorityList,
-                                                   String currentUserDepartmentId, PageRequest pageRequest);
+    Page<BreakageEmployeeDto> getAllEmployeeBreakages(List<Status> statusList, List<Priority> priorityList,
+                                                      String currentUserDepartmentId, PageRequest pageRequest);
 
     /*@Query(
             value = GET_ALL_BREAKAGES + " AND d.id = :currentUserDepartmentId AND b.breakageText ILIKE %:searchText%"
@@ -157,9 +157,9 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     @Query(
             value = GET_ALL_EMPLOYEE_BREAKAGES + " AND d.id = :currentUserDepartmentId AND b.breakageText ILIKE %:searchText%"
     )
-    Page<BreakageShortDto> getAllEmployeeBreakagesByText(List<Status> statusList, List<Priority> priorityList,
-                                                         String currentUserDepartmentId, PageRequest pageRequest,
-                                                         String searchText);
+    Page<BreakageEmployeeDto> getAllEmployeeBreakagesByText(List<Status> statusList, List<Priority> priorityList,
+                                                            String currentUserDepartmentId, PageRequest pageRequest,
+                                                            String searchText);
 
     @Query(
             value = GET_ALL_BREAKAGES + " AND b.executor.id = :currentUserId"
@@ -259,12 +259,12 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
     Page<BreakageDto> getBreakagesByText(String text, PageRequest pageRequest);*/
 
     @Query(
-            value = GET_BREAKAGE + " WHERE b.id = :breakageId"
+            value = GET_FULL_BREAKAGE + " WHERE b.id = :breakageId"
     )
     Optional<BreakageDto> getBreakage(String breakageId);
 
     @Query(
             value = GET_EMPLOYEE_BREAKAGE + " WHERE b.id = :breakageId"
     )
-    Optional<BreakageShortDto> getBreakageEmployee(String breakageId);
+    Optional<BreakageEmployeeDto> getBreakageEmployee(String breakageId);
 }
