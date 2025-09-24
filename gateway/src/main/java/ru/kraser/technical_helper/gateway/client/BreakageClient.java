@@ -121,6 +121,7 @@ public class BreakageClient extends BaseClient {
         );
     }
 
+    // BREAKAGE_COMMENT
     public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
                                              String breakageHeaderName, String breakageId, String jwt) {
         return super.post(

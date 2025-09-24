@@ -66,6 +66,7 @@ export class CurrentBreakageComponent implements OnInit {
   breakageExecutor!: string;
   executorAppointedBy!: string;
   deadline!: string | null;
+  //isOverdue: boolean = false;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
@@ -76,6 +77,7 @@ export class CurrentBreakageComponent implements OnInit {
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
   comments!: [];
   commentsCount!: number;
+  readyForAppoint: boolean = false;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -281,10 +283,12 @@ export class CurrentBreakageComponent implements OnInit {
   setExecutor(id: string, username: string) {
     this.breakageExecutorId = id;
     this.breakageExecutor = username;
+    this.setReadyForAppoint();
   }
 
   onDateChange(event: MatDatepickerInputEvent<Date>) {
     this.deadline = this._datePipe.transform(event.value, 'yyyy-MM-dd');
+    this.setReadyForAppoint();
   }
 
   addBreakageExecutor() {
@@ -337,7 +341,16 @@ export class CurrentBreakageComponent implements OnInit {
       this.breakageExecutorId = '';
       this.executorAppointedBy = 'Отсутствует';
       this.deadline = null;
+      this.readyForAppoint = false;
   }
+
+  private setReadyForAppoint() {
+    if (this.breakageExecutorId != '' && this.deadline != null) {
+      this.readyForAppoint = true;
+    } else {
+      this.readyForAppoint = false;
+    }
+  };
 
   private deleteResponseMessage() {
     setTimeout(() => {
