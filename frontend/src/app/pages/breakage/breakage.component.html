@@ -88,7 +88,7 @@
                     }
                     
                 </mat-label>
-                    <input matInput (keyup)="applyFilter($event)" #input>
+                    <input matInput (keyup)="applyFilter($event)" #input [(ngModel)]="searchText">
             </mat-form-field>
 
             <div [ngClass]="getAllBreakagesError.status < 400 ? 'hide' : 'pb-4' ">
