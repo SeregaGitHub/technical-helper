@@ -177,7 +177,8 @@
                     <ng-container matColumnDef="breakageExecutor">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ breakageExecutor }} </th>
                         <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line"
-                        [ngClass]="{'colorRed': !userProfile.getUserProfile().isEmployee() && 
+                        [ngClass]="{'colorRed': !userProfile.getUserProfile().isEmployee() &&
+                                                (element.status === 'NEW' || element.status === 'IN_PROGRESS') && 
                                                 element.deadline != null &&
                                                 now != null &&
                                                 element.deadline < now }"
