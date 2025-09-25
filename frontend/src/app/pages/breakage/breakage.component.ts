@@ -87,6 +87,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
   executor = Executor.All; 
   deadline = false;
+  now!: Date | null;
 
   searchText = '';
 
@@ -270,8 +271,16 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
             this.displayedColumns = displayedColumns;
             this.breakages = data.content;
+            this.stringToDate(this.breakages);
             this.dataSource = new MatTableDataSource(this.breakages);
             this.totalElements = data.totalElements;
+
+            if (data.now != null) {
+              const [nowYear, nowMonth, nowDay] = data.now.substring(0, 10).split('-');
+              this.now = new Date(+nowYear, +nowMonth - 1, +nowDay, 23, 59, 59);
+            } else {
+              this.now = null;
+            }
           },
           error: err => {
             this.getAllBreakagesError = err.error;
@@ -288,4 +297,17 @@ export class BreakageComponent implements OnInit, OnDestroy{
     });
   };
 
+  private stringToDate(dataContent: any) {
+    dataContent.forEach((breakage: any) => { 
+      breakage.deadline = this.convertToDate(breakage.deadline) }); 
+  }
+
+  private convertToDate(str: string): Date | null {
+    if (str != null) {
+      const [month, day, year] = str.substring(0, 10).split('-');
+      return new Date(+year, +month - 1, +day, 23, 59, 59);
+    } else {
+      return null;
+    }
+  }
 }

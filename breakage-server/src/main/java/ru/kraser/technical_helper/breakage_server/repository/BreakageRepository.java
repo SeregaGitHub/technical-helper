@@ -36,7 +36,7 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
             "(b.id, d.id AS departmentId, " +
             "d.name, b.room, b.breakageTopic, b.breakageText, b.status, b.priority, " +
             "COALESCE (ue.username, 'Не назначен') AS breakageExecutor, " +
-            "uc.username AS createdBy, b.createdDate) " +
+            "uc.username AS createdBy, b.createdDate, b.deadline) " +
             "FROM Breakage as b " +
             "LEFT JOIN FETCH User as ue ON ue.id = b.executor.id " +
             "JOIN FETCH User as uc ON uc.id = b.createdBy " +

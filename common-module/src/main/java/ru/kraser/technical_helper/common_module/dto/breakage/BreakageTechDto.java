@@ -20,6 +20,8 @@ public record BreakageTechDto(
         String breakageExecutor,
         String createdBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime createdDate
+        LocalDateTime createdDate,
+        @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+        LocalDateTime deadline
 ) {
 }

@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.enums.Role;
 
+import java.time.LocalDateTime;
+
 @UtilityClass
 public class AppPageMapper {
 
@@ -23,6 +25,7 @@ public class AppPageMapper {
                 .first(page.isFirst())
                 .last(page.isLast())
                 .isForEmployee(isForEmployee)
+                .now(isForEmployee ? null : LocalDateTime.now().withNano(0))
                 .build();
     }
 }
