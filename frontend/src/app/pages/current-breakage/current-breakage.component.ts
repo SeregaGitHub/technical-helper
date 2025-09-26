@@ -128,6 +128,9 @@ export class CurrentBreakageComponent implements OnInit {
         .getBreakageById(this.breakageId)
           .subscribe({
             next: response => {
+
+              console.log(response);
+
               this.currentBreakage = response.data;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;

@@ -40,10 +40,8 @@ public class BreakageMapper {
         return breakage;
     }
 
-    public BreakageFullDto toBreakageFullDto(
-            BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments) {
+    public BreakageFullDto toBreakageFullDto(BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments) {
         String currentUserId = SecurityUtil.getCurrentUserId();
-
         List<BreakageCommentFrontDto> comments = backComments.stream()
                 .map(comment -> toFrontCommentDto(comment, currentUserId))
                 .toList();
@@ -76,6 +74,9 @@ public class BreakageMapper {
                 .id(backendDto.id())
                 .comment(backendDto.comment())
                 .actionEnabled(actionEnabled)
+                .creatorName(backendDto.creatorName())
+                .createdDate(backendDto.createdDate())
+                .lastUpdatedDate(backendDto.lastUpdatedDate())
                 .build();
     }
 }
