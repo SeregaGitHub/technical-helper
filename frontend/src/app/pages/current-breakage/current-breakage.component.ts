@@ -23,6 +23,8 @@ import { BreakageExecutor } from '../../model/user/breakage-executor';
 import { MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/datepicker';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { AppointBreakageExecutorDto } from '../../model/breakage/appoint-breakage-executor-dto';
+import { BreakageComment } from '../../model/breakage/breakage-comment';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-current-breakage',
@@ -34,7 +36,8 @@ import { AppointBreakageExecutorDto } from '../../model/breakage/appoint-breakag
     MatSelectModule,
     FormsModule,
     MatIconModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatTableModule
   ],
   templateUrl: './current-breakage.component.html',
   styleUrl: './current-breakage.component.css',
@@ -76,12 +79,22 @@ export class CurrentBreakageComponent implements OnInit {
   private readonly _currentDay = new Date().getDate();
   readonly minDate = new Date(this._currentYear, this._currentMonth, this._currentDay);
   readonly maxDate = new Date(this._currentYear + 1, this._currentMonth, this._currentDay);
-  comments!: [];
+  comments: any;
   commentsCount!: number;
   readyForAppoint: boolean = false;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+
+  number = '№';
+  comment = 'Комментарий';
+  creatorName = 'Создан';
+  createdDate = 'Создано';
+  lastUpdatedDate = 'Обновлено';
+  actions = 'Действия';
+
+  public displayedColumns: string[] = [ 'number', 'comment', 'creatorName', 'createdDate', 'lastUpdatedDate', 'actions' ];
+  public dataSource!: MatTableDataSource<BreakageComment>;
 
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
@@ -129,7 +142,7 @@ export class CurrentBreakageComponent implements OnInit {
           .subscribe({
             next: response => {
 
-              console.log(response);
+              console.log(response);  // NEED FOR DELETE
 
               this.currentBreakage = response.data;
               this.status = this.currentBreakage.status;
@@ -141,6 +154,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
               this.comments = this.currentBreakage.comments;
               this.commentsCount = this.comments.length;
+              this.dataSource = new MatTableDataSource(this.comments);
               this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
               this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
@@ -390,6 +404,22 @@ export class CurrentBreakageComponent implements OnInit {
     setTimeout(() => {
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
     }, 3000);
+  };
+
+  createComment() {
+    console.log('createComment()');
+  };
+
+  updateComment(id: string, comment: string, actionEnabled: boolean) {
+    console.log('updateComment()');
+    console.log(id);
+    console.log(comment);
+    console.log(actionEnabled);
+  };
+
+  deleteComment(id: string) {
+    console.log('deleteComment()');
+    console.log(id);
   };
 
   backClicked() {

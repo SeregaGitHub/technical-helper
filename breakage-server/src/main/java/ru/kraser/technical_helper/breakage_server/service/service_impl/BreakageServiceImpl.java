@@ -370,6 +370,11 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional
     public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId) {
+        if (createBreakageCommentDto.status() == Status.SOLVED ||
+            createBreakageCommentDto.status() == Status.CANCELLED) {
+            throw new NotCorrectParameter("Комментарии к заявке о неисправности со статусами " +
+                    "\"Решена\" и \"Отменена\" - не создаются !!!");
+        }
         try {
             Breakage breakage = breakageRepository.getReferenceById(breakageId);
             breakageCommentRepository.saveAndFlush(BreakageCommentMapper.toBreakageComment(

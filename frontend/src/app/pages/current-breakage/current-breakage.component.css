@@ -25,3 +25,24 @@
 .colorGreen {
     color: green;
 }
+
+table {
+    background: rgb(8,56,134);
+    background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+    color: aquamarine;
+    font-family: michroma;
+    opacity: 90%;
+}
+
+th, td {
+    color: aquamarine;
+    font-family: montserrat;
+}
+
+th {
+    font-weight: bolder;
+    text-decoration: underline;
+    text-underline-offset: 0.5rem;
+    text-decoration-thickness: 0.1rem;
+    text-align: center;
+}
