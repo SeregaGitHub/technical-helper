@@ -22,6 +22,7 @@ export const DEPARTMENT_ID = 'X-Department-Id';
 export const DEPARTMENT_NAME = 'X-Department-Name';
 export const USER_ID = 'X-User-Id';
 export const BREAKAGE_ID = "X-Breakage-Id";
+export const BREAKAGE_COMMENT_ID_HEADER = "X-BreakageComment-Id"
 
 export const BUTTON_CREATE = 'Создать';
 export const BUTTON_UPDATE = 'Изменить';

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_COMMENT_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
+import { ADMIN_URL, BASE_URL, BREAKAGE_COMMENT_ID_HEADER, BREAKAGE_COMMENT_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
          DELETE_URL, 
          DEPARTMENT_ID, EMPLOYEE_URL, EXECUTOR_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL 
         } from '../util/constant';
@@ -227,6 +227,24 @@ export class BreakageService {
                 });
               })
           );
-  }
+  };
+
+  updateBreakageComment(breakageCommentId: string, createBreakageCommentDto: CreateBreakageCommentDto) {
+
+    let headers = HttpHeadersFactory.createPermanentHeaders();
+    headers = headers.append(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId);
+
+    return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, createBreakageCommentDto, {headers})
+          .pipe(
+              tap((updatedBreakageComment) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [updatedBreakageComment, ...currentState.breakages]
+                });
+              })
+          );
+  };
 
 }

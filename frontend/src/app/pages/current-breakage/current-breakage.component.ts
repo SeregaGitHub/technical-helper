@@ -146,9 +146,6 @@ export class CurrentBreakageComponent implements OnInit {
         .getBreakageById(this.breakageId)
           .subscribe({
             next: response => {
-
-              console.log(response);  // NEED FOR DELETE
-
               this.currentBreakage = response.data;
               this.status = this.currentBreakage.status;
               this.bufferStatus = this.status;
@@ -412,9 +409,6 @@ export class CurrentBreakageComponent implements OnInit {
   };
 
   createComment() {
-    console.log('createComment()');
-    console.log(this.breakageId);
-    console.log(this.status);
         
     const openDialog = this.dialog.open(BreakageCommentFormComponent, {
       data: {
@@ -427,14 +421,25 @@ export class CurrentBreakageComponent implements OnInit {
     openDialog.afterClosed().subscribe(() => {
         this.getCurrentBreakage();
     });
-      
   };
 
   updateComment(id: string, comment: string, actionEnabled: boolean) {
-    console.log('updateComment()');
-    console.log(id);
-    console.log(comment);
-    console.log(actionEnabled);
+
+    if (actionEnabled) {
+      const openDialog = this.dialog.open(BreakageCommentFormComponent, {
+        data: {
+          'action': Action.Update,
+          'breakageCommentId': id,
+          'breakageId': this.breakageId,
+          'status': this.status,
+          'comment': comment
+        }
+    });
+
+    openDialog.afterClosed().subscribe(() => {
+        this.getCurrentBreakage();
+    });
+    }
   };
 
   deleteComment(id: string) {

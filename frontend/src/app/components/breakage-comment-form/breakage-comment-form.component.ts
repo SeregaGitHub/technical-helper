@@ -5,7 +5,6 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Action } from '../../enum/action.enum';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '../../model/response/api-response';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
@@ -36,19 +35,26 @@ export class BreakageCommentFormComponent implements OnInit {
               }
 
   ngOnInit(): void {
-    console.log('BreakageCommentFormComponent - ngOnInit()');
-    console.log(this.data.breakageId);
-    console.log(this.data.status);
 
     if (this.data.action === Action.Create) {
-      this.buttonName = BUTTON_CREATE;
-    } else {
-      this.buttonName = BUTTON_UPDATE;
-    }
-
-    this.breakageCommentForm = new FormGroup({
+      this.breakageCommentForm = new FormGroup({
         breakageCommentText: new FormControl("", [Validators.required, Validators.minLength(1)])
       });
+
+      this.buttonName = BUTTON_CREATE;
+
+    } else {
+      this.breakageCommentForm = new FormGroup({
+        breakageCommentText: new FormControl(this.data.comment, [Validators.required, Validators.minLength(1)])
+      });
+
+      this.buttonName = BUTTON_UPDATE;
+
+    }
+  };
+
+  clickButton() {
+    this.buttonName == BUTTON_CREATE ? this.createBreakageComment() : this.updateBreakageComment();
   };
 
   createBreakageComment() {
@@ -67,23 +73,24 @@ export class BreakageCommentFormComponent implements OnInit {
             this.apiResponse = err.error;
           }
     })
-
-
-    // const breakageDto = new CreateBreakageDto(
-    //       this.breakageForm.value.room, this.breakageForm.value.breakageTopic, this.breakageForm.value.breakageText
-    //     );
-      
-    //     this._breakageService.createBreakage(breakageDto).subscribe({
-    //       next: response => {
-    //         this.apiResponse = response;
-    //         this.clearForm();
-    //         this.deleteResponseMessage();
-    //       },
-    //       error: err => {
-    //         this.apiResponse = err.error;
-    //       }
-    //     })
   };
+
+  updateBreakageComment() {
+
+    const createBreakageCommentDto = new CreateBreakageCommentDto(
+      this.breakageCommentForm.value.breakageCommentText, this.data.status
+    );
+
+    this._breakageService.updateBreakageComment(this.data.breakageCommentId, createBreakageCommentDto).subscribe({
+        next: response => {
+          this.apiResponse = response;
+          this.deleteResponseMessage();
+        },
+        error: err => {
+          this.apiResponse = err.error;
+        }
+      });
+  }
 
   deleteResponseMessage() {
       setTimeout(() => {
