@@ -442,9 +442,26 @@ export class CurrentBreakageComponent implements OnInit {
     }
   };
 
-  deleteComment(id: string) {
-    console.log('deleteComment()');
-    console.log(id);
+  deleteComment(id: string, number: number) {
+
+    const openDialog = this.dialog.open(ConfirmFormComponent, {data: { 
+      name: 'комментария № - ' + number 
+    }});
+
+    openDialog.afterClosed().subscribe(
+      (confirmResult ) => {
+        if (confirmResult) {
+          this._breakageService.deleteBreakageComment(id)
+            .subscribe({
+              next: () => {
+                this.getCurrentBreakage();
+              },
+              error: () => {
+                this.getCurrentBreakage();
+              }
+            });
+        };
+    });
   };
 
   backClicked() {

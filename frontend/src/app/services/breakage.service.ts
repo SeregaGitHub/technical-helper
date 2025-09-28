@@ -211,7 +211,7 @@ export class BreakageService {
           );
   };
 
-  createBreakageComment(breakageId: string, createBreakageCommentDto: CreateBreakageCommentDto) {
+  createBreakageComment(breakageId: string, createBreakageCommentDto: CreateBreakageCommentDto): Observable<any> {
 
     let headers = HttpHeadersFactory.createPermanentHeaders();
     headers = headers.append(BREAKAGE_ID, breakageId);
@@ -229,7 +229,7 @@ export class BreakageService {
           );
   };
 
-  updateBreakageComment(breakageCommentId: string, createBreakageCommentDto: CreateBreakageCommentDto) {
+  updateBreakageComment(breakageCommentId: string, createBreakageCommentDto: CreateBreakageCommentDto): Observable<any> {
 
     let headers = HttpHeadersFactory.createPermanentHeaders();
     headers = headers.append(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId);
@@ -246,5 +246,13 @@ export class BreakageService {
               })
           );
   };
+
+  deleteBreakageComment(breakageCommentId: string): Observable<any> {
+
+    let headers = HttpHeadersFactory.createPermanentHeaders();
+    headers = headers.append(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId);
+    
+    return this._http.delete(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, {headers});
+  }
 
 }
