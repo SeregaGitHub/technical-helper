@@ -26,6 +26,7 @@ import { AppointBreakageExecutorDto } from '../../model/breakage/appoint-breakag
 import { BreakageComment } from '../../model/breakage/breakage-comment';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { BreakageCommentFormComponent } from '../../components/breakage-comment-form/breakage-comment-form.component';
+import { Action } from '../../enum/action.enum';
 
 @Component({
   selector: 'app-current-breakage',
@@ -417,6 +418,7 @@ export class CurrentBreakageComponent implements OnInit {
         
     const openDialog = this.dialog.open(BreakageCommentFormComponent, {
       data: {
+        'action': Action.Create,
         'breakageId': this.breakageId,
         'status': this.status
       }

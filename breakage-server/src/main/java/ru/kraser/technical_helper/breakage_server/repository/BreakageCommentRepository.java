@@ -34,7 +34,7 @@ public interface BreakageCommentRepository extends JpaRepository<BreakageComment
                     FROM BreakageComment as bc
                     JOIN User AS u ON bc.createdBy = u.id
                     WHERE bc.breakage.id = :breakageId
-                    ORDER BY bc.createdDate DESC
+                    ORDER BY bc.createdDate
                     """
     )
     List<BreakageCommentBackendDto> getAllBreakageComments(String breakageId);

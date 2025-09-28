@@ -9,6 +9,7 @@ export const EMPLOYEE_URL = '/employee';
 export const DEPARTMENT_URL = '/department';
 export const USER_URL = '/user';
 export const BREAKAGE_URL = '/breakage';
+export const BREAKAGE_COMMENT_URL = '/comment';
 export const ALL_URL = '/all';
 export const DELETE_URL = '/delete';
 export const CURRENT_URL = '/current';

@@ -1,8 +1,8 @@
-<p style="color: aquamarine;">breakage-comment work</p>
+<!-- <p style="color: aquamarine;">breakage-comment work</p> -->
 
-<!-- <div class="flex justify-center blue-to-black-gradient min-w-96 max-w-96">
+<div class="flex justify-center blue-to-black-gradient min-w-96 max-w-96">
 
-    <form [formGroup]="breakageForm" (ngSubmit)="createBreakage()" class="min-w-80 max-w-80">
+    <form [formGroup]="breakageCommentForm" (ngSubmit)="createBreakageComment()" class="min-w-80 max-w-80">
 
         <div class="mb-8 flex justify-normal pt-4">
           <button 
@@ -14,66 +14,18 @@
         </div>
 
         <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Помещение</mat-label>
-            <input matInput 
-                   formControlName="room"
-                  >
-                    @if (room.touched && room.invalid) {
-                      <div class="alert">
-                        @if (room.errors?.required) {
-                          <p>Вам необходимо ввести название помещения !!!</p>
-                        }
-                        @if (room.errors?.minlength) {
-                          <p class="text-center">Длина названия помещения должна быть</p>
-                          <p class="text-center">не менее 1 символа !!!</p>
-                        }
-                        @if (room.errors?.maxlength) {
-                          <p class="text-center">Длина названия помещения должна быть</p>
-                          <p class="text-center">не более 128 символов !!!</p>
-                        }
-                      </div>
-                    }
-        </mat-form-field>
-
-        <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Тема заявки</mat-label>
-            <input matInput 
-                   formControlName="breakageTopic"
-                  >
-                    @if (breakageTopic.touched && breakageTopic.invalid) {
-                      <div class="alert">
-                        @if (breakageTopic.errors?.required) {
-                          <p>Вам необходимо ввести тему заявки !!!</p>
-                        }
-                        @if (breakageTopic.errors?.minlength) {
-                          <p class="text-center">Длина темы заявки должна быть</p>
-                          <p class="text-center">не менее 1 символа !!!</p>
-                        }
-                        @if (breakageTopic.errors?.maxlength) {
-                          <p class="text-center">Длина темы заявки должна быть</p>
-                          <p class="text-center">не более 128 символов !!!</p>
-                        }
-                      </div>
-                    }
-        </mat-form-field>
-
-        <mat-form-field class="w-full mb-4">
-            <mat-label class="text-gray-200">Текст заявки</mat-label>
+            <mat-label class="text-gray-200">Текст комментария</mat-label>
           <textarea matInput 
-                    formControlName="breakageText"
+                    formControlName="breakageCommentText"
                   >
-            @if (breakageText.touched && breakageText.invalid) {
+            @if (breakageCommentText.touched && breakageCommentText.invalid) {
                       <div class="alert">
-                        @if (breakageText.errors?.required) {
-                          <p>Вам необходимо ввести текст заявки !!!</p>
+                        @if (breakageCommentText.errors?.required) {
+                          <p>Вам необходимо ввести текст комментария заявки !!!</p>
                         }
-                        @if (breakageText.errors?.minlength) {
-                          <p class="text-center">Длина текста заявки должна быть</p>
+                        @if (breakageCommentText.errors?.minlength) {
+                          <p class="text-center">Длина текста комментария заявки должна быть</p>
                           <p class="text-center">не менее 1 символа !!!</p>
-                        }
-                        @if (breakageText.errors?.maxlength) {
-                          <p class="text-center">Длина текста заявки должна быть</p>
-                          <p class="text-center">не более 128 символов !!!</p>
                         }
                       </div>
                     }
@@ -98,12 +50,12 @@
           </button>
           <button type="submit" 
                   class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
-                  [ngClass]="breakageForm.invalid ? 'btn-not-active' : ''" 
-                  [disabled]="breakageForm.invalid">
+                  [ngClass]="breakageCommentForm.invalid ? 'btn-not-active' : ''" 
+                  [disabled]="breakageCommentForm.invalid">
                   {{ buttonName }}
           </button>
         </div>
 
     </form>
 
-</div> -->
+</div>

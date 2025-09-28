@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
+import { ADMIN_URL, BASE_URL, BREAKAGE_COMMENT_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
          DELETE_URL, 
          DEPARTMENT_ID, EMPLOYEE_URL, EXECUTOR_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL 
         } from '../util/constant';
@@ -11,6 +11,7 @@ import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
 import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-priority-dto';
 import { UpdateBreakageStatusDto } from '../model/breakage/update-breakage-status-dto';
 import { AppointBreakageExecutorDto } from '../model/breakage/appoint-breakage-executor-dto';
+import { CreateBreakageCommentDto } from '../model/breakage/create-breakage-comment-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -205,6 +206,24 @@ export class BreakageService {
                   this.breakageSubject.next({...currentState,
                   breakages:
                   [updatedBreakage, ...currentState.breakages]
+                });
+              })
+          );
+  };
+
+  createBreakageComment(breakageId: string, createBreakageCommentDto: CreateBreakageCommentDto) {
+
+    let headers = HttpHeadersFactory.createPermanentHeaders();
+    headers = headers.append(BREAKAGE_ID, breakageId);
+
+    return this._http.post(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, createBreakageCommentDto, {headers})
+          .pipe(
+              tap((newBreakageComment) => {
+                  const currentState = this.breakageSubject.value;
+  
+                  this.breakageSubject.next({...currentState,
+                  breakages:
+                  [newBreakageComment, ...currentState.breakages]
                 });
               })
           );

@@ -1,5 +1,3 @@
-
-
 export interface BreakageComment {
     id: String;
     comment: String;
