@@ -58,10 +58,10 @@
 
         <mat-form-field class="w-full mb-4">
             <mat-label class="text-gray-200">Текст заявки</mat-label>
-            <input matInput 
-                   formControlName="breakageText"
+          <textarea matInput 
+                    formControlName="breakageText"
                   >
-                    @if (breakageText.touched && breakageText.invalid) {
+            @if (breakageText.touched && breakageText.invalid) {
                       <div class="alert">
                         @if (breakageText.errors?.required) {
                           <p>Вам необходимо ввести текст заявки !!!</p>
@@ -76,6 +76,7 @@
                         }
                       </div>
                     }
+          </textarea>
         </mat-form-field>
 
         <div class="mb-4 min-h-12 max-w-80"

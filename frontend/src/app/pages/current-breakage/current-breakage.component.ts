@@ -408,6 +408,8 @@ export class CurrentBreakageComponent implements OnInit {
 
   createComment() {
     console.log('createComment()');
+    console.log(this.breakageId);
+    console.log(this.status);
   };
 
   updateComment(id: string, comment: string, actionEnabled: boolean) {
