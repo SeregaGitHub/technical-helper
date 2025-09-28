@@ -25,6 +25,7 @@ import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular
 import { AppointBreakageExecutorDto } from '../../model/breakage/appoint-breakage-executor-dto';
 import { BreakageComment } from '../../model/breakage/breakage-comment';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { BreakageCommentFormComponent } from '../../components/breakage-comment-form/breakage-comment-form.component';
 
 @Component({
   selector: 'app-current-breakage',
@@ -117,7 +118,10 @@ export class CurrentBreakageComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    this.getCurrentBreakage();
+  };
 
+  getCurrentBreakage() {
     if (this.isEmployee) {
 
       this.currentBreakage = this._breakageService
@@ -169,7 +173,7 @@ export class CurrentBreakageComponent implements OnInit {
               this.apiResponse = err;
             }
           });
-    } 
+    }
   };
 
   setPriority(priority: Priority) {
@@ -410,6 +414,18 @@ export class CurrentBreakageComponent implements OnInit {
     console.log('createComment()');
     console.log(this.breakageId);
     console.log(this.status);
+        
+    const openDialog = this.dialog.open(BreakageCommentFormComponent, {
+      data: {
+        'breakageId': this.breakageId,
+        'status': this.status
+      }
+    });
+        
+    openDialog.afterClosed().subscribe(() => {
+        this.getCurrentBreakage();
+    });
+      
   };
 
   updateComment(id: string, comment: string, actionEnabled: boolean) {
