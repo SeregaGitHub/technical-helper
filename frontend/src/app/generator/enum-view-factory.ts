@@ -31,9 +31,17 @@ export class EnumViewFactory {
         return priorities;
     }
 
-    public static getStatuses(): StatusView[] {
+    public static getStatuses(currentStatus: Status): StatusView[] {
 
         const statuses = [
+            {value: Status.Solved, viewValue: 'Решена'},
+            {value: Status.InProgress, viewValue: 'В работе'},
+            {value: Status.Paused, viewValue: 'В ожидании'},
+            {value: Status.Redirected, viewValue: 'Передана'},
+            {value: Status.Cancelled, viewValue: 'Отменена'},
+        ];
+
+        const allStatuses = [
             {value: Status.New, viewValue: 'Новая'},
             {value: Status.Solved, viewValue: 'Решена'},
             {value: Status.InProgress, viewValue: 'В работе'},
@@ -42,7 +50,7 @@ export class EnumViewFactory {
             {value: Status.Cancelled, viewValue: 'Отменена'},
         ];
 
-        return statuses;
+        return currentStatus === Status.New ? allStatuses : statuses;
     }
 
     public static getEmployeeStatuses(status: Status): StatusView[] {

@@ -27,6 +27,7 @@ import { BreakageComment } from '../../model/breakage/breakage-comment';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { BreakageCommentFormComponent } from '../../components/breakage-comment-form/breakage-comment-form.component';
 import { Action } from '../../enum/action.enum';
+import { StatusView } from '../../util/status-view';
 
 @Component({
   selector: 'app-current-breakage',
@@ -65,7 +66,7 @@ export class CurrentBreakageComponent implements OnInit {
   priorities = EnumViewFactory.getPriorities();
   status!: Status;
   bufferStatus!: Status;
-  statuses = EnumViewFactory.getStatuses();
+  statuses!: StatusView[];
   employeeStatuses: any;
   breakageExecutorId!: string;
   breakageExecutor!: string;
@@ -162,9 +163,10 @@ export class CurrentBreakageComponent implements OnInit {
               this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
               
-              if (this.status != Status.New) {
-                this.statuses.splice(0, 1);
-              }
+              this.statuses = EnumViewFactory.getStatuses(this.status);
+              // if (this.status != Status.New) {
+              //   this.statuses.splice(0, 1);
+              // }
               if (this.breakageExecutorId != '' && this.deadline != null) {
                 this.isAppointed = true;
               }
