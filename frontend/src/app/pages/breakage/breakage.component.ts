@@ -297,6 +297,10 @@ export class BreakageComponent implements OnInit, OnDestroy{
     });
   };
 
+  toDefaultPageIndex() {
+    this.pageIndex = 0;
+  }
+
   private stringToDate(dataContent: any) {
     dataContent.forEach((breakage: any) => { 
       breakage.deadline = this.convertToDate(breakage.deadline) }); 

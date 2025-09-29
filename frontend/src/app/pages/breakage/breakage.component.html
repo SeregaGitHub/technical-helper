@@ -6,22 +6,40 @@
         <p class="mt-2 text-2xl underline">Статус</p>
         <div class="text-left ml-6 mb-4">
             <p class="text-lg">Новая</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusNew" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusNew" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Решена</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusSolved" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusSolved" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">В работе</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusInProgress" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusInProgress" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">В ожидании</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusPaused" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusPaused" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Передана</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusRedirected" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusRedirected" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Отменена</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusCancelled" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="statusCancelled" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
         </div>
         
 
@@ -29,16 +47,28 @@
 
         <div class="text-left ml-6 mb-4">
             <p class="text-lg">Важный</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityUrgently" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityUrgently" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Высокий</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityHigh" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityHigh" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Средний</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityMedium" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityMedium" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
 
             <p class="text-lg">Низкий</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" (click)="getAllBreakages()"></mat-slide-toggle></p>
+            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" 
+                                              (click)="getAllBreakages()"
+                                              (ngModelChange)="toDefaultPageIndex()"
+                                              ></mat-slide-toggle></p>
         </div>
         
         @if (!userProfile.getUserProfile().isEmployee()) {
@@ -48,7 +78,7 @@
                 <p class="text-lg ml-6 mb-1">Назначенные на:</p>
                 <form>
                     <mat-form-field>
-                        <mat-select [(ngModel)]="executor" name="appointed">
+                        <mat-select [(ngModel)]="executor" (ngModelChange)="toDefaultPageIndex()" name="appointed">
                             @for (executor of executors; track executor) {
                                 <mat-option [value]="executor.value" (click)="getAllBreakages()">{{executor.viewValue}}</mat-option>
                             }
@@ -60,7 +90,10 @@
             @if (executor !== 'NO_APPOINTED') {
                 <div class="text-left ml-6 mb-4">
                     <p class="text-lg">Просроченные</p>
-                    <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" (click)="getAllBreakages()"></mat-slide-toggle></p>
+                    <p class="mb-2"><mat-slide-toggle [(ngModel)]="deadline" 
+                                                      (click)="getAllBreakages()"
+                                                      (ngModelChange)="toDefaultPageIndex()"
+                                                      ></mat-slide-toggle></p>
                 </div>
             }
         }
