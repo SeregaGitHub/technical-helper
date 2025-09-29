@@ -196,7 +196,8 @@
                 @if (userProfile.getUserProfile().isAdmin() && (status === 'NEW' || status === 'IN_PROGRESS')) {
                     <div class="flex w-4/12">
                         <div class="mr-8">
-                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient" 
+                            <button class="button-size btn mouse-enter text-montserrat black-to-blue-gradient"
+                                    [ngClass]="{'btn-not-active': !isAppointed }"
                                     (click)="dropBreakageExecutor()"
                                     >
                                     Сбросить</button>

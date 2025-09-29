@@ -73,6 +73,7 @@ export class CurrentBreakageComponent implements OnInit {
   deadline!: string | null;
   now!: string | null;
   isOverdue: boolean = false;
+  isAppointed: boolean = false;
   executors!: BreakageExecutor[];
   apiResponse: ApiResponse;
 
@@ -163,6 +164,9 @@ export class CurrentBreakageComponent implements OnInit {
               
               if (this.status != Status.New) {
                 this.statuses.splice(0, 1);
+              }
+              if (this.breakageExecutorId != '' && this.deadline != null) {
+                this.isAppointed = true;
               }
 
               this.isBreakageOverdue();
