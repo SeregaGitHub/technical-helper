@@ -20,11 +20,7 @@ export class BreakageService {
 
   constructor(private _http: HttpClient) { }
 
-  breakageSubject = new BehaviorSubject<any>({
-          breakages: [],
-          loading: false,
-          newBreakage: null
-      });
+  breakageSubject = new BehaviorSubject<any>({});
 
   createBreakage(createBreakageDto: CreateBreakageDto): Observable<any> {
   
@@ -34,11 +30,7 @@ export class BreakageService {
           .pipe(
               tap((newBreakage) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [newBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, newBreakage});
               })
           );
   };    
@@ -80,11 +72,7 @@ export class BreakageService {
           .pipe(
               tap((breakage) => {
                   const currentState = this.breakageSubject.value;
-      
-                  this.breakageSubject.next({...currentState, 
-                  breakages:
-                  [breakage, ...currentState.breakages] 
-                });
+                  this.breakageSubject.next({...currentState, breakage});
               })
           );
   };
@@ -93,16 +81,12 @@ export class BreakageService {
       
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
-      
+
       return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL, {headers})
           .pipe(
               tap((breakage) => {
                   const currentState = this.breakageSubject.value;
-      
-                  this.breakageSubject.next({...currentState, 
-                  breakages:
-                  [breakage, ...currentState.breakages] 
-                });
+                  this.breakageSubject.next({...currentState, breakage});
               })
           );
   };
@@ -113,9 +97,9 @@ export class BreakageService {
       return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL, {headers})
         .pipe(
           tap(
-            (list) => {
+            (adminAndTechnicianList) => {
               const currentState = this.breakageSubject.value;
-              this.breakageSubject.next({...currentState, list})
+              this.breakageSubject.next({...currentState, adminAndTechnicianList})
             })
       );
   };
@@ -127,13 +111,9 @@ export class BreakageService {
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', updateBreakagePriorityDto, {headers})
           .pipe(
-              tap((updatedBreakage) => {
+              tap((updatedBreakagePriority) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, updatedBreakagePriority});
               })
           );
   }
@@ -146,13 +126,9 @@ export class BreakageService {
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, null, {headers})
           .pipe(
-              tap((updatedBreakage) => {
+              tap((chancelledBreakage) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, chancelledBreakage});
               })
           );
   }
@@ -164,13 +140,9 @@ export class BreakageService {
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', updateBreakageStatusDto, {headers})
           .pipe(
-              tap((updatedBreakage) => {
+              tap((updatedBreakageStatus) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, updatedBreakageStatus});
               })
           );
   }
@@ -182,13 +154,9 @@ export class BreakageService {
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL, appointBreakageExecutorDto, {headers})
           .pipe(
-              tap((updatedBreakage) => {
+              tap((updatedBreakageExecutor) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, updatedBreakageExecutor});
               })
           );
   }
@@ -200,13 +168,9 @@ export class BreakageService {
 
       return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL, null, {headers})
           .pipe(
-              tap((updatedBreakage) => {
+              tap((dropBreakageExecutor) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakage, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, dropBreakageExecutor});
               })
           );
   };
@@ -220,11 +184,7 @@ export class BreakageService {
           .pipe(
               tap((newBreakageComment) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [newBreakageComment, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, newBreakageComment});
               })
           );
   };
@@ -238,11 +198,7 @@ export class BreakageService {
           .pipe(
               tap((updatedBreakageComment) => {
                   const currentState = this.breakageSubject.value;
-  
-                  this.breakageSubject.next({...currentState,
-                  breakages:
-                  [updatedBreakageComment, ...currentState.breakages]
-                });
+                  this.breakageSubject.next({...currentState, updatedBreakageComment});
               })
           );
   };
