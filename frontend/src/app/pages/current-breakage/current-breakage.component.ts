@@ -162,11 +162,8 @@ export class CurrentBreakageComponent implements OnInit {
               this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
               this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
               this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
-              
               this.statuses = EnumViewFactory.getStatuses(this.status);
-              // if (this.status != Status.New) {
-              //   this.statuses.splice(0, 1);
-              // }
+
               if (this.breakageExecutorId != '' && this.deadline != null) {
                 this.isAppointed = true;
               }

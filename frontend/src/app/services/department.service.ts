@@ -12,11 +12,7 @@ export class DepartmentService {
 
     constructor(private _http: HttpClient) { }
 
-    departmentSubject = new BehaviorSubject<any>({
-        departments: [],
-        loading: false,
-        newDepartment: null
-    });
+    departmentSubject = new BehaviorSubject<any>({});
 
     createDep(departmentDto: DepartmentDto): Observable<any> {
 
@@ -24,12 +20,9 @@ export class DepartmentService {
 
         return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             .pipe(
-                tap((newDep) => {
+                tap((newDepartment) => {
                     const currentState = this.departmentSubject.value;
-
-                    this.departmentSubject.next({...currentState, 
-                    departments:
-                    [newDep, ...currentState.departments] });
+                    this.departmentSubject.next({...currentState, newDepartment});
                 })
             );
     };
@@ -41,13 +34,10 @@ export class DepartmentService {
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             .pipe(
-                tap((dep) => {
+                tap((updatedDepartment) => {
                     const currentState = this.departmentSubject.value;
 
-                    this.departmentSubject.next({...currentState, 
-                    departments:
-                    [dep, ...currentState.departments] 
-                  });
+                    this.departmentSubject.next({...currentState, updatedDepartment});
                 })
             );
     };
@@ -59,9 +49,9 @@ export class DepartmentService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
             .pipe(
                 tap(
-                    (dep) => {
+                    (allDepartments) => {
                         const currentState = this.departmentSubject.value;
-                        this.departmentSubject.next({...currentState, dep})
+                        this.departmentSubject.next({...currentState, allDepartments})
                     }
                 )
             );
@@ -74,13 +64,9 @@ export class DepartmentService {
 
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
             .pipe(
-                tap((dep) => {
+                tap((departmentById) => {
                     const currentState = this.departmentSubject.value;
-
-                    this.departmentSubject.next({...currentState, 
-                    departments:
-                    [dep, ...currentState.departments] 
-                  });
+                    this.departmentSubject.next({...currentState, departmentById});
                 })
             );
     };
@@ -92,13 +78,9 @@ export class DepartmentService {
 
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
             .pipe(
-                tap((dep) => {
+                tap((departmentByName) => {
                     const currentState = this.departmentSubject.value;
-
-                    this.departmentSubject.next({...currentState, 
-                    departments:
-                    [dep, ...currentState.departments] 
-                  });
+                    this.departmentSubject.next({...currentState, departmentByName});
                 })
             );
     };
