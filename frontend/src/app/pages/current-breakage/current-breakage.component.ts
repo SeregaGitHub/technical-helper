@@ -379,8 +379,13 @@ export class CurrentBreakageComponent implements OnInit {
   }
 
   private setReadyForAppoint() {
-    if (this.breakageExecutorId != '' && this.deadline != null) {
-      this.readyForAppoint = true;
+    if (this.breakageExecutorId != '' && this.now != null && this.deadline != null) {
+      const dates = this.stringNowAndDeadlineToDate(this.now, this.deadline);
+      if (dates[0] <= dates[1]) {
+        this.readyForAppoint = true;
+      } else {
+        this.readyForAppoint = false;
+      }
     } else {
       this.readyForAppoint = false;
     }
@@ -392,18 +397,24 @@ export class CurrentBreakageComponent implements OnInit {
         this.now != null && 
         (this.status === Status.New || this.status === Status.InProgress)) {
 
-      const [nowYear, nowMonth, nowDay] = this.now.substring(0, 10).split('-');
-      const now = new Date(+nowYear, +nowMonth - 1, +nowDay, 23, 59, 59);
+      const dates = this.stringNowAndDeadlineToDate(this.now, this.deadline);
 
-      const [deadlineyear, deadlineMonth, deadlineDay] = this.deadline.substring(0, 10).split('-');
-      const deadline = new Date(+deadlineyear, +deadlineMonth - 1, +deadlineDay, 23, 59, 59);
-
-      if (deadline < now) {
+      if (dates[1] < dates[0]) {
         this.isOverdue = true;
       } else {
         this.isOverdue = false;
       }
     }
+  }
+
+  private stringNowAndDeadlineToDate(now: string, deadline: string): Date[] {
+    const [nowYear, nowMonth, nowDay] = now.substring(0, 10).split('-');
+    const nowDate = new Date(+nowYear, +nowMonth - 1, +nowDay, 23, 59, 59);
+
+    const [deadlineyear, deadlineMonth, deadlineDay] = deadline.substring(0, 10).split('-');
+    const deadlineDate = new Date(+deadlineyear, +deadlineMonth - 1, +deadlineDay, 23, 59, 59);
+
+    return [nowDate, deadlineDate];
   }
 
   private deleteResponseMessage() {
