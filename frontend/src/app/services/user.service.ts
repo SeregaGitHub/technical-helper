@@ -14,11 +14,7 @@ export class UserService {
 
     constructor(private _http: HttpClient) { }
 
-    userSubject = new BehaviorSubject<any>({
-        users: [],
-        loading: false,
-        newUser: null
-    });
+    userSubject = new BehaviorSubject<any>({});
 
     createUser(createUserDto: CreateUserDto): Observable<any> {
 
@@ -28,11 +24,7 @@ export class UserService {
             .pipe(
                 tap((newUser) => {
                     const currentState = this.userSubject.value;
-
-                    this.userSubject.next({...currentState,
-                    users:
-                    [newUser, ...currentState.users]
-                  });
+                    this.userSubject.next({...currentState, newUser});
                 })
             );
     };
@@ -44,13 +36,9 @@ export class UserService {
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL, updateUserDto, {headers})
             .pipe(
-                tap((user) => {
+                tap((updatedUser) => {
                     const currentState = this.userSubject.value;
-
-                    this.userSubject.next({...currentState,
-                    users:
-                    [user, ...currentState.users]
-                  });
+                    this.userSubject.next({...currentState, updatedUser});
                 })
             );
     };
@@ -70,9 +58,9 @@ export class UserService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + ALL_URL, {headers})
             .pipe(
                 tap(
-                    (users) => {
+                    (allUsers) => {
                         const currentState = this.userSubject.value;
-                        this.userSubject.next({...currentState, users})
+                        this.userSubject.next({...currentState, allUsers})
                     }
                 )
             );
@@ -87,11 +75,7 @@ export class UserService {
             .pipe(
                 tap((user) => {
                     const currentState = this.userSubject.value;
-    
-                    this.userSubject.next({...currentState, 
-                    users:
-                    [user, ...currentState.users] 
-                  });
+                    this.userSubject.next({...currentState, user});
                 })
             );
     };
