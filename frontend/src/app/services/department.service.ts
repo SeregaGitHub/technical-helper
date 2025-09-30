@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { ADMIN_URL, ALL_URL, BASE_URL, CURRENT_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_NAME, DEPARTMENT_URL, GATEWAY_URL } from '../util/constant';
 import { DepartmentDto } from '../model/department/department-dto';
 import { HttpHeadersFactory } from '../generator/headers-factory';
@@ -12,16 +12,25 @@ export class DepartmentService {
 
     constructor(private _http: HttpClient) { }
 
-    departmentSubject = new BehaviorSubject<any>({});
+    departmentSubject = new Subject<any>();
+
+    // departmentSubject = new BehaviorSubject<any>({});
 
     createDep(departmentDto: DepartmentDto): Observable<any> {
 
         const headers = HttpHeadersFactory.createPermanentHeaders();
 
         return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
+            // .pipe(
+            //     tap((newDepartment) => {
+            //         const currentState = this.departmentSubject.value;
+            //         this.departmentSubject.next({...currentState, newDepartment});
+            //     })
+            // );
+
             .pipe(
                 tap((newDepartment) => {
-                    const currentState = this.departmentSubject.value;
+                    const currentState = this.departmentSubject;
                     this.departmentSubject.next({...currentState, newDepartment});
                 })
             );
@@ -33,9 +42,17 @@ export class DepartmentService {
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
+            // .pipe(
+            //     tap((updatedDepartment) => {
+            //         const currentState = this.departmentSubject.value;
+
+            //         this.departmentSubject.next({...currentState, updatedDepartment});
+            //     })
+            // );
+
             .pipe(
                 tap((updatedDepartment) => {
-                    const currentState = this.departmentSubject.value;
+                    const currentState = this.departmentSubject;
 
                     this.departmentSubject.next({...currentState, updatedDepartment});
                 })
@@ -50,7 +67,7 @@ export class DepartmentService {
             .pipe(
                 tap(
                     (allDepartments) => {
-                        const currentState = this.departmentSubject.value;
+                        const currentState = this.departmentSubject;
                         this.departmentSubject.next({...currentState, allDepartments})
                     }
                 )
@@ -65,7 +82,7 @@ export class DepartmentService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
             .pipe(
                 tap((departmentById) => {
-                    const currentState = this.departmentSubject.value;
+                    const currentState = this.departmentSubject;
                     this.departmentSubject.next({...currentState, departmentById});
                 })
             );
@@ -79,7 +96,7 @@ export class DepartmentService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
             .pipe(
                 tap((departmentByName) => {
-                    const currentState = this.departmentSubject.value;
+                    const currentState = this.departmentSubject;
                     this.departmentSubject.next({...currentState, departmentByName});
                 })
             );
