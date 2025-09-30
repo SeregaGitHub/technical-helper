@@ -65,7 +65,7 @@ export class DepartmentComponent implements OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  private unsubscribe: Subject<void> = new Subject();
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor (private _depService: DepartmentService, public dialog: MatDialog) {
     // this.dataSource = new MatTableDataSource(this.dep);
@@ -74,8 +74,8 @@ export class DepartmentComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe.next();
-    this.unsubscribe.complete();
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   }
 
   // ngAfterViewInit() {
@@ -99,7 +99,7 @@ export class DepartmentComponent implements OnDestroy {
     }});
 
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(() => {
           this.getAllDep();
         });
@@ -113,7 +113,7 @@ export class DepartmentComponent implements OnDestroy {
     }});
 
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(() => {
           this.getAllDep();
         });
@@ -122,7 +122,7 @@ export class DepartmentComponent implements OnDestroy {
   getAllDep(): void {
     this._depService
       .getAllDep()
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: data => {
               this.departments = data;
@@ -139,7 +139,7 @@ export class DepartmentComponent implements OnDestroy {
   getDepById(id: string) {
     this._depService
       .getDepById(id)
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: data => {
               this.department = data;
@@ -165,12 +165,12 @@ export class DepartmentComponent implements OnDestroy {
     }});
 
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(
           (confirmResult ) => {
             if (confirmResult) {
               this._depService.deleteDep(id)
-                .pipe(takeUntil(this.unsubscribe))
+                .pipe(takeUntil(this._unsubscribe))
                   .subscribe({
                       next: () => {
                         this.getAllDep();

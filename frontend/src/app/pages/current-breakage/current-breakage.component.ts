@@ -99,7 +99,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
   public displayedColumns: string[] = [ 'number', 'comment', 'creatorName', 'createdDate', 'lastUpdatedDate', 'actions' ];
   public dataSource!: MatTableDataSource<BreakageComment>;
 
-  private unsubscribe: Subject<void> = new Subject();
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
@@ -113,13 +113,13 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
     this._adapter.setLocale(this._locale());
 
     this._activatedRoute.params
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(params => {
           this.breakageId = params['id'];
     });
 
     this._activatedRoute.queryParams
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(queryParams => {
           this.isEmployee = JSON.parse(queryParams['isEmployee'].toLowerCase());
     });
@@ -130,8 +130,8 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
   };
 
   ngOnDestroy(): void {
-    this.unsubscribe.next();
-    this.unsubscribe.complete();
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   }
 
   getCurrentBreakage() {
@@ -139,7 +139,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
 
       this.currentBreakage = this._breakageService
         .getBreakageEmployeeById(this.breakageId)
-          .pipe(takeUntil(this.unsubscribe))
+          .pipe(takeUntil(this._unsubscribe))
             .subscribe({
               next: data => {
                 this.currentBreakage = data;
@@ -157,7 +157,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
 
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
-          .pipe(takeUntil(this.unsubscribe))
+          .pipe(takeUntil(this._unsubscribe))
             .subscribe({
               next: response => {
                 this.currentBreakage = response.data;
@@ -193,7 +193,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
     const updateBreakagePriorityDto = new UpdateBreakagePriorityDto(priority, this.status);
 
     this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto)
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe({
           next: response => {
           this.priority = priority;
@@ -219,7 +219,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
           }});
 
           openDialog.afterClosed()
-            .pipe(takeUntil(this.unsubscribe))
+            .pipe(takeUntil(this._unsubscribe))
               .subscribe(
                 (confirmResult ) => {
                   if (confirmResult) {
@@ -245,7 +245,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
           }});
 
           openDialog.afterClosed()
-            .pipe(takeUntil(this.unsubscribe))
+            .pipe(takeUntil(this._unsubscribe))
               .subscribe(
                 (confirmResult ) => {
                   if (confirmResult) {
@@ -259,7 +259,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
 
   cancelBreakageToBackend(id: string, departmentId: string) {
       this._breakageService.cancelBreakage(id, departmentId)
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: response => {
               this.status = Status.Cancelled;
@@ -281,7 +281,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
       this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: response => {
               this.status = status;
@@ -313,7 +313,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
   clickExecutor(): void {
     
     this._breakageService.getAdminAndTechnicianList()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe({
           next: data => {
             if (this.executors.length === 1 && this.breakageExecutorId === '') {
@@ -352,7 +352,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
       const executor = new AppointBreakageExecutorDto(this.breakageExecutorId, new Date(+year, +month - 1, +day, 23, 59, 59), this.status);
 
       this._breakageService.addBreakageExecutor(this.breakageId, executor)
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: response => {
               this.apiResponse = response;
@@ -372,7 +372,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
   dropBreakageExecutor() {
 
     this._breakageService.dropExecutor(this.breakageId)
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe({
           next: response => {
             this.dropExecutorVariables();
@@ -457,7 +457,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
     });
         
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(() => {
           this.getCurrentBreakage();
         });
@@ -477,7 +477,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
     });
 
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(() => {
           this.getCurrentBreakage();
         });
@@ -491,11 +491,11 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
     }});
 
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe((confirmResult ) => {
           if (confirmResult) {
             this._breakageService.deleteBreakageComment(id)
-              .pipe(takeUntil(this.unsubscribe))
+              .pipe(takeUntil(this._unsubscribe))
               .subscribe({
                 next: () => {
                   this.getCurrentBreakage();

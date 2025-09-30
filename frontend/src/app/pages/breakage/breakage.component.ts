@@ -108,7 +108,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  private unsubscribe: Subject<void> = new Subject();
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor (private _breakageService: BreakageService, public dialog: MatDialog, private _router: Router) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
@@ -178,8 +178,8 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
     localStorage.setItem('thSearchText', this.searchText);
 
-    this.unsubscribe.next();
-    this.unsubscribe.complete();
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   }
 
   applyFilter(event: Event) {
@@ -233,7 +233,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
     const openDialog = this.dialog.open(BreakageFormComponent);
     
     openDialog.afterClosed()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe(() => {
           this.getAllBreakages();
     });
@@ -258,7 +258,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
         this.executor, this.deadline, this.searchText
       )
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(takeUntil(this._unsubscribe))
         .subscribe({
           next: data => {
 

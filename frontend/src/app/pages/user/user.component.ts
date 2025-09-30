@@ -69,7 +69,7 @@ export class UserComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  private unsubscribe: Subject<void> = new Subject();
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor (private _userService: UserService, public dialog: MatDialog) {
     this.getAllUsersError = ApiResponseFactory.createEmptyApiResponse();
@@ -91,7 +91,7 @@ export class UserComponent {
       }});
   
       openDialog.afterClosed()
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe(() => {
             this.getAllUsers();
           });
@@ -107,7 +107,7 @@ export class UserComponent {
       }});
   
       openDialog.afterClosed()
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe(() => {
             this.getAllUsers();
           });
@@ -116,7 +116,7 @@ export class UserComponent {
   getAllUsers(): void {
     this._userService
       .getAllUsers()
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe({
             next: data => {
               this.users = data;
@@ -133,7 +133,7 @@ export class UserComponent {
   getUserById(id: string) {
       this._userService
         .getUserById(id)
-          .pipe(takeUntil(this.unsubscribe))
+          .pipe(takeUntil(this._unsubscribe))
             .subscribe({
               next: data => {
                 this.user = data;
@@ -161,12 +161,12 @@ export class UserComponent {
       }});
   
       openDialog.afterClosed()
-        .pipe(takeUntil(this.unsubscribe))
+        .pipe(takeUntil(this._unsubscribe))
           .subscribe(
             (confirmResult ) => {
               if (confirmResult) {
                 this._userService.deleteUser(id)
-                  .pipe(takeUntil(this.unsubscribe))
+                  .pipe(takeUntil(this._unsubscribe))
                     .subscribe({
                       next: () => {
                         this.getAllUsers();

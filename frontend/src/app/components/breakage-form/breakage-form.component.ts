@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +9,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { CreateBreakageDto } from '../../model/breakage/create-breakage-dto';
 import { BUTTON_CREATE } from '../../util/constant';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-breakage-form',
@@ -22,11 +23,13 @@ import { BUTTON_CREATE } from '../../util/constant';
   templateUrl: './breakage-form.component.html',
   styleUrl: './breakage-form.component.css'
 })
-export class BreakageFormComponent implements OnInit {
+export class BreakageFormComponent implements OnInit, OnDestroy {
 
   breakageForm: any;
   buttonName = BUTTON_CREATE;
   apiResponse: ApiResponse;
+
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor(private _breakageService: BreakageService,
               private _dialogRef: MatDialogRef<BreakageFormComponent>) {
@@ -40,7 +43,12 @@ export class BreakageFormComponent implements OnInit {
         breakageTopic: new FormControl("", [Validators.required, Validators.minLength(1), Validators.maxLength(128)]),
         breakageText: new FormControl("", [Validators.required, Validators.minLength(1), Validators.maxLength(2048)])
       });
-  }
+  };
+
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
+  };
 
   createBreakage() {
   
@@ -48,16 +56,18 @@ export class BreakageFormComponent implements OnInit {
       this.breakageForm.value.room, this.breakageForm.value.breakageTopic, this.breakageForm.value.breakageText
     );
   
-    this._breakageService.createBreakage(breakageDto).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.clearForm();
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    })
+    this._breakageService.createBreakage(breakageDto)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.clearForm();
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        })
   };
 
   deleteResponseMessage() {

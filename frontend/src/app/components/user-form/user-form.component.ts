@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ApiResponse } from '../../model/response/api-response';
 import { Action } from '../../enum/action.enum';
 import { UserService } from '../../services/user.service';
@@ -17,6 +17,7 @@ import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
 import { ChangeUserPasswordDto } from '../../model/user/change-user-password-dto';
 import { UpdateUserDto } from '../../model/user/update-user-dto';
 import { CreateUserDto } from '../../model/user/create-user-dto';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-user-form',
@@ -32,12 +33,14 @@ import { CreateUserDto } from '../../model/user/create-user-dto';
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
 })
-export class UserFormComponent implements OnInit {
+export class UserFormComponent implements OnInit, OnDestroy {
 
   userForm: any;
   buttonName!: string;
   apiResponse: ApiResponse;
   deps!: Department[];
+
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor(private _userService: UserService,
               private _depService: DepartmentService, 
@@ -45,14 +48,16 @@ export class UserFormComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: any) {
 
       this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
-      this._depService.getAllDep().subscribe({
-        next: data => {
-          this.deps = data;
-        },
-        error: err => {
-        this.apiResponse = err.error;
-        }
-      });
+      this._depService.getAllDep()
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe({
+            next: data => {
+              this.deps = data;
+            },
+            error: err => {
+              this.apiResponse = err.error;
+            }
+          });
     }
 
   ngOnInit(): void {
@@ -65,15 +70,17 @@ export class UserFormComponent implements OnInit {
         role: new FormControl(this.data.role, [Validators.required])
       });
 
-      let departmentId = this._depService.getDep(this.data.department).subscribe({
-        next: data => {
-          departmentId = data.id;
-          this.userForm.get('departmentId').setValue(departmentId);         
-        },
-        error: err => {
-          this.apiResponse = err.error;
-        }
-      });
+      let departmentId = this._depService.getDep(this.data.department)
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe({
+            next: data => {
+              departmentId = data.id;
+              this.userForm.get('departmentId').setValue(departmentId);         
+            },
+            error: err => {
+              this.apiResponse = err.error;
+            }
+          });
     
       this.buttonName = BUTTON_UPDATE;
           
@@ -94,6 +101,11 @@ export class UserFormComponent implements OnInit {
         this.buttonName = BUTTON_CREATE;
       }
   };
+
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
+  }
 
   clickButton() {
     switch(this.data.action) {
@@ -118,16 +130,18 @@ export class UserFormComponent implements OnInit {
       this.userForm.value.role
     );
   
-    this._userService.createUser(newUserDto).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.clearForm();
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    });
+    this._userService.createUser(newUserDto)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.clearForm();
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
   };
 
   updateUser() {
@@ -138,15 +152,17 @@ export class UserFormComponent implements OnInit {
       this.userForm.value.role
     );
   
-    this._userService.updateUser(userDto, this.data.userId).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    });
+    this._userService.updateUser(userDto, this.data.userId)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
   };
 
   changePasswordForm() {
@@ -167,16 +183,18 @@ export class UserFormComponent implements OnInit {
     
     const newPassword = new ChangeUserPasswordDto(this.userForm.value.password);
 
-    this._userService.changeUserPassword(newPassword, this.data.userId).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    });
-  }
+    this._userService.changeUserPassword(newPassword, this.data.userId)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
+  };
 
   deleteResponseMessage() {
     setTimeout(() => {

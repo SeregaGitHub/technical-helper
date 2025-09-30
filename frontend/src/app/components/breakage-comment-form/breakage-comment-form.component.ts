@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { BreakageService } from '../../services/breakage.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { CreateBreakageCommentDto } from '../../model/breakage/create-breakage-comment-dto';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-breakage-comment-form',
@@ -22,11 +23,13 @@ import { CreateBreakageCommentDto } from '../../model/breakage/create-breakage-c
   templateUrl: './breakage-comment-form.component.html',
   styleUrl: './breakage-comment-form.component.css'
 })
-export class BreakageCommentFormComponent implements OnInit {
+export class BreakageCommentFormComponent implements OnInit, OnDestroy {
 
   breakageCommentForm: any;
   buttonName!: string;
   apiResponse: any;
+
+  private unsubscribe: Subject<void> = new Subject();
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, 
               private _breakageService: BreakageService,
@@ -53,6 +56,11 @@ export class BreakageCommentFormComponent implements OnInit {
     }
   };
 
+  ngOnDestroy(): void {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
+  }
+
   clickButton() {
     this.buttonName == BUTTON_CREATE ? this.createBreakageComment() : this.updateBreakageComment();
   };
@@ -63,7 +71,9 @@ export class BreakageCommentFormComponent implements OnInit {
       this.breakageCommentForm.value.breakageCommentText, this.data.status
     );
 
-    this._breakageService.createBreakageComment(this.data.breakageId, createBreakageCommentDto).subscribe({
+    this._breakageService.createBreakageComment(this.data.breakageId, createBreakageCommentDto)
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe({
           next: response => {
             this.apiResponse = response;
             this.clearForm();
@@ -81,16 +91,18 @@ export class BreakageCommentFormComponent implements OnInit {
       this.breakageCommentForm.value.breakageCommentText, this.data.status
     );
 
-    this._breakageService.updateBreakageComment(this.data.breakageCommentId, createBreakageCommentDto).subscribe({
-        next: response => {
-          this.apiResponse = response;
-          this.deleteResponseMessage();
-        },
-        error: err => {
-          this.apiResponse = err.error;
-        }
-      });
-  }
+    this._breakageService.updateBreakageComment(this.data.breakageCommentId, createBreakageCommentDto)
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
+  };
 
   deleteResponseMessage() {
       setTimeout(() => {
