@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 
 @Component({
@@ -30,10 +31,12 @@ import { Router } from '@angular/router';
   styleUrl: './auth.component.css'
 })
 
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
 
   authForm: any;
   authError: any;
+
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor(private _authService: AuthService, private _router: Router) {
       this.authForm = new FormGroup({
@@ -44,27 +47,33 @@ export class AuthComponent implements OnInit {
 
   ngOnInit(): void {
     localStorage.clear();
-    //localStorage.removeItem('thJwt');
+  };
+
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   };
 
   onSubmit() {
 
-    this._authService.auth(this.authForm.value).subscribe({
-      next: response => {
-        if (response.thJwt != null) {
-          localStorage.setItem("thJwt", response.thJwt);
-          this._authService.setUserProfile(response.username, response.role);
-          this._router.navigateByUrl("/breakage");
-        }
-      },
-      error: err => {
-        if (err.status <= 0) {
-          this.authError = 'Отказано в подключении к серверу Gateway !!!';
-        } else {
-          this.authError = err.error.message;
-        }
-      }
-    });
+    this._authService.auth(this.authForm.value)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            if (response.thJwt != null) {
+              localStorage.setItem("thJwt", response.thJwt);
+              this._authService.setUserProfile(response.username, response.role);
+              this._router.navigateByUrl("/breakage");
+            }
+          },
+          error: err => {
+            if (err.status <= 0) {
+              this.authError = 'Отказано в подключении к серверу Gateway !!!';
+            } else {
+              this.authError = err.error.message;
+            }
+          }
+        });
   };
 
   // onSubmit() {
