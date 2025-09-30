@@ -1,0 +1,84 @@
+table {
+    width: 100%;
+}
+  
+th {
+    font-weight: bolder;
+    text-decoration: underline;
+    text-underline-offset: 0.5rem;
+    text-decoration-thickness: 0.1rem;
+    text-align: center;
+}
+
+p {
+    color: aquamarine;
+    font-family: michroma;
+}
+
+th, td {
+    color: aquamarine;
+    /* font-family: michroma; */
+    font-family: montserrat;
+    /* background-color: opacify($color: mediumorchid, $amount: 0.1);  
+    opacity: 20%;
+    background: rgb(8,56,134);
+    background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%); */
+}
+
+table, mat-paginator {
+    background: rgb(8,56,134);
+    background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%);
+    color: aquamarine;
+    font-family: michroma;
+    opacity: 90%;
+}
+
+/* 
+    The original version
+
+.mat-sidenav-container {
+    height: calc(205vh - 115vh);
+} */
+
+.mat-sidenav-container {
+    height: calc(205vh - 119.2vh);
+}
+  
+.mat-sidenav {
+    width: 15%;
+}
+
+.mat-icon-sidenav {
+    color: aquamarine;
+    font-size: xx-large;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.mat-icon-priority {
+    transform: scale(0.5);
+}
+
+.colorRed {
+    color: red;
+}
+
+.colorLawngreen {
+    color: lawngreen;
+}
+
+.colorAqua {
+    color: aqua;
+}
+
+.colorFuchsia {
+    color: fuchsia;
+}
+
+.colorGold {
+    color:gold;
+}
+
+.colorGreen {
+    color: green;
+}

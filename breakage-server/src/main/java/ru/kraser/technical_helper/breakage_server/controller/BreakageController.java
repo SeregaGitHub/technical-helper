@@ -48,7 +48,7 @@ public class BreakageController {
         return response;
     }
 
-    @PatchMapping(path = TECHNICIAN_URL + PRIORITY_URL)
+    @PatchMapping(path = ADMIN_URL + PRIORITY_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateBreakagePriority(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                               @RequestBody UpdateBreakagePriorityDto updateBreakagePriorityDto) {
@@ -58,13 +58,22 @@ public class BreakageController {
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL)
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse addBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                            @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
-        log.info("Adding executor and deadline of breakage with Id={}", breakageId);
+        log.info("Adding breakageExecutor and deadline of breakage with Id={}", breakageId);
         ApiResponse response = breakageService.addBreakageExecutor(breakageId, appointBreakageExecutorDto);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
+        return response;
+    }
+
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + DELETE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse dropBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Dropping breakageExecutor of breakage with Id={}", breakageId);
+        ApiResponse response = breakageService.dropBreakageExecutor(breakageId);
+        log.info("Executor and deadline of breakage with Id={}, successfully dropped", breakageId);
         return response;
     }
 
@@ -98,44 +107,37 @@ public class BreakageController {
                                        boolean priorityMedium,
                                    @RequestParam(value = "priorityLow", defaultValue = "true")
                                        boolean priorityLow,
-                                   @RequestParam(value = "executor", required = false)
+                                   @RequestParam(value = "breakageExecutor", required = false)
                                        String executor,
                                    @RequestParam(value = "deadline", defaultValue = "false")
-                                       boolean deadline
+                                       boolean deadline,
+                                   @RequestParam(value = "searchText", required = false)
+                                       String searchText
     ) {
         log.info("Getting Breakages");
         AppPage appPage = breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline);
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText);
         log.info("Breakages received successfully");
-        return appPage;
-    }
-
-    @GetMapping(path = EMPLOYEE_URL + "/{text}")
-    @ResponseStatus(HttpStatus.OK)
-    public AppPage getBreakagesByText(@PathVariable("text") String text,
-                                      @RequestParam(value = "pageSize", defaultValue = "10")
-                                      Integer pageSize,
-                                      @RequestParam(value = "pageIndex", defaultValue = "0")
-                                      Integer pageIndex,
-                                      @RequestParam(value = "sortBy", defaultValue = "lastUpdatedDate")
-                                      String sortBy,
-                                      @RequestParam(value = "direction", defaultValue = "DESC")
-                                      String direction
-    ) {
-        log.info("Getting Breakages by text");
-        AppPage appPage = breakageService.getBreakagesByText(text, pageIndex, pageSize, sortBy, direction);
-        log.info("Breakages contains text, received successfully");
         return appPage;
     }
 
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public BreakageFullDto getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+    public BreakageEmployeeDto getBreakageEmployee(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+        log.info("Getting Breakage for Employee with Id={}", breakageId);
+        BreakageEmployeeDto breakageEmployeeDto = breakageService.getBreakageEmployee(breakageId);
+        log.info("Breakage for Employee with Id={}, received successfully", breakageId);
+        return breakageEmployeeDto;
+    }
+
+    @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);
-        BreakageFullDto breakageFullDto = breakageService.getBreakage(breakageId);
+        ApiResponse response = breakageService.getBreakage(breakageId);
         log.info("Breakage with Id={}, received successfully", breakageId);
-        return breakageFullDto;
+        return response;
     }
 
     // BREAKAGE_COMMENT

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
@@ -6,7 +6,6 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/service/auth.service';
-import { Subscription } from 'rxjs';
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 
 @Component({
@@ -38,8 +37,12 @@ export class HeaderComponent {
 
     constructor(public authService: AuthService, private _router: Router) {}
 
-    ngOnInit(): void {
-      localStorage.removeItem('thJwt');
+    //ngOnInit(): void {
+      // CHECK FOR NEED !!!
+      // localStorage.removeItem('thJwt');
+      // CHECK FOR NEED !!!
+
+
 
       // console.log('HeaderComponent - init');
       // console.log('this.authService.getUserProfile() -' + this.authService.getUserProfile());
@@ -62,7 +65,7 @@ export class HeaderComponent {
       //this.roleFromStorage = localStorage.getItem('thUr');
       // console.log('nameFromStorage - ' + this.nameFromStorage);
       // console.log('roleFromStorage - ' + this.roleFromStorage);
-    }
+    //}
 
     // ngOnDestroy(): void {
   	// 	this.name?.unsubscribe();

@@ -3,7 +3,6 @@ package ru.kraser.technical_helper.breakage_server.service.service_impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_COMMENT_NOT_EXIST;
@@ -86,6 +84,7 @@ public class BreakageServiceImpl implements BreakageService {
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
                     .build();
         } else {
             throw new ForbiddenException("Только технический специалист или сотрудник отдела, " +
@@ -97,23 +96,36 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-
-        int response;
-        response = breakageRepository.updateBreakageStatus(
-                breakageId,
-                updatedStatus.status(),
-                SecurityUtil.getCurrentUserId(),
-                now
-        );
-        if (response != 1) {
-            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        if (updatedStatus.status() == Status.NEW) {
+            throw new NotCorrectParameter("Заявка на неисправность не может изменить статус на - \"Новая\" !!!");
+        } else {
+            int response;
+            if (updatedStatus.status() == Status.PAUSED || updatedStatus.status() == Status.REDIRECTED) {
+                response = breakageRepository.updateBreakageStatusAndResetExecutor(
+                        breakageId,
+                        updatedStatus.status(),
+                        SecurityUtil.getCurrentUserId(),
+                        now
+                );
+            } else {
+                response = breakageRepository.updateBreakageStatus(
+                        breakageId,
+                        updatedStatus.status(),
+                        SecurityUtil.getCurrentUserId(),
+                        now
+                );
+            }
+            if (response != 1) {
+                throw new NotFoundException(BREAKAGE_NOT_EXIST);
+            }
+            return ApiResponse.builder()
+                    .message("Статус заявки на неисправность был успешно изменен")
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("Статус заявки на неисправность была успешно изменен на - " + updatedStatus.status())
-                .status(200)
-                .httpStatus(HttpStatus.OK)
-                .timestamp(now)
-                .build();
     }
 
     @Override
@@ -121,55 +133,93 @@ public class BreakageServiceImpl implements BreakageService {
     public ApiResponse updateBreakagePriority(String breakageId, UpdateBreakagePriorityDto updatedPriority) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
 
-        int response;
-        response = breakageRepository.updateBreakagePriority(
-                breakageId,
-                updatedPriority.priority(),
-                SecurityUtil.getCurrentUserId(),
-                now
-        );
-        if (response != 1) {
-            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        if (updatedPriority.status() == Status.SOLVED || updatedPriority.status() == Status.CANCELLED) {
+            throw new NotCorrectParameter("Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
+                    " - не может быть изменена !!!");
+        } else {
+            int response;
+            response = breakageRepository.updateBreakagePriority(
+                    breakageId,
+                    updatedPriority.priority(),
+                    SecurityUtil.getCurrentUserId(),
+                    now
+            );
+            if (response != 1) {
+                throw new NotFoundException(BREAKAGE_NOT_EXIST);
+            }
+            return ApiResponse.builder()
+                    .message("Приоритет заявки на неисправность был успешно изменен")
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("Приоритет заявки на неисправность был успешно изменен на - " + updatedPriority.priority())
-                .status(200)
-                .httpStatus(HttpStatus.OK)
-                .timestamp(now)
-                .build();
     }
 
     @Override
     @Transactional
     public ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
-        LocalDate deadline = appointBreakageExecutorDto.deadline();
+        if (appointBreakageExecutorDto.status() == Status.NEW ||
+            appointBreakageExecutorDto.status() == Status.IN_PROGRESS) {
 
-        if (deadline.isBefore(now.toLocalDate())) {
-            throw new NotCorrectParameter("Необходимо указать корректный срок исполнения заявки на неисправность.");
+            LocalDateTime now = LocalDateTime.now().withNano(0);
+            LocalDate deadline = appointBreakageExecutorDto.deadline();
+
+            if (deadline.isBefore(now.toLocalDate())) {
+                throw new NotCorrectParameter("Необходимо указать корректный срок исполнения заявки на неисправность.");
+            } else {
+                int response;
+                try {
+                    response = breakageRepository.addBreakageExecutor(
+                            breakageId,
+                            appointBreakageExecutorDto.executor(),
+                            LocalDateTime.of(deadline, LocalTime.of(23, 59, 59)),
+                            SecurityUtil.getCurrentUserId(),
+                            now
+                    );
+                } catch (Exception e) {
+                    throw new NotFoundException("Пользователь, который назначается исполнителем заявки на неисправность, " +
+                            "не существует.");
+                }
+                if (response != 1) {
+                    throw new NotFoundException(BREAKAGE_NOT_EXIST);
+                }
+            }
+            return ApiResponse.builder()
+                    .message("Исполнитель заявки на неисправность и срок исполнения были успешно назначены.")
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(SecurityUtil.getCurrentUsername())
+                    .build();
         } else {
-            int response;
-            try {
-                response = breakageRepository.addBreakageExecutor(
-                        breakageId,
-                        appointBreakageExecutorDto.executor(),
-                        LocalDateTime.of(deadline, LocalTime.of(23, 59, 59)),
-                        SecurityUtil.getCurrentUserId(),
-                        now
-                );
-            } catch (Exception e) {
-                throw new NotFoundException("Пользователь, который назначается исполнителем заявки на неисправность, " +
-                        "не существует.");
-            }
-            if (response != 1) {
-                throw new NotFoundException(BREAKAGE_NOT_EXIST);
-            }
+            throw new NotCorrectParameter("Заявке на неисправность со статусами: \"В ожидании\", \"Передана\"" +
+                    ", \"Решена\" или \"Отменена\" - не может быть назначен исполнитель !!!");
         }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse dropBreakageExecutor(String breakageId) {
+        LocalDateTime now = LocalDateTime.now().withNano(0);
+
+        int response = breakageRepository.dropBreakageExecutor(
+                    breakageId,
+                    SecurityUtil.getCurrentUserId(),
+                    now
+            );
+
+        if (response != 1) {
+            throw new NotFoundException(BREAKAGE_NOT_EXIST);
+        }
+
         return ApiResponse.builder()
-                .message("Исполнитель заявки на неисправность был успешно назначен.")
+                .message("Исполнитель заявки на неисправность и срок исполнения были успешно удалены.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(now)
+                .data(SecurityUtil.getCurrentUsername())
                 .build();
     }
 
@@ -181,102 +231,150 @@ public class BreakageServiceImpl implements BreakageService {
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh,
             boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline) {
+            String executor, boolean deadline, String searchText) {
+
+        Role currentUserRole = SecurityUtil.getCurrentUserRole();
 
         PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
-                statusPaused, statusRedirected, statusCancelled, deadline);
+                statusPaused, statusRedirected, statusCancelled, deadline, currentUserRole, executor);
 
         List<Priority> priorityList = AppPageUtil.createPriorityList(priorityUrgently, priorityHigh,
                 priorityMedium, priorityLow);
 
-        if (SecurityUtil.getCurrentUserRole() == Role.EMPLOYEE) {
+        if (currentUserRole == Role.EMPLOYEE) {
             String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
-            Page<BreakageDto> pageEmployeeBreakages =
-                    breakageRepository.getAllEmployeeBreakages(
-                            statusList, priorityList, currentUserDepartmentId, pageRequest);
-            return AppPageMapper.toAppPage(pageEmployeeBreakages);
+            Page<BreakageEmployeeDto> pageEmployeeBreakages;
+            if (searchText == null || searchText.length() < 3) {
+                pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakages(
+                                statusList, priorityList, currentUserDepartmentId, pageRequest);
+            } else {
+                pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakagesByText(
+                                statusList, priorityList, currentUserDepartmentId, pageRequest, searchText);
+            }
+            return AppPageMapper.toAppPage(pageEmployeeBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToMe(
-                        statusList, priorityList, pageRequest, currentUserId, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, now);
+                } else {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, now, searchText);
+                }
             } else {
-                pageBreakages = breakageRepository.getAllBreakagesAppointedToMe(
-                                statusList, priorityList, pageRequest, currentUserId);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllBreakagesAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId);
+                } else {
+                    pageBreakages = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                            statusList, priorityList, pageRequest, currentUserId, searchText);
+                }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
             String currentUserId = SecurityUtil.getCurrentUserId();
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToOthers(
-                        statusList, priorityList, pageRequest, currentUserId, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, now);
+                } else {
+                    pageBreakages = breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, now, searchText);
+                }
             } else {
-                pageBreakages = breakageRepository.getAllBreakagesAppointedToOthers(
-                                statusList, priorityList, pageRequest, currentUserId);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages = breakageRepository.getAllBreakagesAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId);
+                } else {
+                    pageBreakages = breakageRepository.getAllBreakagesByTextAppointedToOthers(
+                            statusList, priorityList, pageRequest, currentUserId, searchText);
+                }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.NO_APPOINTED.name())) {
-            Page<BreakageDto> pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
-                    statusList, priorityList, pageRequest);
-            return AppPageMapper.toAppPage(pageBreakages);
+            Page<BreakageTechDto> pageBreakages;
+            if (searchText == null || searchText.length() < 3) {
+                pageBreakages = breakageRepository.getAllBreakagesNoAppointed(
+                        statusList, priorityList, pageRequest);
+            } else {
+                pageBreakages = breakageRepository.getAllBreakagesByTextNoAppointed(
+                        statusList, priorityList, pageRequest, searchText);
+            }
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else {
-            Page<BreakageDto> pageBreakages;
+            Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
-                pageBreakages =
-                        breakageRepository.getAllDeadlineExpiredBreakages(statusList, priorityList, pageRequest, now);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages =
+                            breakageRepository.getAllDeadlineExpiredBreakages(
+                                    statusList, priorityList, pageRequest, now);
+                } else {
+                    pageBreakages =
+                            breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                                    statusList, priorityList, pageRequest, now, searchText);
+                }
             } else {
-                pageBreakages =
-                        breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+                if (searchText == null || searchText.length() < 3) {
+                    pageBreakages =
+                            breakageRepository.getAllBreakages(statusList, priorityList, pageRequest);
+                } else {
+                    pageBreakages =
+                            breakageRepository.getAllBreakagesByText(statusList, priorityList, pageRequest, searchText);
+                }
             }
-            return AppPageMapper.toAppPage(pageBreakages);
+            return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AppPage getBreakagesByText(
-            String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
-
-        PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
-
-        Page<BreakageDto> pageBreakages = breakageRepository.getBreakagesByText(text, pageRequest);
-
-        return AppPageMapper.toAppPage(pageBreakages);
+    public BreakageEmployeeDto getBreakageEmployee(String breakageId) {
+        return breakageRepository.getBreakageEmployee(breakageId).orElseThrow(
+                () -> new NotFoundException("Данная заявка на неисправность не существует.")
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BreakageFullDto getBreakage(String breakageId) {
+    public ApiResponse getBreakage(String breakageId) {
         BreakageDto breakageDto = breakageRepository.getBreakage(breakageId).orElseThrow(
                 () -> new NotFoundException("Данная заявка на неисправность не существует.")
         );
-
         BreakageFullDto breakageFullDto;
-        if (SecurityUtil.getCurrentUserRole().equals(Role.EMPLOYEE)) {
-            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, Collections.emptyList());
-        } else {
-            List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
-            breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
-        }
 
-        return breakageFullDto;
+        List<BreakageCommentBackendDto> backComments = breakageCommentRepository.getAllBreakageComments(breakageId);
+        breakageFullDto = BreakageMapper.toBreakageFullDto(breakageDto, backComments);
+
+        return ApiResponse.builder()
+                .message("Заявка на неисправность с ID=" + breakageId + ", получена успешно")
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now().withNano(0))
+                .data(breakageFullDto)
+                .build();
     }
 
     // BREAKAGE_COMMENT
     @Override
     @Transactional
     public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId) {
+        if (createBreakageCommentDto.status() == Status.SOLVED ||
+            createBreakageCommentDto.status() == Status.CANCELLED) {
+            throw new NotCorrectParameter("Комментарии к заявке о неисправности со статусами " +
+                    "\"Решена\" и \"Отменена\" - не создаются !!!");
+        }
         try {
             Breakage breakage = breakageRepository.getReferenceById(breakageId);
             breakageCommentRepository.saveAndFlush(BreakageCommentMapper.toBreakageComment(
@@ -325,5 +423,4 @@ public class BreakageServiceImpl implements BreakageService {
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
     }
-
 }

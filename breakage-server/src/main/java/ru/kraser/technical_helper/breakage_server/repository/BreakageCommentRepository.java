@@ -30,10 +30,11 @@ public interface BreakageCommentRepository extends JpaRepository<BreakageComment
     @Query(
             value = """
                     SELECT new ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto
-                    (bc.id, bc.comment, bc.createdBy)
+                    (bc.id, bc.comment, bc.createdBy, u.username AS creatorName, bc.createdDate, bc.lastUpdatedDate)
                     FROM BreakageComment as bc
+                    JOIN User AS u ON bc.createdBy = u.id
                     WHERE bc.breakage.id = :breakageId
-                    ORDER BY bc.createdDate DESC
+                    ORDER BY bc.createdDate
                     """
     )
     List<BreakageCommentBackendDto> getAllBreakageComments(String breakageId);

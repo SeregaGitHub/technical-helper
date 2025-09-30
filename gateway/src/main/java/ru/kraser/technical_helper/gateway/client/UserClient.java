@@ -4,10 +4,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 
 import java.util.List;
 
@@ -56,6 +53,14 @@ public class UserClient extends BaseClient {
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + ALL_URL,
                 jwt,
                 ParameterizedTypeReference.forType(UserDto.class)
+        );
+    }
+
+    public List<UserShortDto> getAdminAndTechnicianList(String jwt) {
+        return super.getAll(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL,
+                jwt,
+                ParameterizedTypeReference.forType(UserShortDto.class)
         );
     }
 

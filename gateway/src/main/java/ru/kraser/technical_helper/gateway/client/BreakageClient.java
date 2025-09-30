@@ -53,7 +53,7 @@ public class BreakageClient extends BaseClient {
     public ApiResponse updateBreakagePriority(String breakageHeaderName, String breakageId,
                                               UpdateBreakagePriorityDto updatedPriority, String jwt) {
         return super.patch(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + PRIORITY_URL,
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + PRIORITY_URL,
                 updatedPriority,
                 jwt,
                 breakageHeaderName,
@@ -65,8 +65,18 @@ public class BreakageClient extends BaseClient {
     public ApiResponse addBreakageExecutor(String breakageHeaderName, String breakageId,
                                            AppointBreakageExecutorDto appointBreakageExecutorDto, String jwt) {
         return super.patch(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL,
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL,
                 appointBreakageExecutorDto,
+                jwt,
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    public ApiResponse dropBreakageExecutor(String breakageHeaderName, String breakageId, String jwt) {
+        return super.delete(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL,
                 jwt,
                 breakageHeaderName,
                 breakageId,
@@ -79,40 +89,39 @@ public class BreakageClient extends BaseClient {
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline) {
+            String executor, boolean deadline, String searchText) {
+
         return super.getAllByPage(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
                 pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline,
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText,
                 jwt,
                 ParameterizedTypeReference.forType(AppPage.class)
         );
     }
 
-    public AppPage getBreakagesByText(
-            String jwt, String text, Integer pageIndex, Integer pageSize, String sortBy, String direction) {
-        return super.getAllByText(
-                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + text,
-                jwt,
-                pageIndex,
-                pageSize,
-                sortBy,
-                direction,
-                ParameterizedTypeReference.forType(AppPage.class)
-        );
-    }
-
-    public BreakageFullDto getBreakage(String jwt, String breakageHeaderName, String breakageId) {
+    public BreakageEmployeeDto getBreakageEmployee(String jwt, String breakageHeaderName, String breakageId) {
         return super.get(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL,
                 jwt,
                 breakageHeaderName,
                 breakageId,
-                ParameterizedTypeReference.forType(BreakageFullDto.class)
+                ParameterizedTypeReference.forType(BreakageEmployeeDto.class)
         );
     }
 
+    public ApiResponse getBreakage(String jwt, String breakageHeaderName, String breakageId) {
+        return super.get(
+                BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL,
+                jwt,
+                breakageHeaderName,
+                breakageId,
+                ParameterizedTypeReference.forType(ApiResponse.class)
+        );
+    }
+
+    // BREAKAGE_COMMENT
     public ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
                                              String breakageHeaderName, String breakageId, String jwt) {
         return super.post(

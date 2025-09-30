@@ -19,26 +19,18 @@ public class SecurityUtil {
     }
 
     public String getCurrentUserId() {
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-
-        //return userDetails.getUserId();
         return getCurrentUser().getId();
     }
 
-    public Department getCurrentUserDepartment() {
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
+    public String getCurrentUsername() {
+        return getCurrentUser().getUsername();
+    }
 
-        //return userDetails.getUser().getDepartment();
+    public Department getCurrentUserDepartment() {
         return getCurrentUser().getDepartment();
     }
 
     public Role getCurrentUserRole() {
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-
-        //return userDetails.getUser().getRole();
         return getCurrentUser().getRole();
     }
 }

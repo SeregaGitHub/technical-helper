@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.ChangeUserPasswordDto;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.util.List;
@@ -58,6 +55,15 @@ public class UserController {
         List<UserDto> users =  userService.getAllUsers();
         log.info("All Users received successfully");
         return users;
+    }
+
+    @GetMapping(path = BREAKAGE_URL)
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserShortDto> getAdminAndTechnicianList() {
+        log.info("Getting admin and technician list");
+        List<UserShortDto> list = userService.getAdminAndTechnicianList();
+        log.info("Admin and technician list received successfully");
+        return list;
     }
 
     @GetMapping(path = CURRENT_URL)

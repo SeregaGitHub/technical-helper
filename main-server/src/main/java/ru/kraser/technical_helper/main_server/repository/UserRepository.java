@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.User;
 
@@ -68,6 +69,17 @@ public interface UserRepository extends JpaRepository<User, String> {
             value = GET_USER + "WHERE u.enabled = true ORDER BY u.username"
     )
     List<UserDto> getAllUsers();
+
+    @Query(
+            value = """
+                    SELECT new ru.kraser.technical_helper.common_module.dto.user.UserShortDto
+                    (u.id, u.username)
+                    FROM User AS u
+                    WHERE u.enabled = true AND (u.role = 'TECHNICIAN' OR u.role = 'ADMIN')
+                    ORDER BY u.role, u.username
+                    """
+    )
+    List<UserShortDto> getAdminAndTechnicianList();
 
     @Query(
             value = GET_USER + "WHERE u.id = :userId AND u.enabled = true"

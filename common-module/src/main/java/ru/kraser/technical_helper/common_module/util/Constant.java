@@ -27,6 +27,7 @@ public class Constant {
 
     public static final String STATUS_URL = "/status";
     public static final String PRIORITY_URL = "/priority";
+    public static final String EXECUTOR_URL = "/executor";
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String USER_ID_HEADER = "X-User-Id";

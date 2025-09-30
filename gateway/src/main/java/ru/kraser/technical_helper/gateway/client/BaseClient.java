@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 
@@ -85,6 +86,9 @@ public abstract class BaseClient {
                 .onStatus(HttpStatus.NOT_FOUND::equals,
                         clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
                 )
+                .onStatus(HttpStatus.BAD_REQUEST::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotCorrectParameter.class)
+                )
                 .bodyToMono(typeReference);
 
         return patchResponse.block();
@@ -134,7 +138,7 @@ public abstract class BaseClient {
                                  boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
                                  boolean priorityUrgently, boolean priorityHigh,
                                  boolean priorityMedium, boolean priorityLow, String executor, boolean deadline,
-                                 String jwt, ParameterizedTypeReference<T> typeReference) {
+                                 String searchText, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
                 .uri(url, uriBuilder ->
@@ -152,8 +156,9 @@ public abstract class BaseClient {
                                 .queryParam("priorityHigh", priorityHigh)
                                 .queryParam("priorityMedium", priorityMedium)
                                 .queryParam("priorityLow", priorityLow)
-                                .queryParam("executor", executor)
+                                .queryParam("breakageExecutor", executor)
                                 .queryParam("deadline", deadline)
+                                .queryParam("searchText", searchText)
                                 .build())
                 .header(AUTH_HEADER, jwt)
                 .accept(MediaType.APPLICATION_JSON)
@@ -165,7 +170,7 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
+    /*protected <T> T getAllByText(String url, String jwt, Integer pageIndex, Integer pageSize,
                                  String sortBy, String direction, ParameterizedTypeReference<T> typeReference) {
         Mono<T> getResponse = webClient
                 .get()
@@ -183,7 +188,7 @@ public abstract class BaseClient {
                 .bodyToMono(typeReference);
 
         return getResponse.block();
-    }
+    }*/
 
     protected <T> T get(String url, String jwt, String entityHeaderName,
                         String entityId, ParameterizedTypeReference<T> typeReference) {

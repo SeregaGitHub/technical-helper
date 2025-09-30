@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { DepartmentDto } from '../../model/department/department-dto';
 import { DepartmentService } from '../../services/department.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action } from '../../enum/action.enum';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-department-form',
@@ -23,11 +24,13 @@ import { BUTTON_CREATE, BUTTON_UPDATE } from '../../util/constant';
   templateUrl: './department-form.component.html',
   styleUrl: './department-form.component.css'
 })
-export class DepartmentFormComponent implements OnInit {
+export class DepartmentFormComponent implements OnInit, OnDestroy {
 
   departmentForm: any;
   buttonName!: string;
   apiResponse: ApiResponse;
+
+  private _unsubscribe: Subject<void> = new Subject();
 
   constructor(private _depService: DepartmentService, 
               private _dialogRef: MatDialogRef<DepartmentFormComponent>,
@@ -53,7 +56,12 @@ export class DepartmentFormComponent implements OnInit {
 
         this.buttonName = BUTTON_CREATE;
       }
-  }
+  };
+
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
+  };
 
   clickButton() {
     this.buttonName == BUTTON_CREATE ? this.createDepartment() : this.updateDepartment();
@@ -63,31 +71,35 @@ export class DepartmentFormComponent implements OnInit {
 
     const departmentDto = new DepartmentDto(this.departmentForm.value.name);
 
-    this._depService.createDep(departmentDto).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.clearForm();
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    })
+    this._depService.createDep(departmentDto)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+          this.apiResponse = response;
+          this.clearForm();
+          this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        })
   };
 
   updateDepartment() {
 
     const departmentDto = new DepartmentDto(this.departmentForm.value.name);
 
-    this._depService.updateDep(departmentDto, this.data.departmentId).subscribe({
-      next: response => {
-        this.apiResponse = response;
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-      }
-    });
+    this._depService.updateDep(departmentDto, this.data.departmentId)
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            this.apiResponse = response;
+            this.deleteResponseMessage();
+          },
+          error: err => {
+            this.apiResponse = err.error;
+          }
+        });
   };
 
   deleteResponseMessage() {

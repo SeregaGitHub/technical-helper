@@ -17,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Role } from '../../enum/role.enum';
 import { ViewUserFormComponent } from '../../components/view-user-form/view-user-form.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-user',
@@ -68,6 +69,8 @@ export class UserComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  private _unsubscribe: Subject<void> = new Subject();
+
   constructor (private _userService: UserService, public dialog: MatDialog) {
     this.getAllUsersError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllUsers();
@@ -87,9 +90,11 @@ export class UserComponent {
         action: Action.Create
       }});
   
-      openDialog.afterClosed().subscribe(() => {
-        this.getAllUsers();
-      });
+      openDialog.afterClosed()
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe(() => {
+            this.getAllUsers();
+          });
   };
 
   updateUser(userId: string, username: string, department: string, role: Role): void {
@@ -101,49 +106,53 @@ export class UserComponent {
         role: role
       }});
   
-      openDialog.afterClosed().subscribe(() => {
-        this.getAllUsers();
-      });
+      openDialog.afterClosed()
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe(() => {
+            this.getAllUsers();
+          });
   };
 
   getAllUsers(): void {
     this._userService
       .getAllUsers()
-        .subscribe({
-          next: data => {
-            this.users = data;
-            this.dataSource = new MatTableDataSource(this.users);
-            this.dataSource.paginator = this.paginator;
-            this.dataSource.sort = this.sort;
-          },
-          error: err => {
-            this.getAllUsersError = err.error;
-          }
-        })
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe({
+            next: data => {
+              this.users = data;
+              this.dataSource = new MatTableDataSource(this.users);
+              this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
+            },
+            error: err => {
+              this.getAllUsersError = err.error;
+            }
+          })
   };
 
   getUserById(id: string) {
       this._userService
         .getUserById(id)
-          .subscribe({
-            next: data => {
-              this.user = data;
+          .pipe(takeUntil(this._unsubscribe))
+            .subscribe({
+              next: data => {
+                this.user = data;
   
-              this.dialog.open(ViewUserFormComponent, {data: {
-                userId: this.user.id,
-                username: this.user.username,
-                userDepartment: this.user.department,
-                userRole: this.user.role,
-                createdBy: this.user.createdBy,
-                createdDate: this.user.createdDate,
-                lastUpdatedBy: this.user.lastUpdatedBy,
-                lastUpdatedDate: this.user.lastUpdatedDate
-              }});
-            },
-            error: err => {
-              this.getAllUsersError = err.error;
-            }
-          });
+                this.dialog.open(ViewUserFormComponent, {data: {
+                  userId: this.user.id,
+                  username: this.user.username,
+                  userDepartment: this.user.department,
+                  userRole: this.user.role,
+                  createdBy: this.user.createdBy,
+                  createdDate: this.user.createdDate,
+                  lastUpdatedBy: this.user.lastUpdatedBy,
+                  lastUpdatedDate: this.user.lastUpdatedDate
+                }});
+              },
+              error: err => {
+                this.getAllUsersError = err.error;
+              }
+            });
     };
 
   deleteUser(id: string, username: string): void {
@@ -151,19 +160,22 @@ export class UserComponent {
         name: username 
       }});
   
-      openDialog.afterClosed().subscribe(
-        (confirmResult ) => {
-          if (confirmResult) {
-            this._userService.deleteUser(id)
-              .subscribe({
-                next: () => {
-                  this.getAllUsers();
-                },
-                error: () => {
-                  this.getAllUsers();
-                }
-              });
-          };
-      });
+      openDialog.afterClosed()
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe(
+            (confirmResult ) => {
+              if (confirmResult) {
+                this._userService.deleteUser(id)
+                  .pipe(takeUntil(this._unsubscribe))
+                    .subscribe({
+                      next: () => {
+                        this.getAllUsers();
+                      },
+                      error: () => {
+                        this.getAllUsers();
+                      }
+                    });
+              };
+          });
   };
 }

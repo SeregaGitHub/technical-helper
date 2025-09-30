@@ -11,17 +11,18 @@ import java.time.LocalDateTime;
 public record BreakageDto(
         String id,
         String departmentId,
-        String departmentName,      // emp
-        String room,                // emp
-        String breakageTopic,       // emp
+        String breakageExecutorId,
+        String departmentName,
+        String room,
+        String breakageTopic,
         String breakageText,
-        Status status,              // emp
-        Priority priority,          // emp
-        String executor,            // emp
+        Status status,
+        Priority priority,
+        String breakageExecutor,
         String executorAppointedBy,
-        String createdBy,           // emp
+        String createdBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
-        LocalDateTime createdDate,  // emp
+        LocalDateTime createdDate,
         String lastUpdatedBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
         LocalDateTime lastUpdatedDate,

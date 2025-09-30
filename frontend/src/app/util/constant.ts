@@ -9,15 +9,20 @@ export const EMPLOYEE_URL = '/employee';
 export const DEPARTMENT_URL = '/department';
 export const USER_URL = '/user';
 export const BREAKAGE_URL = '/breakage';
+export const BREAKAGE_COMMENT_URL = '/comment';
 export const ALL_URL = '/all';
 export const DELETE_URL = '/delete';
 export const CURRENT_URL = '/current';
+export const EXECUTOR_URL = "/executor";
 
 export const DATE_FORMAT = 'dd-MM-yyyy HH:mm:ss';
+export const DEADLINE_DATE_FORMAT = 'dd-MM-yyyy';
 
 export const DEPARTMENT_ID = 'X-Department-Id';
 export const DEPARTMENT_NAME = 'X-Department-Name';
 export const USER_ID = 'X-User-Id';
+export const BREAKAGE_ID = "X-Breakage-Id";
+export const BREAKAGE_COMMENT_ID_HEADER = "X-BreakageComment-Id"
 
 export const BUTTON_CREATE = 'Создать';
 export const BUTTON_UPDATE = 'Изменить';

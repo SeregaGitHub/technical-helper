@@ -18,6 +18,14 @@ export class CustomPaginatorIntl extends MatPaginatorIntl {
         const startIndex = page * pageSize;
         const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
 
+        // console.log('CustomPaginatorIntl');
+        // console.log('startIndex');
+        // console.log(startIndex);
+        // console.log('endIndex');
+        // console.log(endIndex);
+        // console.log('length');
+        // console.log(length);
+
         //return `${initialText} ${startIndex + 1} - ${endIndex} из ${length}`;
         return `${startIndex + 1} - ${endIndex} из ${length}`;
     }

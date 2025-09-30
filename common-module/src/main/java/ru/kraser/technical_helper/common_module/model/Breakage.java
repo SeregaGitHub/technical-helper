@@ -24,7 +24,7 @@ public class Breakage extends BaseEntity {
     @Column(name = "room", length = 128, nullable = false)
     private String room;
 
-    @Column(name = "breakage_topic", length = 64, nullable = false)
+    @Column(name = "breakage_topic", length = 128, nullable = false)
     private String breakageTopic;
 
     @Column(name = "breakage_text", length = 2048, nullable = false)

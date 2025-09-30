@@ -40,10 +40,8 @@ public class BreakageMapper {
         return breakage;
     }
 
-    public BreakageFullDto toBreakageFullDto(
-            BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments) {
+    public BreakageFullDto toBreakageFullDto(BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments) {
         String currentUserId = SecurityUtil.getCurrentUserId();
-
         List<BreakageCommentFrontDto> comments = backComments.stream()
                 .map(comment -> toFrontCommentDto(comment, currentUserId))
                 .toList();
@@ -51,13 +49,14 @@ public class BreakageMapper {
         return BreakageFullDto.builder()
                 .id(breakageDto.id())
                 .departmentId(breakageDto.departmentId())
+                .breakageExecutorId(breakageDto.breakageExecutorId())
                 .departmentName(breakageDto.departmentName())
                 .room(breakageDto.room())
                 .breakageTopic(breakageDto.breakageTopic())
                 .breakageText(breakageDto.breakageText())
                 .status(breakageDto.status())
                 .priority(breakageDto.priority())
-                .executor(breakageDto.executor())
+                .breakageExecutor(breakageDto.breakageExecutor())
                 .executorAppointedBy(breakageDto.executorAppointedBy())
                 .createdBy(breakageDto.createdBy())
                 .createdDate(breakageDto.createdDate())
@@ -75,6 +74,9 @@ public class BreakageMapper {
                 .id(backendDto.id())
                 .comment(backendDto.comment())
                 .actionEnabled(actionEnabled)
+                .creatorName(backendDto.creatorName())
+                .createdDate(backendDto.createdDate())
+                .lastUpdatedDate(backendDto.lastUpdatedDate())
                 .build();
     }
 }

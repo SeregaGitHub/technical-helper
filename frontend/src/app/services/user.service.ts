@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { CreateUserDto } from '../model/user/create-user-dto';
 import { HttpHeadersFactory } from '../generator/headers-factory';
 import { ADMIN_URL, ALL_URL, BASE_URL, CURRENT_URL, DELETE_URL, GATEWAY_URL, USER_ID, USER_URL } from '../util/constant';
@@ -14,25 +14,26 @@ export class UserService {
 
     constructor(private _http: HttpClient) { }
 
-    userSubject = new BehaviorSubject<any>({
-        users: [],
-        loading: false,
-        newUser: null
-    });
+    userSubject = new Subject<any>();
+
+    // userSubject = new BehaviorSubject<any>({});
 
     createUser(createUserDto: CreateUserDto): Observable<any> {
 
         const headers = HttpHeadersFactory.createPermanentHeaders();
 
         return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL, createUserDto, {headers})
+            // .pipe(
+            //     tap((newUser) => {
+            //         const currentState = this.userSubject.value;
+            //         this.userSubject.next({...currentState, newUser});
+            //     })
+            // );
+
             .pipe(
                 tap((newUser) => {
-                    const currentState = this.userSubject.value;
-
-                    this.userSubject.next({...currentState,
-                    users:
-                    [newUser, ...currentState.users]
-                  });
+                    const currentState = this.userSubject;
+                    this.userSubject.next({...currentState, newUser});
                 })
             );
     };
@@ -44,13 +45,9 @@ export class UserService {
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL, updateUserDto, {headers})
             .pipe(
-                tap((user) => {
-                    const currentState = this.userSubject.value;
-
-                    this.userSubject.next({...currentState,
-                    users:
-                    [user, ...currentState.users]
-                  });
+                tap((updatedUser) => {
+                    const currentState = this.userSubject;
+                    this.userSubject.next({...currentState, updatedUser});
                 })
             );
     };
@@ -70,9 +67,9 @@ export class UserService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + ALL_URL, {headers})
             .pipe(
                 tap(
-                    (users) => {
-                        const currentState = this.userSubject.value;
-                        this.userSubject.next({...currentState, users})
+                    (allUsers) => {
+                        const currentState = this.userSubject;
+                        this.userSubject.next({...currentState, allUsers})
                     }
                 )
             );
@@ -86,12 +83,8 @@ export class UserService {
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL, {headers})
             .pipe(
                 tap((user) => {
-                    const currentState = this.userSubject.value;
-    
-                    this.userSubject.next({...currentState, 
-                    users:
-                    [user, ...currentState.users] 
-                  });
+                    const currentState = this.userSubject;
+                    this.userSubject.next({...currentState, user});
                 })
             );
     };

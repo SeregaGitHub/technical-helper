@@ -17,14 +17,18 @@ public interface BreakageService {
 
     ApiResponse addBreakageExecutor(String breakageId, AppointBreakageExecutorDto appointBreakageExecutorDto);
 
+    ApiResponse dropBreakageExecutor(String breakageId);
+
     AppPage getAllBreakages(
             Integer pageSize, Integer pageIndex, String sortBy, String direction,
             boolean statusNew, boolean statusSolved, boolean statusInProgress,
             boolean statusPaused, boolean statusRedirected, boolean statusCancelled,
             boolean priorityUrgently, boolean priorityHigh, boolean priorityMedium, boolean priorityLow,
-            String executor, boolean deadline);
+            String executor, boolean deadline, String searchText);
 
-    AppPage getBreakagesByText(String text, Integer pageIndex, Integer pageSize, String sortBy, String direction);
+    BreakageEmployeeDto getBreakageEmployee(String breakageId);
+
+    ApiResponse getBreakage(String breakageId);
 
     // BREAKAGE_COMMENT
     ApiResponse createBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageId);
@@ -32,6 +36,4 @@ public interface BreakageService {
     ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto, String breakageCommentId);
 
     ApiResponse deleteBreakageComment(String breakageCommentId);
-
-    BreakageFullDto getBreakage(String breakageId);
 }

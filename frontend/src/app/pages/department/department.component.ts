@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -16,6 +16,7 @@ import { Action } from '../../enum/action.enum';
 import { ApiResponse } from '../../model/response/api-response';
 import { ApiResponseFactory } from '../../generator/api-response-factory';
 import { ViewDepartmentFormComponent } from '../../components/view-department-form/view-department-form.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-department',
@@ -34,7 +35,7 @@ import { ViewDepartmentFormComponent } from '../../components/view-department-fo
     { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
   ]
 })
-export class DepartmentComponent {
+export class DepartmentComponent implements OnDestroy {
   //export class DepartmentComponent implements AfterViewInit {
 
   number = '№';
@@ -64,10 +65,17 @@ export class DepartmentComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  private _unsubscribe: Subject<void> = new Subject();
+
   constructor (private _depService: DepartmentService, public dialog: MatDialog) {
     // this.dataSource = new MatTableDataSource(this.dep);
     this.getAllDepError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllDep();
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   }
 
   // ngAfterViewInit() {
@@ -90,9 +98,11 @@ export class DepartmentComponent {
       action: Action.Create
     }});
 
-    openDialog.afterClosed().subscribe(() => {
-      this.getAllDep();
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe(() => {
+          this.getAllDep();
+        });
   };
 
   updateDep(id: string, name: string): void {
@@ -102,47 +112,51 @@ export class DepartmentComponent {
       departmentName: name
     }});
 
-    openDialog.afterClosed().subscribe(() => {
-      this.getAllDep();
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe(() => {
+          this.getAllDep();
+        });
   };
 
   getAllDep(): void {
     this._depService
       .getAllDep()
-        .subscribe({
-          next: data => {
-            this.departments = data;
-            this.dataSource = new MatTableDataSource(this.departments);
-            this.dataSource.paginator = this.paginator;
-            this.dataSource.sort = this.sort;
-          },
-          error: err => {
-            this.getAllDepError = err.error;
-          }
-        })
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe({
+            next: data => {
+              this.departments = data;
+              this.dataSource = new MatTableDataSource(this.departments);
+              this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
+            },
+            error: err => {
+              this.getAllDepError = err.error;
+            }
+          })
   };
 
   getDepById(id: string) {
     this._depService
       .getDepById(id)
-        .subscribe({
-          next: data => {
-            this.department = data;
+        .pipe(takeUntil(this._unsubscribe))
+          .subscribe({
+            next: data => {
+              this.department = data;
 
-            this.dialog.open(ViewDepartmentFormComponent, {data: {
-              departmentId: this.department.id,
-              departmentName: this.department.name,
-              createdBy: this.department.createdBy,
-              createdDate: this.department.createdDate,
-              lastUpdatedBy: this.department.lastUpdatedBy,
-              lastUpdatedDate: this.department.lastUpdatedDate
-            }});
-          },
-          error: err => {
-            this.getAllDepError = err.error;
-          }
-        })
+              this.dialog.open(ViewDepartmentFormComponent, {data: {
+                departmentId: this.department.id,
+                departmentName: this.department.name,
+                createdBy: this.department.createdBy,
+                createdDate: this.department.createdDate,
+                lastUpdatedBy: this.department.lastUpdatedBy,
+                lastUpdatedDate: this.department.lastUpdatedDate
+              }});
+            },
+            error: err => {
+              this.getAllDepError = err.error;
+            }
+          })
   };
 
   deleteDep(id: string, name: string): void {
@@ -150,19 +164,22 @@ export class DepartmentComponent {
       name: name 
     }});
 
-    openDialog.afterClosed().subscribe(
-      (confirmResult ) => {
-        if (confirmResult) {
-          this._depService.deleteDep(id)
-            .subscribe({
-              next: () => {
-                this.getAllDep();
-              },
-              error: () => {
-                this.getAllDep();
-              }
-            });
-        };
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe(
+          (confirmResult ) => {
+            if (confirmResult) {
+              this._depService.deleteDep(id)
+                .pipe(takeUntil(this._unsubscribe))
+                  .subscribe({
+                      next: () => {
+                        this.getAllDep();
+                      },
+                      error: () => {
+                      this.getAllDep();
+                      }
+                  });
+            };
+        });
   };
 }

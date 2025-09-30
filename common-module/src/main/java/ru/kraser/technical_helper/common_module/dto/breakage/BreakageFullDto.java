@@ -13,13 +13,14 @@ import java.util.List;
 public record BreakageFullDto(
         String id,
         String departmentId,
+        String breakageExecutorId,
         String departmentName,
         String room,
         String breakageTopic,
         String breakageText,
         Status status,
         Priority priority,
-        String executor,
+        String breakageExecutor,
         String executorAppointedBy,
         String createdBy,
         @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")

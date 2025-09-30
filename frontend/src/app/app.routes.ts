@@ -6,12 +6,17 @@ import { DepartmentComponent } from './pages/department/department.component';
 import { RoleGuard } from './security/role-guard.guard';
 import { Role } from './enum/role.enum';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { CurrentBreakageComponent } from './pages/current-breakage/current-breakage.component';
 
 
 export const routes: Routes = [
     { path: '', redirectTo: 'auth', pathMatch: 'full' },
     { path: 'auth', component: AuthComponent },
     { path: 'breakage', component: BreakageComponent, 
+        canActivate: [RoleGuard], data: {
+             roles: [Role.Admin, Role.Technician, Role.Employee]
+            } },
+    { path: 'breakage/:id', component: CurrentBreakageComponent, 
         canActivate: [RoleGuard], data: {
              roles: [Role.Admin, Role.Technician, Role.Employee]
             } },

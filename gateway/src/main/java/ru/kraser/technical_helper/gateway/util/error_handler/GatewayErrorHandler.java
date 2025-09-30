@@ -141,6 +141,6 @@ public class GatewayErrorHandler {
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .timestamp(LocalDateTime.now().withNano(0))
                 .build();
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
