@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -28,6 +28,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { BreakageCommentFormComponent } from '../../components/breakage-comment-form/breakage-comment-form.component';
 import { Action } from '../../enum/action.enum';
 import { StatusView } from '../../util/status-view';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-current-breakage',
@@ -49,13 +50,11 @@ import { StatusView } from '../../util/status-view';
     DatePipe
   ],
 })
-export class CurrentBreakageComponent implements OnInit {
+export class CurrentBreakageComponent implements OnInit, OnDestroy {
 
   statusMap = EnumViewFactory.getStatusViews();
   priorityMap = EnumViewFactory.getPriorityViews();
 
-  sub: any;
-  emplSub: any;
   isEmployee!: boolean;
 
   currentBreakage: any;
@@ -100,6 +99,8 @@ export class CurrentBreakageComponent implements OnInit {
   public displayedColumns: string[] = [ 'number', 'comment', 'creatorName', 'createdDate', 'lastUpdatedDate', 'actions' ];
   public dataSource!: MatTableDataSource<BreakageComment>;
 
+  private unsubscribe: Subject<void> = new Subject();
+
   constructor(private _location: Location, 
               private _activatedRoute: ActivatedRoute, 
               private _breakageService: BreakageService,
@@ -111,12 +112,16 @@ export class CurrentBreakageComponent implements OnInit {
     this._locale.set('ru');
     this._adapter.setLocale(this._locale());
 
-    this.sub = this._activatedRoute.params.subscribe(params => {
-      this.breakageId = params['id'];
+    this._activatedRoute.params
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe(params => {
+          this.breakageId = params['id'];
     });
 
-    this.emplSub = this._activatedRoute.queryParams.subscribe(queryParams => {
-      this.isEmployee = JSON.parse(queryParams['isEmployee'].toLowerCase());
+    this._activatedRoute.queryParams
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe(queryParams => {
+          this.isEmployee = JSON.parse(queryParams['isEmployee'].toLowerCase());
     });
   }
   
@@ -124,55 +129,62 @@ export class CurrentBreakageComponent implements OnInit {
     this.getCurrentBreakage();
   };
 
+  ngOnDestroy(): void {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
+  }
+
   getCurrentBreakage() {
     if (this.isEmployee) {
 
       this.currentBreakage = this._breakageService
         .getBreakageEmployeeById(this.breakageId)
-          .subscribe({
-            next: data => {
-              this.currentBreakage = data;
-              this.status = this.currentBreakage.status;
-              this.bufferStatus = this.status;
-              this.breakageExecutor = this.currentBreakage.breakageExecutor;
+          .pipe(takeUntil(this.unsubscribe))
+            .subscribe({
+              next: data => {
+                this.currentBreakage = data;
+                this.status = this.currentBreakage.status;
+                this.bufferStatus = this.status;
+                this.breakageExecutor = this.currentBreakage.breakageExecutor;
               
-              this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
-            },
-            error: err => {
-              this.apiResponse = err;
-            }
-          });
+                this.employeeStatuses = EnumViewFactory.getEmployeeStatuses(this.status);
+              },
+              error: err => {
+                this.apiResponse = err;
+              }
+            });
     } else {
 
       this.currentBreakage = this._breakageService
         .getBreakageById(this.breakageId)
-          .subscribe({
-            next: response => {
-              this.currentBreakage = response.data;
-              this.status = this.currentBreakage.status;
-              this.bufferStatus = this.status;
-              this.breakageExecutor = this.currentBreakage.breakageExecutor;
+          .pipe(takeUntil(this.unsubscribe))
+            .subscribe({
+              next: response => {
+                this.currentBreakage = response.data;
+                this.status = this.currentBreakage.status;
+                this.bufferStatus = this.status;
+                this.breakageExecutor = this.currentBreakage.breakageExecutor;
               
-              this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
-              this.priority = this.currentBreakage.priority;
-              this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
-              this.comments = this.currentBreakage.comments;
-              this.commentsCount = this.comments.length;
-              this.dataSource = new MatTableDataSource(this.comments);
-              this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
-              this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
-              this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
-              this.statuses = EnumViewFactory.getStatuses(this.status);
+                this.breakageExecutorId = this.currentBreakage.breakageExecutorId;
+                this.priority = this.currentBreakage.priority;
+                this.executorAppointedBy = this.currentBreakage.executorAppointedBy;
+                this.comments = this.currentBreakage.comments;
+                this.commentsCount = this.comments.length;
+                this.dataSource = new MatTableDataSource(this.comments);
+                this.deadline = this._datePipe.transform(this.currentBreakage.deadline, 'yyyy-MM-dd');
+                this.now = this._datePipe.transform(response.timestamp, 'yyyy-MM-dd');
+                this.executors.push(new BreakageExecutor(this.breakageExecutorId, this.breakageExecutor));
+                this.statuses = EnumViewFactory.getStatuses(this.status);
 
-              if (this.breakageExecutorId != '' && this.deadline != null) {
-                this.isAppointed = true;
+                if (this.breakageExecutorId != '' && this.deadline != null) {
+                  this.isAppointed = true;
+                }
+
+                this.isBreakageOverdue();
+              },
+              error: err => {
+                this.apiResponse = err;
               }
-
-              this.isBreakageOverdue();
-            },
-            error: err => {
-              this.apiResponse = err;
-            }
           });
     }
   };
@@ -180,20 +192,22 @@ export class CurrentBreakageComponent implements OnInit {
   setPriority(priority: Priority) {
     const updateBreakagePriorityDto = new UpdateBreakagePriorityDto(priority, this.status);
 
-    this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto).subscribe({
-      next: response => {
-        this.priority = priority;
-        this.apiResponse = response;
-        this.currentBreakage.lastUpdatedBy = response.data;
-        this.currentBreakage.lastUpdatedDate = response.timestamp;
-        this.deleteResponseMessage();
-      },
-      error: err => {
-        this.apiResponse = err.error;
-        this.deleteResponseMessage();
-      }
-    });
-  }
+    this._breakageService.setPriority(this.breakageId, updateBreakagePriorityDto)
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe({
+          next: response => {
+          this.priority = priority;
+          this.apiResponse = response;
+          this.currentBreakage.lastUpdatedBy = response.data;
+          this.currentBreakage.lastUpdatedDate = response.timestamp;
+          this.deleteResponseMessage();
+        },
+        error: err => {
+          this.apiResponse = err.error;
+          this.deleteResponseMessage();
+        }
+      });
+  };
 
   setStatus(status: Status) {
     
@@ -204,14 +218,16 @@ export class CurrentBreakageComponent implements OnInit {
               status: this.statusMap.get(status) 
           }});
 
-          openDialog.afterClosed().subscribe(
-            (confirmResult ) => {
-              if (confirmResult) {
-                this.setStatusToBackend(status);
-              } else {
-                this.status = this.bufferStatus;
-              };
-          });
+          openDialog.afterClosed()
+            .pipe(takeUntil(this.unsubscribe))
+              .subscribe(
+                (confirmResult ) => {
+                  if (confirmResult) {
+                    this.setStatusToBackend(status);
+                  } else {
+                    this.status = this.bufferStatus;
+                  };
+              });
       } else {
           this.setStatusToBackend(status);
           if (this.bufferStatus === Status.New) {
@@ -228,88 +244,94 @@ export class CurrentBreakageComponent implements OnInit {
               status: this.statusMap.get(status) 
           }});
 
-          openDialog.afterClosed().subscribe(
-            (confirmResult ) => {
-              if (confirmResult) {
-                this.cancelBreakageToBackend(this.breakageId, this.currentBreakage.departmentId);
-              } else {
-                this.status = this.bufferStatus;
-              };
-          });
+          openDialog.afterClosed()
+            .pipe(takeUntil(this.unsubscribe))
+              .subscribe(
+                (confirmResult ) => {
+                  if (confirmResult) {
+                    this.cancelBreakageToBackend(this.breakageId, this.currentBreakage.departmentId);
+                  } else {
+                    this.status = this.bufferStatus;
+                  };
+              });
     }
-  }
+  };
 
   cancelBreakageToBackend(id: string, departmentId: string) {
       this._breakageService.cancelBreakage(id, departmentId)
-        .subscribe({
-          next: response => {
-            this.status = Status.Cancelled;
-            this.isOverdue = false;
-            this.apiResponse = response;
-            this.deleteResponseMessage();
-            this.bufferStatus = this.status;
-            this.currentBreakage.lastUpdatedBy = response.data;
-            this.currentBreakage.lastUpdatedDate = response.timestamp;
-          },
-          error: err => {
-            this.apiResponse = err.error;
-            this.deleteResponseMessage();
-          }
-        });
-  }
+        .pipe(takeUntil(this.unsubscribe))
+          .subscribe({
+            next: response => {
+              this.status = Status.Cancelled;
+              this.isOverdue = false;
+              this.apiResponse = response;
+              this.deleteResponseMessage();
+              this.bufferStatus = this.status;
+              this.currentBreakage.lastUpdatedBy = response.data;
+              this.currentBreakage.lastUpdatedDate = response.timestamp;
+            },
+            error: err => {
+              this.apiResponse = err.error;
+              this.deleteResponseMessage();
+            }
+          });
+  };
 
   setStatusToBackend(status: Status) {
       const updateBreakageStatusDto = new UpdateBreakageStatusDto(status);
 
       this._breakageService.setStatus(this.breakageId, updateBreakageStatusDto)
-        .subscribe({
-          next: response => {
-            this.status = status;
-            this.apiResponse = response;
-            this.deleteResponseMessage();
-            this.bufferStatus = this.status;
-            this.currentBreakage.lastUpdatedBy = response.data;
-            this.currentBreakage.lastUpdatedDate = response.timestamp;
-            if (status === Status.Paused || status === Status.Redirected) {
-              this.isOverdue = false;
-              this.deadline = null;
-              this.breakageExecutorId = '';
-              this.breakageExecutor = 'Не назначен';
-              this.executorAppointedBy = 'Отсутствует';
-              this.executors.splice(0);
-              this.executors.push(new BreakageExecutor('', 'Не назначен'));
-            } else if (status === Status.Solved || status === Status.Cancelled) {
+        .pipe(takeUntil(this.unsubscribe))
+          .subscribe({
+            next: response => {
+              this.status = status;
+              this.apiResponse = response;
+              this.deleteResponseMessage();
+              this.bufferStatus = this.status;
+              this.currentBreakage.lastUpdatedBy = response.data;
+              this.currentBreakage.lastUpdatedDate = response.timestamp;
+
+              if (status === Status.Paused || status === Status.Redirected) {
                 this.isOverdue = false;
+                this.deadline = null;
+                this.breakageExecutorId = '';
+                this.breakageExecutor = 'Не назначен';
+                this.executorAppointedBy = 'Отсутствует';
+                this.executors.splice(0);
+                this.executors.push(new BreakageExecutor('', 'Не назначен'));
+              } else if (status === Status.Solved || status === Status.Cancelled) {
+                  this.isOverdue = false;
+              }
+            },
+            error: err => {
+              this.apiResponse = err.error;
+              this.deleteResponseMessage();
             }
-          },
-          error: err => {
-            this.apiResponse = err.error;
-            this.deleteResponseMessage();
-          }
-        });
-  }
+          });
+  };
 
   clickExecutor(): void {
     
     this._breakageService.getAdminAndTechnicianList()
-      .subscribe({
-        next: data => {
-          if (this.executors.length === 1 && this.breakageExecutorId === '') {
-            this.executors = [...this.executors, ...data];
-          } else {
-            this.executors.splice(0);
-            this.executors.push(new BreakageExecutor('', 'Не назначен'));
-            this.executors = [...this.executors, ...data];
-          }
-        },
-        error: err => {
-          this.apiResponse = err;
-            setTimeout(() => {
-              this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
-            }, 3000);
-          }
-      })
-  }
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe({
+          next: data => {
+            if (this.executors.length === 1 && this.breakageExecutorId === '') {
+              this.executors = [...this.executors, ...data];
+            } else {
+              this.executors.splice(0);
+              this.executors.push(new BreakageExecutor('', 'Не назначен'));
+              this.executors = [...this.executors, ...data];
+            }
+          },
+          error: err => {
+            this.apiResponse = err;
+              setTimeout(() => {
+                this.apiResponse = ApiResponseFactory.createEmptyApiResponse();
+              }, 3000);
+            }
+        })
+  };
 
   setExecutor(id: string, username: string) {
     this.breakageExecutorId = id;
@@ -330,10 +352,31 @@ export class CurrentBreakageComponent implements OnInit {
       const executor = new AppointBreakageExecutorDto(this.breakageExecutorId, new Date(+year, +month - 1, +day, 23, 59, 59), this.status);
 
       this._breakageService.addBreakageExecutor(this.breakageId, executor)
+        .pipe(takeUntil(this.unsubscribe))
+          .subscribe({
+            next: response => {
+              this.apiResponse = response;
+              this.isOverdue = false;
+              this.deleteResponseMessage();
+              this.currentBreakage.lastUpdatedBy = response.data;
+              this.currentBreakage.lastUpdatedDate = response.timestamp;
+            },
+            error: err => {
+              this.apiResponse = err.error;
+              this.deleteResponseMessage();
+            }
+          })
+    }
+  };
+
+  dropBreakageExecutor() {
+
+    this._breakageService.dropExecutor(this.breakageId)
+      .pipe(takeUntil(this.unsubscribe))
         .subscribe({
           next: response => {
+            this.dropExecutorVariables();
             this.apiResponse = response;
-            this.isOverdue = false;
             this.deleteResponseMessage();
             this.currentBreakage.lastUpdatedBy = response.data;
             this.currentBreakage.lastUpdatedDate = response.timestamp;
@@ -342,27 +385,8 @@ export class CurrentBreakageComponent implements OnInit {
             this.apiResponse = err.error;
             this.deleteResponseMessage();
           }
-        })
-    }
-  }
-
-  dropBreakageExecutor() {
-
-    this._breakageService.dropExecutor(this.breakageId)
-      .subscribe({
-        next: response => {
-          this.dropExecutorVariables();
-          this.apiResponse = response;
-          this.deleteResponseMessage();
-          this.currentBreakage.lastUpdatedBy = response.data;
-          this.currentBreakage.lastUpdatedDate = response.timestamp;
-        },
-        error: err => {
-          this.apiResponse = err.error;
-          this.deleteResponseMessage();
-        }
-      });
-  }
+        });
+  };
 
   private dropExecutorVariables() {
       this.currentBreakage.breakageExecutor = 'Не назначен';
@@ -432,9 +456,11 @@ export class CurrentBreakageComponent implements OnInit {
       }
     });
         
-    openDialog.afterClosed().subscribe(() => {
-        this.getCurrentBreakage();
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.getCurrentBreakage();
+        });
   };
 
   updateComment(id: string, comment: string, actionEnabled: boolean) {
@@ -450,9 +476,11 @@ export class CurrentBreakageComponent implements OnInit {
         }
     });
 
-    openDialog.afterClosed().subscribe(() => {
-        this.getCurrentBreakage();
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.getCurrentBreakage();
+        });
     }
   };
 
@@ -462,20 +490,22 @@ export class CurrentBreakageComponent implements OnInit {
       name: 'комментария № - ' + number 
     }});
 
-    openDialog.afterClosed().subscribe(
-      (confirmResult ) => {
-        if (confirmResult) {
-          this._breakageService.deleteBreakageComment(id)
-            .subscribe({
-              next: () => {
-                this.getCurrentBreakage();
-              },
-              error: () => {
-                this.getCurrentBreakage();
-              }
-            });
-        };
-    });
+    openDialog.afterClosed()
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe((confirmResult ) => {
+          if (confirmResult) {
+            this._breakageService.deleteBreakageComment(id)
+              .pipe(takeUntil(this.unsubscribe))
+              .subscribe({
+                next: () => {
+                  this.getCurrentBreakage();
+                },
+                error: () => {
+                  this.getCurrentBreakage();
+                }
+              });
+          };
+        });
   };
 
   backClicked() {

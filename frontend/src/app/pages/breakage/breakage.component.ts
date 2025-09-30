@@ -23,6 +23,7 @@ import { CustomBreakagePaginatorIntl } from '../../util/custom-breakage-paginato
 import { UserProfileDirective } from '../../directive/user-profile.directive';
 import { Router } from '@angular/router';
 import { LocalStorageUtil } from '../../util/local-storage-util';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-breakage',
@@ -107,6 +108,8 @@ export class BreakageComponent implements OnInit, OnDestroy{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  private unsubscribe: Subject<void> = new Subject();
+
   constructor (private _breakageService: BreakageService, public dialog: MatDialog, private _router: Router) { 
     this.getAllBreakagesError = ApiResponseFactory.createEmptyApiResponse();
    }
@@ -174,6 +177,9 @@ export class BreakageComponent implements OnInit, OnDestroy{
     localStorage.setItem('thDeadline', LocalStorageUtil.booleanToString(this.deadline));
 
     localStorage.setItem('thSearchText', this.searchText);
+
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   applyFilter(event: Event) {
@@ -226,8 +232,10 @@ export class BreakageComponent implements OnInit, OnDestroy{
     
     const openDialog = this.dialog.open(BreakageFormComponent);
     
-    openDialog.afterClosed().subscribe(() => {
-        this.getAllBreakages();
+    openDialog.afterClosed()
+      .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.getAllBreakages();
     });
   };
 
@@ -250,6 +258,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
         this.priorityUrgently, this.priorityHigh, this.priorityMedium, this.priorityLow,
         this.executor, this.deadline, this.searchText
       )
+      .pipe(takeUntil(this.unsubscribe))
         .subscribe({
           next: data => {
 
