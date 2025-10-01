@@ -253,15 +253,15 @@ CREATE OR REPLACE FUNCTION audit_breakage_comment() RETURNS trigger AS '
 BEGIN
     IF TG_OP = ''INSERT'' THEN
 	    INSERT INTO breakage_comment_audit
-	        SELECT ''I'', nt.id, nt.comment, nt.last_updated_by, nt.last_updated_date, nt.breakage
+	        SELECT ''I'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
 	        FROM new_table AS nt;
 	ELSEIF TG_OP = ''UPDATE'' THEN
 	    INSERT INTO breakage_comment_audit
-	        SELECT ''U'', nt.id, nt.comment, nt.last_updated_by, nt.last_updated_date, nt.breakage
+	        SELECT ''U'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
         	FROM new_table AS nt;
     ELSEIF TG_OP = ''DELETE'' THEN
     	INSERT INTO breakage_comment_audit
-    	    SELECT ''D'', ot.id, ot.comment, ot.last_updated_by, NOW()::timestamp, ot.breakage
+    	    SELECT ''D'', ot.id, ot.breakage, ot.comment, ot.last_updated_by, NOW()::timestamp
             FROM old_table AS ot;
     END IF;
 	RETURN NULL;
