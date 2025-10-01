@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public record UserDto(
         String id,
         String username,
+        String departmentId,
         String department,
         Role role,
         String createdBy,

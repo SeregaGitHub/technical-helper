@@ -97,11 +97,12 @@ export class UserComponent {
           });
   };
 
-  updateUser(userId: string, username: string, department: string, role: Role): void {
+  updateUser(userId: string, username: string, departmentId: string, department: string, role: Role): void {
       const openDialog = this.dialog.open(UserFormComponent, {data: {
         action: Action.Update,
         userId: userId,
         username: username,
+        departmentId: departmentId,
         department: department,
         role: role
       }});

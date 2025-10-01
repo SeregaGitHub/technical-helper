@@ -66,21 +66,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
 
       this.userForm = new FormGroup({
         username: new FormControl(this.data.username, [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
-        departmentId: new FormControl('', [Validators.required]),
+        departmentId: new FormControl(this.data.departmentId, [Validators.required]),
         role: new FormControl(this.data.role, [Validators.required])
       });
-
-      let departmentId = this._depService.getDep(this.data.department)
-        .pipe(takeUntil(this._unsubscribe))
-          .subscribe({
-            next: data => {
-              departmentId = data.id;
-              this.userForm.get('departmentId').setValue(departmentId);         
-            },
-            error: err => {
-              this.apiResponse = err.error;
-            }
-          });
     
       this.buttonName = BUTTON_UPDATE;
           
