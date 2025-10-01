@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseEntity extends BaseEntityShot {
+public class BaseEntity {
 
     @Id
     @GeneratedValue
@@ -30,4 +30,10 @@ public class BaseEntity extends BaseEntityShot {
 
     @Column(name = "created_date")
     public LocalDateTime createdDate;
+
+    @Column(name = "last_updated_by", length = 36)
+    public String lastUpdatedBy;
+
+    @Column(name = "last_updated_date")
+    public LocalDateTime lastUpdatedDate;
 }

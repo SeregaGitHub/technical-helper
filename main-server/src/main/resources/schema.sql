@@ -20,6 +20,38 @@ ALTER TABLE IF EXISTS department
 	DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
 
 
+DO
+'
+BEGIN
+    CREATE TYPE user_role AS ENUM (''ADMIN'', ''TECHNICIAN'', ''EMPLOYEE'');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END
+'
+;
+
+DO
+'
+BEGIN
+    CREATE TYPE breakage_status AS ENUM (
+                ''NEW'', ''IN_PROGRESS'', ''PAUSED'', ''REDIRECTED'', ''SOLVED'', ''CANCELLED'');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END
+'
+;
+
+DO
+'
+BEGIN
+    CREATE TYPE breakage_priority AS ENUM (''URGENTLY'', ''HIGH'', ''MEDIUM'', ''LOW'');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END
+'
+;
+
+
 CREATE TABLE IF NOT EXISTS department (
   id                varchar(36) NOT NULL,
   name              varchar(64) NOT NULL,
@@ -38,41 +70,35 @@ CREATE TABLE IF NOT EXISTS users (
   password          varchar(128) NOT NULL,
   enabled           boolean      NOT NULL,
   department        varchar(36)  NOT NULL,
-  role              varchar(15)  NOT NULL,
+  role              user_role    NOT NULL,
   created_by        varchar(36)  NOT NULL,
   created_date      timestamp    NOT NULL,
   last_updated_by   varchar(36)  NOT NULL,
   last_updated_date timestamp    NOT NULL,
   CONSTRAINT pk_users_id         PRIMARY KEY (id),
   CONSTRAINT uk_users_username   UNIQUE (username),
-  CONSTRAINT ch_users_role       CHECK (role IN ('ADMIN', 'TECHNICIAN', 'EMPLOYEE')),
   CONSTRAINT fk_users_department FOREIGN KEY (department)
         REFERENCES department (id)
 );
 
 CREATE TABLE IF NOT EXISTS breakage (
-  id                         varchar(36)   NOT NULL,
-  department                 varchar(36)   NOT NULL,
-  room                       varchar(128)  NOT NULL,
-  breakage_topic             varchar(128)   NOT NULL,
-  breakage_text              varchar(2048) NOT NULL,
-  status                     varchar(11)   NOT NULL,
-  priority                   varchar(8)    NOT NULL,
+  id                         varchar(36)       NOT NULL,
+  department                 varchar(36)       NOT NULL,
+  room                       varchar(128)      NOT NULL,
+  breakage_topic             varchar(128)      NOT NULL,
+  breakage_text              varchar(2048)     NOT NULL,
+  status                     breakage_status   NOT NULL,
+  priority                   breakage_priority NOT NULL,
   executor                   varchar(36),
   executor_appointed_by      varchar(36),
   deadline                   timestamp,
-  created_by                 varchar(36)   NOT NULL,
-  created_date               timestamp     NOT NULL,
-  last_updated_by            varchar(36)   NOT NULL,
-  last_updated_date          timestamp     NOT NULL,
+  created_by                 varchar(36)       NOT NULL,
+  created_date               timestamp         NOT NULL,
+  last_updated_by            varchar(36)       NOT NULL,
+  last_updated_date          timestamp         NOT NULL,
   CONSTRAINT pk_breakage_id                    PRIMARY KEY (id),
   CONSTRAINT fk_breakage_department            FOREIGN KEY (department)
         REFERENCES department (id),
-  CONSTRAINT ch_breakage_status                CHECK (status IN (
-                                                        'NEW', 'SOLVED', 'IN_PROGRESS',
-                                                        'PAUSED', 'REDIRECTED', 'CANCELLED')
-                                                        ),
-  CONSTRAINT ch_breakage_priority              CHECK (priority IN ('URGENTLY', 'HIGH', 'MEDIUM', 'LOW')),
   CONSTRAINT fk_breakage_executor              FOREIGN KEY (executor)
         REFERENCES users (id),
   CONSTRAINT fk_breakage_executor_appointed_by FOREIGN KEY (executor_appointed_by)
@@ -84,19 +110,19 @@ CREATE TABLE IF NOT EXISTS breakage (
 );
 
 CREATE TABLE IF NOT EXISTS breakage_audit (
-  operation                  char(1)       NOT NULL,
-  breakage                   varchar(36)   NOT NULL,
-  department                 varchar(36)   NOT NULL,
-  room                       varchar(128)  NOT NULL,
-  breakage_topic             varchar(128)  NOT NULL,
-  breakage_text              varchar(2048) NOT NULL,
-  status                     varchar(11)   NOT NULL,
-  priority                   varchar(8)    NOT NULL,
+  operation                  char(1)           NOT NULL,
+  breakage                   varchar(36)       NOT NULL,
+  department                 varchar(36)       NOT NULL,
+  room                       varchar(128)      NOT NULL,
+  breakage_topic             varchar(128)      NOT NULL,
+  breakage_text              varchar(2048)     NOT NULL,
+  status                     breakage_status   NOT NULL,
+  priority                   breakage_priority NOT NULL,
   executor                   varchar(36),
   executor_appointed_by      varchar(36),
   deadline                   timestamp,
-  last_updated_by            varchar(36)   NOT NULL,
-  last_updated_date          timestamp     NOT NULL,
+  last_updated_by            varchar(36)       NOT NULL,
+  last_updated_date          timestamp         NOT NULL,
   CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
   CONSTRAINT fk_breakage_audit_breakage_id           FOREIGN KEY (breakage)
         REFERENCES breakage (id),
@@ -134,7 +160,7 @@ CREATE TABLE IF NOT EXISTS breakage_comment_audit (
   comment           text        NOT NULL,
   last_updated_by   varchar(36) NOT NULL,
   last_updated_date timestamp   NOT NULL,
-  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date),
+  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date, last_updated_by),
   CONSTRAINT fk_breakage_comment_audit_breakage_id FOREIGN KEY (breakage)
         REFERENCES breakage (id),
   CONSTRAINT fk_breakage_audit_last_updated_by     FOREIGN KEY (last_updated_by)
@@ -145,7 +171,7 @@ CREATE TABLE IF NOT EXISTS breakage_comment_audit (
 CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE INDEX IF NOT EXISTS idx_breakage_breakage_text ON breakage USING gin (breakage_text gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_breakage_breakage_text ON breakage USING gist (breakage_text gist_trgm_ops);
 
 CREATE INDEX IF NOT EXISTS idx_breakage_department ON breakage(department);
 
