@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile    
     # build: ./frontend
-    image: th-frontend-image:0.0.1
+    image: th-frontend-image:0.0.2
     restart: on-failure
     container_name: th-frontend-container
     ports:
@@ -33,16 +33,16 @@ services:
   #     GATEWAY_URL: http://gateway:12344
   #     TZ: Europe/Moscow
 
-  # th-nginx:
-  #   # build:
-  #   #   context: ./
-  #   #   dockerfile: ./Dockerfile
-  #   build: ./frontend
-  #   image: nginx:alpine
-  #   container_name: th-nginx-container
-  #   ports:
-  #    - "12346:80"
-  #   command: ["nginx", "-g", "daemon off;"]
+  th-nginx:
+     # build:
+     #   context: ./
+     #   dockerfile: ./Dockerfile
+    build: ./frontend
+    image: nginx:stable-alpine
+    container_name: th-nginx-container
+    ports:
+      - "12346:80"
+    command: ["nginx", "-g", "daemon off;"]
 
   gateway:
     build:
