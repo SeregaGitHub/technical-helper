@@ -64,7 +64,7 @@ public class DepartmentGatewayController {
         return departmentDto;
     }
 
-    @GetMapping()
+/*    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public DepartmentDto getDepartmentByName(@RequestHeader(AUTH_HEADER) String jwt,
                                              @RequestHeader(DEPARTMENT_NAME_HEADER) String departmentName) {
@@ -72,7 +72,7 @@ public class DepartmentGatewayController {
         DepartmentDto departmentDto = departmentClient.getDepartmentByName(departmentName, jwt, DEPARTMENT_NAME_HEADER);
         log.info("Department with name - {}, received successfully", departmentName);
         return departmentDto;
-    }
+    }*/
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)

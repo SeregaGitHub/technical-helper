@@ -70,18 +70,18 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional(readOnly = true)
     public DepartmentDto getDepartment(String headerName, String dep) {
-        if (headerName.equals(DEPARTMENT_NAME_HEADER)) {
+/*        if (headerName.equals(DEPARTMENT_NAME_HEADER)) {
             Department department = departmentRepository.findByNameAndEnabledTrue(dep).orElseThrow(
                     () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
             );
             return DepartmentMapper.toDepartmentDto(department);
-        } else if (headerName.equals(DEPARTMENT_ID_HEADER)) {
+        } else if (headerName.equals(DEPARTMENT_ID_HEADER)) {*/
             return departmentRepository.getDepartmentById(dep).orElseThrow(
                     () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
             );
-        } else {
+/*        } else {
             throw new NotFoundException(DEPARTMENT_NOT_EXIST);
-        }
+        }*/
     }
 
     @Override
