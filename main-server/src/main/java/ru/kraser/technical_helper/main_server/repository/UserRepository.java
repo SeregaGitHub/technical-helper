@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
 
     String GET_USER = "SELECT new ru.kraser.technical_helper.common_module.dto.user.UserDto " +
-            "(u.id, u.username, d.name AS department, u.role, " +
+            "(u.id, u.username, d.id AS departmentId, d.name AS department, u.role, " +
             "uc.username AS createdBy, u.createdDate, uu.username AS lastUpdatedBy, u.lastUpdatedDate) " +
             "FROM User AS u " +
             "JOIN FETCH Department AS d ON d.id = u.department.id " +

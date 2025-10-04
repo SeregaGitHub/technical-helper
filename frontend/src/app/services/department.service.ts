@@ -88,19 +88,19 @@ export class DepartmentService {
             );
     };
 
-    getDep(name: string): Observable<any> {
+    // getDep(name: string): Observable<any> {
 
-        let headers = HttpHeadersFactory.createPermanentHeaders();
-        headers = headers.append(DEPARTMENT_NAME, name);
+    //     let headers = HttpHeadersFactory.createPermanentHeaders();
+    //     headers = headers.append(DEPARTMENT_NAME, name);
 
-        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
-            .pipe(
-                tap((departmentByName) => {
-                    const currentState = this.departmentSubject;
-                    this.departmentSubject.next({...currentState, departmentByName});
-                })
-            );
-    };
+    //     return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
+    //         .pipe(
+    //             tap((departmentByName) => {
+    //                 const currentState = this.departmentSubject;
+    //                 this.departmentSubject.next({...currentState, departmentByName});
+    //             })
+    //         );
+    // };
 
     deleteDep(id: string): Observable<any> {
 

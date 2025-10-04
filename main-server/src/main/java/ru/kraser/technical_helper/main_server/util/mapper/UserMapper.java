@@ -3,7 +3,6 @@ package ru.kraser.technical_helper.main_server.util.mapper;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
@@ -35,10 +34,11 @@ public class UserMapper {
         return user;
     }
 
-    public UserDto toUserDto (User user) {
+    /*public UserDto toUserDto (User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .departmentId(user.getDepartment().getId())
                 .department(user.getDepartment().getName())
                 .role(user.getRole())
                 .createdBy(user.getCreatedBy())
@@ -46,5 +46,5 @@ public class UserMapper {
                 .lastUpdatedBy(user.getLastUpdatedBy())
                 .lastUpdatedDate(user.getLastUpdatedDate())
                 .build();
-    }
+    }*/
 }

@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Status;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -31,9 +34,11 @@ public class Breakage extends BaseEntity {
     private String breakageText;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Status status;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Priority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,4 +51,19 @@ public class Breakage extends BaseEntity {
 
     @Column(name = "deadline")
     private LocalDateTime deadline;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Breakage breakage = (Breakage) o;
+        return Objects.equals(room, breakage.room) &&
+                Objects.equals(breakageTopic, breakage.breakageTopic) &&
+                Objects.equals(breakageText, breakage.breakageText) &&
+                Objects.equals(id, breakage.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, room, breakageTopic, breakageText);
+    }
 }

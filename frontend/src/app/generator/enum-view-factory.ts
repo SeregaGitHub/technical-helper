@@ -34,19 +34,19 @@ export class EnumViewFactory {
     public static getStatuses(currentStatus: Status): StatusView[] {
 
         const statuses = [
-            {value: Status.Solved, viewValue: 'Решена'},
             {value: Status.InProgress, viewValue: 'В работе'},
             {value: Status.Paused, viewValue: 'В ожидании'},
             {value: Status.Redirected, viewValue: 'Передана'},
+            {value: Status.Solved, viewValue: 'Решена'},
             {value: Status.Cancelled, viewValue: 'Отменена'},
         ];
 
         const allStatuses = [
             {value: Status.New, viewValue: 'Новая'},
-            {value: Status.Solved, viewValue: 'Решена'},
             {value: Status.InProgress, viewValue: 'В работе'},
             {value: Status.Paused, viewValue: 'В ожидании'},
             {value: Status.Redirected, viewValue: 'Передана'},
+            {value: Status.Solved, viewValue: 'Решена'},
             {value: Status.Cancelled, viewValue: 'Отменена'},
         ];
 
@@ -67,10 +67,10 @@ export class EnumViewFactory {
 
         const statusMap = new Map<Status, string>([ 
             [Status.New, 'Новая'],
-            [Status.Solved, 'Решена'],
             [Status.InProgress, 'В работе'],
             [Status.Paused, 'В ожидании'],
             [Status.Redirected, 'Передана'],
+            [Status.Solved, 'Решена'],
             [Status.Cancelled, 'Отменена']
         ]);
 

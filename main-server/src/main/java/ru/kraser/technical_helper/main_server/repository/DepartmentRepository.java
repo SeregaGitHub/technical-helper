@@ -61,7 +61,7 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     )
     Optional<DepartmentDto> getDepartmentById(String departmentId);
 
-    Optional<Department> findByNameAndEnabledTrue(String departmentName);
+//    Optional<Department> findByNameAndEnabledTrue(String departmentName);
 
     @Modifying
     @Query(

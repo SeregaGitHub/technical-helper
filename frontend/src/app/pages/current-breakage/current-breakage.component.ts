@@ -357,6 +357,8 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
             next: response => {
               this.apiResponse = response;
               this.isOverdue = false;
+              this.readyForAppoint = false;
+              this.isAppointed = true;
               this.deleteResponseMessage();
               this.currentBreakage.lastUpdatedBy = response.data;
               this.currentBreakage.lastUpdatedDate = response.timestamp;
@@ -399,6 +401,7 @@ export class CurrentBreakageComponent implements OnInit, OnDestroy {
       this.deadline = null;
       this.readyForAppoint = false;
       this.isOverdue = false;
+      this.isAppointed = false;
   }
 
   private setReadyForAppoint() {

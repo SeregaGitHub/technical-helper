@@ -191,7 +191,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
     if (event.type === 'keyup') {
       const value = (event.target as HTMLInputElement).value;
-      const filterValue = value.trim().toLowerCase();
+      const filterValue = value.toLowerCase();
       this.searchText = filterValue;
 
       if (this.searchText.length > 2) {

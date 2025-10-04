@@ -143,7 +143,8 @@ public interface BreakageRepository extends JpaRepository<Breakage, String> {
                                                       String currentUserDepartmentId, PageRequest pageRequest);
 
     @Query(
-            value = GET_ALL_EMPLOYEE_BREAKAGES + " AND d.id = :currentUserDepartmentId AND b.breakageText ILIKE %:searchText%"
+            value = GET_ALL_EMPLOYEE_BREAKAGES +
+                    " AND d.id = :currentUserDepartmentId AND b.breakageText ILIKE %:searchText%"
     )
     Page<BreakageEmployeeDto> getAllEmployeeBreakagesByText(List<Status> statusList, List<Priority> priorityList,
                                                             String currentUserDepartmentId, PageRequest pageRequest,
