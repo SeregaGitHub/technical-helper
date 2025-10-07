@@ -58,18 +58,18 @@ public class UserGatewayController {
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getAllUsers(@RequestHeader(AUTH_HEADER) String jwt) {
+    public List<UserDto> getAllUsers() {
         log.info("Getting all Users");
-        List<UserDto> userDtoList = userClient.getAllUsers(jwt);
+        List<UserDto> userDtoList = userClient.getAllUsers();
         log.info("All Users received successfully");
         return userDtoList;
     }
 
     @GetMapping(path = BREAKAGE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<UserShortDto> getAdminAndTechnicianList(@RequestHeader(AUTH_HEADER) String jwt) {
+    public List<UserShortDto> getAdminAndTechnicianList() {
         log.info("Getting admin and technician list");
-        List<UserShortDto> list = userClient.getAdminAndTechnicianList(jwt);
+        List<UserShortDto> list = userClient.getAdminAndTechnicianList();
         log.info("Admin and technician list received successfully");
         return list;
     }

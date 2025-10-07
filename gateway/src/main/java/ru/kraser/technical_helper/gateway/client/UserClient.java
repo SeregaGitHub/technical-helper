@@ -46,18 +46,16 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public List<UserDto> getAllUsers(String jwt) {
+    public List<UserDto> getAllUsers() {
         return super.getAll(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + ALL_URL,
-                jwt,
                 ParameterizedTypeReference.forType(UserDto.class)
         );
     }
 
-    public List<UserShortDto> getAdminAndTechnicianList(String jwt) {
+    public List<UserShortDto> getAdminAndTechnicianList() {
         return super.getAll(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL,
-                jwt,
                 ParameterizedTypeReference.forType(UserShortDto.class)
         );
     }

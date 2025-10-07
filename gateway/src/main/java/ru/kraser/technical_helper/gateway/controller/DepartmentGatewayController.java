@@ -45,9 +45,9 @@ public class DepartmentGatewayController {
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<DepartmentDto> getAllDepartments(@RequestHeader(AUTH_HEADER) String jwt) {
+    public List<DepartmentDto> getAllDepartments() {
         log.info("Getting all Departments");
-        List<DepartmentDto> departmentDtoList = departmentClient.getAllDepartments(jwt);
+        List<DepartmentDto> departmentDtoList = departmentClient.getAllDepartments();
         log.info("All Departments received successfully");
         return departmentDtoList;
     }

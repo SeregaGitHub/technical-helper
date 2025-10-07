@@ -35,10 +35,9 @@ public class DepartmentClient extends BaseClient {
         );
     }
 
-    public List<DepartmentDto> getAllDepartments(String jwt) {
+    public List<DepartmentDto> getAllDepartments() {
         return super.getAll(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL,
-                jwt,
                 ParameterizedTypeReference.forType(DepartmentDto.class)
         );
     }

@@ -168,6 +168,22 @@ public abstract class BaseClient {
         return patchResponse.block();
     }
 
+    protected <T> List<T> getAll(String url, ParameterizedTypeReference<T> typeReference) {
+        Mono<List<T>> getResponse = webClient
+                .get()
+                .uri(url)
+                //.header(AUTH_HEADER, jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .bodyToFlux(typeReference)
+                .collectList();
+
+        return getResponse.block();
+    }
+
+    // NEED FOR DELETE
     protected <T> List<T> getAll(String url, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<List<T>> getResponse = webClient
                 .get()
