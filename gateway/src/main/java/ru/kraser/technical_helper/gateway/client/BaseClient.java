@@ -210,6 +210,23 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
+    protected <T> T get(String url, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> getResponse = webClient
+                .get()
+                .uri(url)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return getResponse.block();
+    }
+
     protected <T> T delete(String url, String jwt, String entityHeaderName,
                               String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> deleteResponse = webClient

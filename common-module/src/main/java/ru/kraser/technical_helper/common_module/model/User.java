@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -18,11 +19,11 @@ import java.util.Objects;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class User extends BaseEntity {
     @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", length = 128, nullable = false)
     private String password;
 

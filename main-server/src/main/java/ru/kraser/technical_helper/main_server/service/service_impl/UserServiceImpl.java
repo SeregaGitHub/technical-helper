@@ -2,7 +2,7 @@ package ru.kraser.technical_helper.main_server.service.service_impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -27,14 +27,14 @@ import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EX
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public ApiResponse createUser(CreateUserDto createUserDto) {
         try {
             Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
-            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, passwordEncoder));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
         } catch (Exception e) {
             ThrowMainServerException.userHandler(e.getMessage(), createUserDto.username());
         }
@@ -78,7 +78,8 @@ public class UserServiceImpl implements UserService {
         int response;
         response = userRepository.changeUserPassword(
                 userId,
-                passwordEncoder.encode(passwordDto.newPassword()),
+                //passwordEncoder.encode(passwordDto.newPassword()),
+                passwordDto.newPassword(),
                 SecurityUtil.getCurrentUserId(),
                 now
         );
@@ -112,6 +113,18 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUserById(userId).orElseThrow(
                 () -> new NotFoundException(USER_NOT_EXIST)
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByName(String username) {
+        /*return userRepository.findUserByUsernameAndEnabledTrue(username).orElseThrow(
+                () -> new NotFoundException(USER_NOT_EXIST)
+        );*/
+        UserFullDto userFullDto = userRepository.getUserByUsernameAndEnabledTrue(username).orElseThrow(
+                () -> new NotFoundException(USER_NOT_EXIST)
+        );
+        return UserMapper.toUserFull(userFullDto);
     }
 
     @Override

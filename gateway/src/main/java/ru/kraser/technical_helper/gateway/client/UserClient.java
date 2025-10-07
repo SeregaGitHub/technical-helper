@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
+import ru.kraser.technical_helper.common_module.model.User;
 
 import java.util.List;
 
@@ -71,6 +72,13 @@ public class UserClient extends BaseClient {
                 userHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(UserDto.class)
+        );
+    }
+
+    public User getUserByName(String username) {
+        return super.get(
+                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + "/" + username,
+                ParameterizedTypeReference.forType(User.class)
         );
     }
 

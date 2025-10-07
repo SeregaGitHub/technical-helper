@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.User;
@@ -26,7 +27,22 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findUserByUsername(String username);
 
-    Optional<User> findUserByUsernameAndEnabledTrue(String username);
+    //Optional<User> findUserByUsernameAndEnabledTrue(String username);
+
+    @Query(
+            value = """
+                    SELECT new ru.kraser.technical_helper.common_module.dto.user.UserFullDto
+                    (u.id, u.username, u.password, u.enabled, u.role,
+                    u.createdBy, u.createdDate, u.lastUpdatedBy, u.lastUpdatedDate,
+                    d.id AS departmentId, d.name AS departmentName, d.enabled AS departmentEnabled,
+                    d.createdBy AS departmentCreatedBy, d.createdDate AS departmentCreatedDate,
+                    d.lastUpdatedBy AS departmentLastUpdatedBy, d.lastUpdatedDate AS departmentLastUpdatedDate)
+                    FROM User AS u
+                    JOIN FETCH Department AS d ON d.id = u.department.id
+                    WHERE u.username = :username AND u.enabled = true
+                    """
+    )
+    Optional<UserFullDto> getUserByUsernameAndEnabledTrue(String username);
 
     Optional<User> findTop1ByRoleAndEnabledTrue(Role role);
 

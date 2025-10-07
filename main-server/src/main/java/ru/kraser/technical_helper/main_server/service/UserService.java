@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.main_server.service;
 
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
+import ru.kraser.technical_helper.common_module.model.User;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ public interface UserService {
     List<UserShortDto> getAdminAndTechnicianList();
 
     UserDto getUser(String userId);
+
+    User getUserByName(String username);
 
     ApiResponse deleteUser(String userId);
 }

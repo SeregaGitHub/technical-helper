@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -29,8 +29,8 @@ public class MainServer implements CommandLineRunner {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    //@Autowired
+    //private PasswordEncoder passwordEncoder;
 
     @Autowired
     DataSours dataSours;
@@ -98,7 +98,7 @@ public class MainServer implements CommandLineRunner {
                     admin.setLastUpdatedDate(now);
                     admin = userRepository.save(admin);
                 } else {
-                    admin = new User(
+                    /*admin = new User(
                             "admin",
                             passwordEncoder.encode("adminpassword"),
                             true,
@@ -108,10 +108,10 @@ public class MainServer implements CommandLineRunner {
                     admin.setCreatedDate(now);
                     admin.setLastUpdatedBy(temporaryAdminId);
                     admin.setLastUpdatedDate(now);
-                    admin = userRepository.save(admin);
+                    admin = userRepository.save(admin);*/
                 }
 
-                clst = conn.prepareCall("CALL set_current_id(?, ?, ?, ?, ?, ?, ?)");
+                /*clst = conn.prepareCall("CALL set_current_id(?, ?, ?, ?, ?, ?, ?)");
                 clst.setString(1, adminDepartment.getId());
                 clst.setString(2, admin.getId());
                 clst.setString(3, adminDepartment.getCreatedBy());
@@ -119,7 +119,7 @@ public class MainServer implements CommandLineRunner {
                 clst.setString(5, adminDepartment.getLastUpdatedBy());
                 clst.setString(6, admin.getLastUpdatedBy());
                 clst.setString(7, temporaryAdminId);
-                clst.execute();
+                clst.execute();*/
 
             } catch (SQLException e) {
                 throw new ServerException("Неверные параметры подключения к базе данных !!!");

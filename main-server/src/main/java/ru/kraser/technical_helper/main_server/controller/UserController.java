@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
+import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.util.List;
@@ -72,6 +73,15 @@ public class UserController {
         log.info("Getting User with Id={}", userId);
         UserDto user = userService.getUser(userId);
         log.info("User with Id={}, received successfully", userId);
+        return user;
+    }
+
+    @GetMapping(path = "/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public User getUserByName(@PathVariable("username") String username) {
+        log.info("Getting User with username - {}", username);
+        User user = userService.getUserByName(username);
+        log.info("User with username - {}, received successfully", username);
         return user;
     }
 
