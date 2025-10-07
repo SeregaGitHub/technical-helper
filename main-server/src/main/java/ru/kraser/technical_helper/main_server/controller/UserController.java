@@ -33,9 +33,10 @@ public class UserController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@RequestHeader (USER_ID_HEADER) String userId,
-                             @RequestBody UpdateUserDto updateUserDto) {
+                                  @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                  @RequestBody UpdateUserDto updateUserDto) {
         log.info("Updating User with Id={}", userId);
-        ApiResponse apiResponse =  userService.updateUser(userId, updateUserDto);
+        ApiResponse apiResponse =  userService.updateUser(userId, updateUserDto, currentUserId);
         log.info("User with Id={}, successfully updated", userId);
         return apiResponse;
     }

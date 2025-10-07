@@ -10,7 +10,7 @@ public interface UserService {
 
     ApiResponse createUser(CreateUserDto createUserDto, String currentUserId);
 
-    ApiResponse updateUser(String userId, UpdateUserDto updateUserDto);
+    ApiResponse updateUser(String userId, UpdateUserDto updateUserDto, String currentUserId);
 
     ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto, String currentUserId);
 

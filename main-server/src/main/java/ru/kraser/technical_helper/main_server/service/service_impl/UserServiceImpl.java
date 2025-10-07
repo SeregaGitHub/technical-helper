@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApiResponse updateUser(String userId, UpdateUserDto updateUserDto) {
+    public ApiResponse updateUser(String userId, UpdateUserDto updateUserDto, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
                     updateUserDto.username(),
                     updateUserDto.departmentId(),
                     updateUserDto.role(),
-                    SecurityUtil.getCurrentUserId(),
+                    currentUserId,
                     now);
             ThrowMainServerException.isExist(response, "пользователь");
         } catch (Exception e) {

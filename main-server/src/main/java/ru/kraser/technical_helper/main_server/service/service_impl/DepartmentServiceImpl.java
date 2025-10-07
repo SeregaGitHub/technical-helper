@@ -43,12 +43,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
+    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
             response = departmentRepository.updateDepartment(
-                    departmentId, departmentDto.name(), SecurityUtil.getCurrentUserId(), now);
+                    departmentId, departmentDto.name(), currentUserId, now);
             ThrowMainServerException.isExist(response, "отдел");
         } catch (Exception e) {
             ThrowMainServerException.departmentHandler(e.getMessage(), departmentDto.name());

@@ -38,10 +38,9 @@ public class UserGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@Validated() @RequestBody UpdateUserDto updateUserDto,
-                                  @RequestHeader(AUTH_HEADER) String jwt,
                                   @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Updating User with Id={}", userId);
-        ApiResponse response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto, jwt);
+        ApiResponse response = userClient.updateUser(USER_ID_HEADER, userId, updateUserDto);
         log.info("User with Id={}, successfully updated", userId);
         return response;
     }

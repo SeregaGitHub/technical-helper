@@ -33,9 +33,10 @@ public class DepartmentController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
+                                        @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
                                         @RequestBody CreateDepartmentDto departmentDto) {
         log.info("Updating Department with Id={}", departmentId);
-        ApiResponse apiResponse =  departmentService.updateDepartment(departmentId, departmentDto);
+        ApiResponse apiResponse =  departmentService.updateDepartment(departmentId, departmentDto, currentUserId);
         log.info("Department with Id={}, successfully updated", departmentId);
         return apiResponse;
     }

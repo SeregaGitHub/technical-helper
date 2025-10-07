@@ -35,11 +35,10 @@ public class DepartmentGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                        @RequestHeader(AUTH_HEADER) String jwt,
                                         @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Updating Department with Id={}", departmentId);
         ApiResponse response = departmentClient.updateDepartment(
-                DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto, jwt);
+                DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto);
         log.info("Department with Id={}, successfully updated", departmentId);
         return response;
     }

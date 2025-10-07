@@ -25,11 +25,10 @@ public class UserClient extends BaseClient {
     }
 
     public ApiResponse updateUser(String entityHeaderName, String userId,
-                             UpdateUserDto updateUserDto, String jwt) {
+                             UpdateUserDto updateUserDto) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL,
                 updateUserDto,
-                jwt,
                 entityHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(ApiResponse.class)

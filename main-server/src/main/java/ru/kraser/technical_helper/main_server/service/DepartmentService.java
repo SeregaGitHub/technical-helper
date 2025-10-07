@@ -10,7 +10,7 @@ public interface DepartmentService {
 
     ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId);
 
-    ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto);
+    ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto, String currentUserId);
 
     List<DepartmentDto> getAllDepartments();
 
