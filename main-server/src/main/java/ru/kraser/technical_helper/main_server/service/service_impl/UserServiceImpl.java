@@ -31,10 +31,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApiResponse createUser(CreateUserDto createUserDto) {
+    public ApiResponse createUser(CreateUserDto createUserDto, String currentUserId) {
         try {
             Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
-            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, currentUserId));
         } catch (Exception e) {
             ThrowMainServerException.userHandler(e.getMessage(), createUserDto.username());
         }

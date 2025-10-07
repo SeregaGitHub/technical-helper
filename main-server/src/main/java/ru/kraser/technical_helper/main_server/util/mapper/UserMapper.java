@@ -7,20 +7,19 @@ import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
-import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.time.LocalDateTime;
 
 @UtilityClass
 public class UserMapper {
-    public User toUser(CreateUserDto createUserDto, Department department) {
+    public User toUser(CreateUserDto createUserDto, Department department, String currentUserId) {
         if (!department.isEnabled()) {
             throw new NotFoundException("fk_users_department");
         }
 
         User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        String currentUserId = SecurityUtil.getCurrentUserId();
+        //String currentUserId = SecurityUtil.getCurrentUserId();
 
         user.setUsername(createUserDto.username());
         //user.setPassword(passwordEncoder.encode(createUserDto.password()));

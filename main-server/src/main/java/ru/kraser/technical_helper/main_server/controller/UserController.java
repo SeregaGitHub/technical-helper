@@ -22,9 +22,10 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createUser(@RequestBody CreateUserDto createUserDto) {
+    public ApiResponse createUser(@RequestHeader (USER_ID_HEADER) String currentUserId,
+                                  @RequestBody CreateUserDto createUserDto) {
         log.info("Creating User with name - {}", createUserDto.username());
-        ApiResponse apiResponse = userService.createUser(createUserDto);
+        ApiResponse apiResponse = userService.createUser(createUserDto, currentUserId);
         log.info("User with name - {}, successfully created", createUserDto.username());
         return apiResponse;
     }

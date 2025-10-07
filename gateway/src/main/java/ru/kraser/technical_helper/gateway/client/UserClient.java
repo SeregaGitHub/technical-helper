@@ -17,11 +17,10 @@ public class UserClient extends BaseClient {
         super(webClient);
     }
 
-    public ApiResponse createUser(CreateUserDto createUserDto, String jwt) {
+    public ApiResponse createUser(CreateUserDto createUserDto) {
         return super.post(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL,
                 createUserDto,
-                jwt,
                 ParameterizedTypeReference.forType(ApiResponse.class));
     }
 

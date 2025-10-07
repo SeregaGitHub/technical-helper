@@ -3,11 +3,13 @@ package ru.kraser.technical_helper.gateway.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.gateway.client.UserClient;
+import ru.kraser.technical_helper.gateway.util.user_util.UserUtil;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 @Validated
 public class UserGatewayController {
     private final UserClient userClient;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createUser(@Validated() @RequestBody CreateUserDto createUserDto,
-                                  @RequestHeader(AUTH_HEADER) String jwt) {
+    public ApiResponse createUser(@Validated() @RequestBody CreateUserDto createUserDto) {
         log.info("Creating User with name - {}", createUserDto.username());
-        ApiResponse response = userClient.createUser(createUserDto, jwt);
+        ApiResponse response = userClient.createUser(
+                UserUtil.hashCreateUserDtoPassword(createUserDto, passwordEncoder));
         log.info("User with name - {}, successfully created", createUserDto.username());
         return response;
     }
