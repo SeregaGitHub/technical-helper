@@ -22,5 +22,5 @@ public interface UserService {
 
     User getUserByName(String username);
 
-    ApiResponse deleteUser(String userId);
+    ApiResponse deleteUser(String userId, String currentUserId);
 }

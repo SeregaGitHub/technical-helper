@@ -76,10 +76,9 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ApiResponse deleteUser(String userHeaderName, String userId, String jwt) {
+    public ApiResponse deleteUser(String userHeaderName, String userId) {
         return super.delete(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + DELETE_URL,
-                jwt,
                 userHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(ApiResponse.class)

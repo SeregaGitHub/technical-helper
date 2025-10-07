@@ -16,5 +16,5 @@ public interface DepartmentService {
 
     DepartmentDto getDepartment(String headerName, String departmentName);
 
-    ApiResponse deleteDepartment(String departmentId);
+    ApiResponse deleteDepartment(String departmentId, String currentUserId);
 }

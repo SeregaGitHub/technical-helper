@@ -85,10 +85,9 @@ public class UserGatewayController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteUser(@RequestHeader(AUTH_HEADER) String jwt,
-                                  @RequestHeader(USER_ID_HEADER) String userId) {
+    public ApiResponse deleteUser(@RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Deleting User with Id={}", userId);
-        ApiResponse response = userClient.deleteUser(USER_ID_HEADER, userId, jwt);
+        ApiResponse response = userClient.deleteUser(USER_ID_HEADER, userId);
         log.info("User with Id={}, successfully deleted", userId);
         return response;
     }

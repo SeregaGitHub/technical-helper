@@ -86,10 +86,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse deleteDepartment(String departmentId) {
+    public ApiResponse deleteDepartment(String departmentId, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = departmentRepository.deleteDepartment(departmentId, SecurityUtil.getCurrentUserId(), now);
+        response = departmentRepository.deleteDepartment(departmentId, currentUserId, now);
 
         if (response != 1) {
             throw new NotFoundException(DEPARTMENT_NOT_EXIST);

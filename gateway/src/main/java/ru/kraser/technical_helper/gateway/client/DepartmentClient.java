@@ -61,10 +61,9 @@ public class DepartmentClient extends BaseClient {
         );
     }*/
 
-    public ApiResponse deleteDepartment(String departmentHeaderName, String departmentId, String jwt) {
+    public ApiResponse deleteDepartment(String departmentHeaderName, String departmentId) {
         return super.delete(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL,
-                jwt,
                 departmentHeaderName,
                 departmentId,
                 ParameterizedTypeReference.forType(ApiResponse.class)

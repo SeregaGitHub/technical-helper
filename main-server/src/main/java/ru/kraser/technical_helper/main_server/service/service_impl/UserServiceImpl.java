@@ -129,10 +129,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApiResponse deleteUser(String userId) {
+    public ApiResponse deleteUser(String userId, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = userRepository.deleteUser(userId, SecurityUtil.getCurrentUserId(), now);
+        response = userRepository.deleteUser(userId, currentUserId, now);
 
         if (response != 1) {
             throw new NotFoundException(USER_NOT_EXIST);

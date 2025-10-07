@@ -70,9 +70,10 @@ public class DepartmentController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                        @RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Deleting Department with Id={}", departmentId);
-        ApiResponse apiResponse =  departmentService.deleteDepartment(departmentId);
+        ApiResponse apiResponse =  departmentService.deleteDepartment(departmentId, currentUserId);
         log.info("Department with Id={}, successfully deleted", departmentId);
         return apiResponse;
     }

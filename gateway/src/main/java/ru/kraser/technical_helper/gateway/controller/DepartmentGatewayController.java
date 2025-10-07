@@ -73,10 +73,9 @@ public class DepartmentGatewayController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteDepartment(@RequestHeader(AUTH_HEADER) String jwt,
-                                        @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Deleting Department with Id={}", departmentId);
-        ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
+        ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId);
         log.info("Department with Id={}, successfully deleted", departmentId);
         return response;
     }

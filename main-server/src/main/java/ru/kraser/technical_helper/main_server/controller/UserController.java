@@ -90,9 +90,10 @@ public class UserController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteUser(@RequestHeader (USER_ID_HEADER) String userId) {
+    public ApiResponse deleteUser(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                  @RequestHeader (USER_ID_HEADER) String userId) {
         log.info("Deleting User with Id={}", userId);
-        ApiResponse apiResponse = userService.deleteUser(userId);
+        ApiResponse apiResponse = userService.deleteUser(userId, currentUserId);
         log.info("User with Id={}, successfully deleted", userId);
         return apiResponse;
     }

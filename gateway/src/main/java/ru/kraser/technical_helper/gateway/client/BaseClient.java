@@ -11,6 +11,7 @@ import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
 import ru.kraser.technical_helper.common_module.util.SecurityUtil;
+import ru.kraser.technical_helper.gateway.util.user_util.UserUtil;
 
 import java.util.List;
 
@@ -313,8 +314,28 @@ public abstract class BaseClient {
         return getResponse.block();
     }
 
-    protected <T> T delete(String url, String jwt, String entityHeaderName,
+    protected <T> T delete(String url, String entityHeaderName,
                               String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> deleteResponse = webClient
+                .patch()
+                .uri(url)
+                .header(CURRENT_USER_ID_HEADER, SecurityUtil.getCurrentUserId())
+                .header(entityHeaderName, entityId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+
+        return deleteResponse.block();
+    }
+
+    // NEED FOR DELETE
+    protected <T> T delete(String url, String jwt, String entityHeaderName,
+                           String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> deleteResponse = webClient
                 .patch()
                 .uri(url)
