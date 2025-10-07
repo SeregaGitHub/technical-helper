@@ -76,10 +76,9 @@ public class UserGatewayController {
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public UserDto getUser(@RequestHeader(AUTH_HEADER) String jwt,
-                           @RequestHeader(USER_ID_HEADER) String userId) {
+    public UserDto getUser(@RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Getting User with Id={}", userId);
-        UserDto userDto = userClient.getUser(userId, jwt, USER_ID_HEADER);
+        UserDto userDto = userClient.getUser(userId, USER_ID_HEADER);
         log.info("User with Id={}, received successfully", userId);
         return userDto;
     }

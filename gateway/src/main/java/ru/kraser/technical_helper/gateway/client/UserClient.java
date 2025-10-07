@@ -60,10 +60,9 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public UserDto getUser(String userId, String jwt, String userHeaderName) {
+    public UserDto getUser(String userId, String userHeaderName) {
         return super.get(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL,
-                jwt,
                 userHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(UserDto.class)
