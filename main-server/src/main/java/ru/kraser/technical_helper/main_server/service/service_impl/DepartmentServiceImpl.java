@@ -27,9 +27,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId) {
         try {
-            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
+            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId));
         } catch (Exception e) {
             ThrowMainServerException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }

@@ -22,9 +22,10 @@ public class DepartmentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(@RequestHeader (USER_ID_HEADER) String currentUserId,
+                                        @RequestBody CreateDepartmentDto createDepartmentDto) {
         log.info("Creating Department with name - {}", createDepartmentDto.name());
-        ApiResponse apiResponse = departmentService.createDepartment(createDepartmentDto);
+        ApiResponse apiResponse = departmentService.createDepartment(createDepartmentDto, currentUserId);
         log.info("Department with name - {}, successfully created", createDepartmentDto.name());
         return apiResponse;
     }
@@ -32,7 +33,7 @@ public class DepartmentController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
-                                   @RequestBody CreateDepartmentDto departmentDto) {
+                                        @RequestBody CreateDepartmentDto departmentDto) {
         log.info("Updating Department with Id={}", departmentId);
         ApiResponse apiResponse =  departmentService.updateDepartment(departmentId, departmentDto);
         log.info("Department with Id={}, successfully updated", departmentId);

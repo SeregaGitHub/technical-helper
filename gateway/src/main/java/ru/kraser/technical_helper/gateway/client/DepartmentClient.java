@@ -17,11 +17,10 @@ public class DepartmentClient extends BaseClient {
         super(webClient);
     }
 
-    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String jwt) {
+    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto) {
         return super.post(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
                 createDepartmentDto,
-                jwt,
                 ParameterizedTypeReference.forType(ApiResponse.class));
     }
 

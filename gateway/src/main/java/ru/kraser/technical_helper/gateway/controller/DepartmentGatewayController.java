@@ -25,10 +25,9 @@ public class DepartmentGatewayController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                        @RequestHeader(AUTH_HEADER) String jwt) {
+    public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto) {
         log.info("Creating Department with name - {}", createDepartmentDto.name());
-        ApiResponse response = departmentClient.createDepartment(createDepartmentDto, jwt);
+        ApiResponse response = departmentClient.createDepartment(createDepartmentDto);
         log.info("Department with name - {}, successfully created", createDepartmentDto.name());
         return response;
     }

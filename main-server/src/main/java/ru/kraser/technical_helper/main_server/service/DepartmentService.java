@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DepartmentService {
 
-    ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto);
+    ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId);
 
     ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto);
 

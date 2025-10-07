@@ -10,11 +10,11 @@ import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException
 import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
+import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.AUTH_HEADER;
-import static ru.kraser.technical_helper.common_module.util.Constant.SERVER_ERROR;
+import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 public abstract class BaseClient {
     protected final WebClient webClient;
@@ -23,6 +23,28 @@ public abstract class BaseClient {
         this.webClient = webClient;
     }
 
+    protected <T, O> T post(String url, O obj, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> entityMono = webClient
+                .post()
+                .uri(url)
+                .header(USER_ID_HEADER, SecurityUtil.getCurrentUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(obj)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+        return entityMono.block();
+    }
+
+    // NEED FOR DELETE !!!
     protected <T, O> T post(String url, O obj, String jwt, ParameterizedTypeReference<T> typeReference) {
         Mono<T> entityMono = webClient
                 .post()
