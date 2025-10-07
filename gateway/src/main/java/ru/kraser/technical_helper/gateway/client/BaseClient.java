@@ -27,7 +27,7 @@ public abstract class BaseClient {
         Mono<T> entityMono = webClient
                 .post()
                 .uri(url)
-                .header(USER_ID_HEADER, SecurityUtil.getCurrentUserId())
+                .header(CURRENT_USER_ID_HEADER, SecurityUtil.getCurrentUserId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(obj)
                 .retrieve()

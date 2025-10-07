@@ -22,7 +22,7 @@ public class DepartmentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@RequestHeader (USER_ID_HEADER) String currentUserId,
+    public ApiResponse createDepartment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
                                         @RequestBody CreateDepartmentDto createDepartmentDto) {
         log.info("Creating Department with name - {}", createDepartmentDto.name());
         ApiResponse apiResponse = departmentService.createDepartment(createDepartmentDto, currentUserId);

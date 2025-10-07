@@ -31,6 +31,7 @@ public class Constant {
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String USER_ID_HEADER = "X-User-Id";
+    public static final String CURRENT_USER_ID_HEADER = "X-CurrentUser-Id";
     public static final String DEPARTMENT_ID_HEADER = "X-Department-Id";
     // public static final String DEPARTMENT_NAME_HEADER = "X-Department-Name";
     public static final String BREAKAGE_ID_HEADER = "X-Breakage-Id";
