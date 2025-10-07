@@ -73,14 +73,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto) {
+    public ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         response = userRepository.changeUserPassword(
                 userId,
                 //passwordEncoder.encode(passwordDto.newPassword()),
                 passwordDto.newPassword(),
-                SecurityUtil.getCurrentUserId(),
+                currentUserId,
                 now
         );
 

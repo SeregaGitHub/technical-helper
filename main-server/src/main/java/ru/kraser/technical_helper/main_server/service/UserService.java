@@ -12,7 +12,7 @@ public interface UserService {
 
     ApiResponse updateUser(String userId, UpdateUserDto updateUserDto);
 
-    ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto);
+    ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto, String currentUserId);
 
     List<UserDto> getAllUsers();
 

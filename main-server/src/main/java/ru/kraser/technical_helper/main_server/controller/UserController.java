@@ -43,9 +43,10 @@ public class UserController {
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
-                                     @RequestBody ChangeUserPasswordDto passwordDto) {
+                                          @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                          @RequestBody ChangeUserPasswordDto passwordDto) {
         log.info("Change password of User with Id={}", userId);
-        ApiResponse apiResponse = userService.changeUserPassword(userId, passwordDto);
+        ApiResponse apiResponse = userService.changeUserPassword(userId, passwordDto, currentUserId);
         log.info("Password User with Id={}, successfully changed", userId);
         return apiResponse;
     }

@@ -89,6 +89,34 @@ public abstract class BaseClient {
         return entityMono.block();
     }
 
+    protected <T, O> T patch(String url, O obj, String entityHeaderName,
+                             String entityId, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> patchResponse = webClient
+                .patch()
+                .uri(url)
+                .header(CURRENT_USER_ID_HEADER, SecurityUtil.getCurrentUserId())
+                .header(entityHeaderName, entityId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(obj)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .onStatus(HttpStatus.BAD_REQUEST::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotCorrectParameter.class)
+                )
+                .bodyToMono(typeReference);
+
+        return patchResponse.block();
+    }
+
+    // NEED FOR DELETE
     protected <T, O> T patch(String url, O obj, String jwt, String entityHeaderName,
                              String entityId, ParameterizedTypeReference<T> typeReference) {
         Mono<T> patchResponse = webClient

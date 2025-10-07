@@ -49,10 +49,10 @@ public class UserGatewayController {
     @PatchMapping(path = PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@Validated() @RequestBody ChangeUserPasswordDto changeUserPasswordDto,
-                                          @RequestHeader(AUTH_HEADER) String jwt,
                                           @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Change password of User with Id={}", userId);
-        ApiResponse response = userClient.changeUserPassword(USER_ID_HEADER, userId, changeUserPasswordDto, jwt);
+        ApiResponse response = userClient.changeUserPassword(USER_ID_HEADER, userId,
+                UserUtil.hashUserPasswordDto(changeUserPasswordDto, passwordEncoder));
         log.info("Password User with Id={}, successfully changed", userId);
         return response;
     }

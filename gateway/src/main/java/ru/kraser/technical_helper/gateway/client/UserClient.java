@@ -37,11 +37,10 @@ public class UserClient extends BaseClient {
     }
 
     public ApiResponse changeUserPassword(String entityHeaderName, String userId,
-                                     ChangeUserPasswordDto changeUserPasswordDto, String jwt) {
+                                     ChangeUserPasswordDto changeUserPasswordDto) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL,
                 changeUserPasswordDto,
-                jwt,
                 entityHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(ApiResponse.class)
