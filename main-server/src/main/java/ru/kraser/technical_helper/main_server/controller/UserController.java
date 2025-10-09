@@ -81,7 +81,7 @@ public class UserController {
 
     @GetMapping(path = "/{username}")
     @ResponseStatus(HttpStatus.OK)
-    public User getUserByName(@PathVariable("username") String username) {
+    public User getUserByName(@PathVariable ("username") String username) {
         log.info("Getting User with username - {}", username);
         User user = userService.getUserByName(username);
         log.info("User with username - {}, received successfully", username);

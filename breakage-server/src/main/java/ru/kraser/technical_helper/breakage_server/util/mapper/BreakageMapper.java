@@ -18,12 +18,12 @@ import java.util.List;
 @UtilityClass
 public class BreakageMapper {
 
-    public Breakage toBreakage(CreateBreakageDto createBreakageDto) {
+    public Breakage toBreakage(CreateBreakageDto createBreakageDto, String currentUserId) {
         Breakage breakage = new Breakage();
 
         LocalDateTime now = LocalDateTime.now().withNano(0);
         Department currentUserDepartment = SecurityUtil.getCurrentUserDepartment();
-        String currentUserId = SecurityUtil.getCurrentUserId();
+        //String currentUserId = SecurityUtil.getCurrentUserId();
 
         breakage.setDepartment(currentUserDepartment);
         breakage.setRoom(createBreakageDto.room());
@@ -40,8 +40,9 @@ public class BreakageMapper {
         return breakage;
     }
 
-    public BreakageFullDto toBreakageFullDto(BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments) {
-        String currentUserId = SecurityUtil.getCurrentUserId();
+    public BreakageFullDto toBreakageFullDto(
+            BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments, String currentUserId) {
+        //String currentUserId = SecurityUtil.getCurrentUserId();
         List<BreakageCommentFrontDto> comments = backComments.stream()
                 .map(comment -> toFrontCommentDto(comment, currentUserId))
                 .toList();

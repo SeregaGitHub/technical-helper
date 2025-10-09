@@ -9,6 +9,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
+import ru.kraser.technical_helper.common_module.enums.Role;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -21,58 +22,75 @@ public class BreakageController {
 
     @PostMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createBreakage(@RequestBody CreateBreakageDto createBreakageDto) {
+    public ApiResponse createBreakage(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                      @RequestBody CreateBreakageDto createBreakageDto) {
         log.info("Creating Breakage with breakage topic - {}", createBreakageDto.breakageTopic());
-        ApiResponse response = breakageService.createBreakage(createBreakageDto);
+        ApiResponse response = breakageService.createBreakage(createBreakageDto, currentUserId);
         log.info("Breakage with breakage topic - {}, successfully created", createBreakageDto.breakageTopic());
         return response;
     }
 
-    @PatchMapping(path = EMPLOYEE_URL)
+    @PatchMapping(path = EMPLOYEE_URL + "/{currentUsername}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse cancelBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                      @RequestHeader(DEPARTMENT_ID_HEADER) String breakageDepartmentId) {
+    public ApiResponse cancelBreakage(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                      @RequestHeader (BREAKAGE_ID_HEADER) String breakageId,
+                                      @RequestHeader (DEPARTMENT_ID_HEADER) String breakageDepartmentId,
+                                      @RequestHeader (USER_ROLE_HEADER) Role currentUserRole,
+                                      @RequestHeader (USER_DEPARTMENT_ID_HEADER) String currentUserDepartmentId,
+                                      @PathVariable ("currentUsername") String currentUsername) {
         log.info("Canceling Breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.cancelBreakage(breakageId, breakageDepartmentId);
+        ApiResponse response = breakageService.cancelBreakage(breakageId, breakageDepartmentId, currentUserId,
+                currentUserRole, currentUserDepartmentId, currentUsername);
         log.info("Breakage with Id={}, successfully created", breakageId);
         return response;
     }
 
-    @PatchMapping(path = TECHNICIAN_URL + STATUS_URL)
+    @PatchMapping(path = TECHNICIAN_URL + STATUS_URL + "/{currentUsername}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse updateBreakageStatus(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                            @RequestBody UpdateBreakageStatusDto updatedStatus) {
+    public ApiResponse updateBreakageStatus(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                            @RequestHeader (BREAKAGE_ID_HEADER) String breakageId,
+                                            @RequestBody UpdateBreakageStatusDto updatedStatus,
+                                            @PathVariable ("currentUsername") String currentUsername) {
         log.info("Updating Status of breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.updateBreakageStatus(breakageId, updatedStatus);
+        ApiResponse response = breakageService.updateBreakageStatus(
+                breakageId, updatedStatus, currentUserId, currentUsername);
         log.info("Status of breakage with Id={}, successfully updated", breakageId);
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL + PRIORITY_URL)
+    @PatchMapping(path = ADMIN_URL + PRIORITY_URL + "/{currentUsername}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse updateBreakagePriority(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                              @RequestBody UpdateBreakagePriorityDto updateBreakagePriorityDto) {
+    public ApiResponse updateBreakagePriority(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                              @RequestHeader (BREAKAGE_ID_HEADER) String breakageId,
+                                              @RequestBody UpdateBreakagePriorityDto updateBreakagePriorityDto,
+                                              @PathVariable ("currentUsername") String currentUsername) {
         log.info("Updating Priority of breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.updateBreakagePriority(breakageId, updateBreakagePriorityDto);
+        ApiResponse response = breakageService.updateBreakagePriority(
+                breakageId, updateBreakagePriorityDto, currentUserId, currentUsername);
         log.info("Priority of breakage with Id={}, successfully updated", breakageId);
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL)
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + "/{currentUsername}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse addBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
-                                           @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto) {
+    public ApiResponse addBreakageExecutor(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                           @RequestHeader (BREAKAGE_ID_HEADER) String breakageId,
+                                           @RequestBody AppointBreakageExecutorDto appointBreakageExecutorDto,
+                                           @PathVariable ("currentUsername") String currentUsername) {
         log.info("Adding breakageExecutor and deadline of breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.addBreakageExecutor(breakageId, appointBreakageExecutorDto);
+        ApiResponse response = breakageService.addBreakageExecutor(
+                breakageId, appointBreakageExecutorDto, currentUserId, currentUsername);
         log.info("Executor and deadline of breakage with Id={}, successfully added", breakageId);
         return response;
     }
 
-    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + DELETE_URL)
+    @PatchMapping(path = ADMIN_URL + EXECUTOR_URL + DELETE_URL + "/{currentUsername}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse dropBreakageExecutor(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+    public ApiResponse dropBreakageExecutor(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                            @RequestHeader (BREAKAGE_ID_HEADER) String breakageId,
+                                            @PathVariable ("currentUsername") String currentUsername) {
         log.info("Dropping breakageExecutor of breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.dropBreakageExecutor(breakageId);
+        ApiResponse response = breakageService.dropBreakageExecutor(breakageId, currentUserId, currentUsername);
         log.info("Executor and deadline of breakage with Id={}, successfully dropped", breakageId);
         return response;
     }
@@ -112,30 +130,40 @@ public class BreakageController {
                                    @RequestParam(value = "deadline", defaultValue = "false")
                                        boolean deadline,
                                    @RequestParam(value = "searchText", required = false)
-                                       String searchText
+                                       String searchText,
+                                   @RequestHeader (USER_ROLE_HEADER) Role currentUserRole,
+                                   @RequestHeader (value = USER_DEPARTMENT_ID_HEADER, required = false)
+                                       String currentUserDepartmentId,
+                                   @RequestHeader (value = CURRENT_USER_ID_HEADER, required = false)
+                                       String currentUserId
+
     ) {
         log.info("Getting Breakages");
         AppPage appPage = breakageService.getAllBreakages(pageSize, pageIndex, sortBy, direction,
                 statusNew, statusSolved, statusInProgress, statusPaused, statusRedirected, statusCancelled,
-                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText);
+                priorityUrgently, priorityHigh, priorityMedium, priorityLow, executor, deadline, searchText,
+                currentUserRole, currentUserDepartmentId, currentUserId);
         log.info("Breakages received successfully");
         return appPage;
     }
 
     @GetMapping(path = EMPLOYEE_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public BreakageEmployeeDto getBreakageEmployee(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+    public BreakageEmployeeDto getBreakageEmployee(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+                                       @RequestHeader (USER_DEPARTMENT_ID_HEADER) String currentUserDepartmentId) {
         log.info("Getting Breakage for Employee with Id={}", breakageId);
-        BreakageEmployeeDto breakageEmployeeDto = breakageService.getBreakageEmployee(breakageId);
+        BreakageEmployeeDto breakageEmployeeDto = breakageService.getBreakageEmployee(
+                breakageId, currentUserDepartmentId);
         log.info("Breakage for Employee with Id={}, received successfully", breakageId);
         return breakageEmployeeDto;
     }
 
     @GetMapping(path = TECHNICIAN_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getBreakage(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
+    public ApiResponse getBreakage(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                   @RequestHeader(BREAKAGE_ID_HEADER) String breakageId) {
         log.info("Getting Breakage with Id={}", breakageId);
-        ApiResponse response = breakageService.getBreakage(breakageId);
+        ApiResponse response = breakageService.getBreakage(breakageId, currentUserId);
         log.info("Breakage with Id={}, received successfully", breakageId);
         return response;
     }
@@ -143,20 +171,24 @@ public class BreakageController {
     // BREAKAGE_COMMENT
     @PostMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createBreakageComment(@RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
+    public ApiResponse createBreakageComment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                             @RequestHeader(BREAKAGE_ID_HEADER) String breakageId,
                                              @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
         log.info("Creating Comment with breakage Id={}", breakageId);
-        ApiResponse apiResponse =  breakageService.createBreakageComment(createBreakageCommentDto, breakageId);
+        ApiResponse apiResponse =  breakageService.createBreakageComment(
+                createBreakageCommentDto, breakageId, currentUserId);
         log.info("Comment with breakage Id={}, successfully created", breakageId);
         return apiResponse;
     }
 
     @PatchMapping(path = TECHNICIAN_URL + BREAKAGE_COMMENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse updateBreakageComment(@RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
+    public ApiResponse updateBreakageComment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                             @RequestHeader(BREAKAGE_COMMENT_ID_HEADER) String breakageCommentId,
                                              @RequestBody CreateBreakageCommentDto createBreakageCommentDto) {
         log.info("Updating Comment with Id={}", breakageCommentId);
-        ApiResponse apiResponse =   breakageService.updateBreakageComment(createBreakageCommentDto, breakageCommentId);
+        ApiResponse apiResponse = breakageService.updateBreakageComment(
+                createBreakageCommentDto, breakageCommentId, currentUserId);
         log.info("Comment with Id={}, successfully updated", breakageCommentId);
         return apiResponse;
     }
