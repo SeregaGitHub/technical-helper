@@ -52,12 +52,12 @@ export class UserService {
             );
     };
 
-    changeUserPassword(changeUserPasswordDto: ChangeUserPasswordDto, id: string): Observable<any> {
+    changeUserPassword(userPasswordDto: ChangeUserPasswordDto, id: string): Observable<any> {
 
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(USER_ID, id);
 
-        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + '/password', changeUserPasswordDto, {headers});
+        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + '/password', userPasswordDto, {headers});
     };
 
     getAllUsers(): Observable<any> {
@@ -76,10 +76,10 @@ export class UserService {
     };
 
     getUserById(id: string): Observable<any> {
-    
+
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(USER_ID, id);
-    
+
         return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL, {headers})
             .pipe(
                 tap((user) => {

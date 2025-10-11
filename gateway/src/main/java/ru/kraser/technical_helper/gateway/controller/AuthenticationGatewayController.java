@@ -7,7 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationRequest;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationResponse;
-//import ru.kraser.technical_helper.gateway.client.AuthenticationClient;
 import ru.kraser.technical_helper.gateway.security.AuthenticationService;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;

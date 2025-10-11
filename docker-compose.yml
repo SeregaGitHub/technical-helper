@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile    
     # build: ./frontend
-    image: th-frontend:0.0.2
+    image: th-frontend:0.0.3
     restart: on-failure
     container_name: th-frontend
     ports:
@@ -49,13 +49,14 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     #build: gateway
-    image: th-gateway:0.0.2
+    image: th-gateway:0.0.3
     restart: on-failure
     container_name: th-gateway
     ports:
       - "12344:12344"
     depends_on:
       - main-server
+      - breakage-server
     environment:
       MAIN_SERVER_URL: http://main-server:12333
       TZ: Europe/Moscow
@@ -68,11 +69,11 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-breakage-server:0.0.2
+    image: th-breakage-server:0.0.3
     restart: on-failure
     container_name: th-breakage-server
-    ports:
-      - "12301:12301"
+#    ports:
+#      - "12301:12301"
     depends_on:
       - main-server
     environment:
@@ -92,11 +93,11 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-main-server:0.0.2
+    image: th-main-server:0.0.3
     restart: on-failure
     container_name: th-main-server
-    ports:
-      - "12333:12333"
+#    ports:
+#      - "12333:12333"
     depends_on:
       - db-postgres
     environment:
@@ -114,8 +115,8 @@ services:
     image: postgres:17-alpine
     restart: on-failure
     container_name: postgresql
-    ports:
-      - "12222:5432"
+#    ports:
+#      - "12222:5432"
     volumes:
       - data:/var/lib/postgresql/data
     environment:

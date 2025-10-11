@@ -12,7 +12,7 @@ public interface UserService {
 
     ApiResponse updateUser(String userId, UpdateUserDto updateUserDto, String currentUserId);
 
-    ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto, String currentUserId);
+    ApiResponse changeUserPassword(String userId, UserPasswordDto passwordDto, String currentUserId);
 
     List<UserDto> getAllUsers();
 
@@ -23,4 +23,6 @@ public interface UserService {
     User getUserByName(String username);
 
     ApiResponse deleteUser(String userId, String currentUserId);
+
+    ApiResponse createDefaultAdmin(UserPasswordDto userPasswordDto);
 }

@@ -36,10 +36,10 @@ public class UserClient extends BaseClient {
     }
 
     public ApiResponse changeUserPassword(String entityHeaderName, String userId,
-                                     ChangeUserPasswordDto changeUserPasswordDto) {
+                                     UserPasswordDto userPasswordDto) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL,
-                changeUserPasswordDto,
+                userPasswordDto,
                 entityHeaderName,
                 userId,
                 ParameterizedTypeReference.forType(ApiResponse.class)
@@ -83,5 +83,12 @@ public class UserClient extends BaseClient {
                 userId,
                 ParameterizedTypeReference.forType(ApiResponse.class)
         );
+    }
+
+    public ApiResponse createDefaultAdmin(UserPasswordDto userPasswordDto) {
+        return super.post(
+                MAIN_SERVER_URL + BASE_URL + DEFAULT_URL,
+                userPasswordDto,
+                ParameterizedTypeReference.forType(ApiResponse.class));
     }
 }

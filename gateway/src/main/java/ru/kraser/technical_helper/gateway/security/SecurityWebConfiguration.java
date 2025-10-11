@@ -31,7 +31,8 @@ public class SecurityWebConfiguration {
                 .authorizeHttpRequests((request) -> request
                         .requestMatchers(BASE_URL + AUTH_URL)
                         .permitAll()
-
+                        .requestMatchers(BASE_URL + DEFAULT_URL)
+                        .permitAll()
                         .requestMatchers(BASE_URL + ADMIN_URL + "/**").hasAnyAuthority(
                                 Role.ADMIN.name())
 

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
@@ -405,5 +406,25 @@ public abstract class BaseClient {
                 .bodyToMono(typeReference);
 
         return deleteResponse.block();
+    }
+
+    protected <T> T post(String url, UserPasswordDto userPasswordDto, ParameterizedTypeReference<T> typeReference) {
+        Mono<T> entityMono = webClient
+                .post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userPasswordDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> Mono.error(
+                                new ServerException(SERVER_ERROR)))
+                .onStatus(HttpStatus.UNPROCESSABLE_ENTITY::equals,
+                        clientResponse -> clientResponse.bodyToMono(AlreadyExistsException.class)
+                )
+                .onStatus(HttpStatus.NOT_FOUND::equals,
+                        clientResponse -> clientResponse.bodyToMono(NotFoundException.class)
+                )
+                .bodyToMono(typeReference);
+        return entityMono.block();
     }
 }

@@ -3,6 +3,8 @@ package ru.kraser.technical_helper.main_server.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
@@ -114,4 +116,15 @@ public interface UserRepository extends JpaRepository<User, String> {
                     """
     )
     int deleteUser(String userId, String currentUserId, LocalDateTime lastUpdatedDate);
+
+    @Procedure(procedureName = "drop_constraints")
+    void dropConstraints();
+
+    @Procedure(procedureName = "set_current_id")
+    void setCurrentId(@Param("dep_id") String adminDepartmentId, @Param("adm_id") String adminId,
+                      @Param("dep_created_by") String adminDepartmentCreatedBy,
+                      @Param("adm_created_by") String adminCreatedBy,
+                      @Param("dep_last_updated_by") String adminDepartmentLastUpdatedBy,
+                      @Param("adm_last_updated_by") String adminLastUpdatedBy,
+                      @Param("temporary_admin_id") String temporaryAdminId);
 }

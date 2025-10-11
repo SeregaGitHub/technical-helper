@@ -199,6 +199,22 @@ ALTER TABLE users
 		REFERENCES users (id);
 
 
+CREATE OR REPLACE PROCEDURE drop_constraints()
+LANGUAGE plpgsql
+AS
+'
+BEGIN
+	ALTER TABLE IF EXISTS users
+		DROP CONSTRAINT IF EXISTS fk_user_created_by;
+	ALTER TABLE IF EXISTS users
+		DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
+	ALTER TABLE IF EXISTS department
+		DROP CONSTRAINT IF EXISTS fk_department_created_by;
+	ALTER TABLE IF EXISTS department
+		DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
+END; '
+;
+
 CREATE OR REPLACE PROCEDURE set_current_id(
 	IN dep_id varchar, IN adm_id varchar,
 	IN dep_created_by varchar, IN adm_created_by varchar,

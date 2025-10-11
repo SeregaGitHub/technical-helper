@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +18,7 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @CrossOrigin(origins = FRONT_URL)
 @RestController
-@RequestMapping(path = BASE_URL + ADMIN_URL + USER_URL)
+@RequestMapping(path = BASE_URL)
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -25,7 +26,10 @@ public class UserGatewayController {
     private final UserClient userClient;
     private final PasswordEncoder passwordEncoder;
 
-    @PostMapping
+    @Value("${default.admin.password}")
+    private String defaultAdminPassword;
+
+    @PostMapping(path = ADMIN_URL + USER_URL)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createUser(@Validated() @RequestBody CreateUserDto createUserDto) {
         log.info("Creating User with name - {}", createUserDto.username());
@@ -35,7 +39,7 @@ public class UserGatewayController {
         return response;
     }
 
-    @PatchMapping()
+    @PatchMapping(path = ADMIN_URL + USER_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@Validated() @RequestBody UpdateUserDto updateUserDto,
                                   @RequestHeader(USER_ID_HEADER) String userId) {
@@ -45,18 +49,18 @@ public class UserGatewayController {
         return response;
     }
 
-    @PatchMapping(path = PASSWORD_URL)
+    @PatchMapping(path = ADMIN_URL + USER_URL + PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse changeUserPassword(@Validated() @RequestBody ChangeUserPasswordDto changeUserPasswordDto,
+    public ApiResponse changeUserPassword(@Validated() @RequestBody UserPasswordDto userPasswordDto,
                                           @RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Change password of User with Id={}", userId);
         ApiResponse response = userClient.changeUserPassword(USER_ID_HEADER, userId,
-                UserUtil.hashUserPasswordDto(changeUserPasswordDto, passwordEncoder));
+                UserUtil.hashUserPasswordDto(userPasswordDto, passwordEncoder));
         log.info("Password User with Id={}, successfully changed", userId);
         return response;
     }
 
-    @GetMapping(path = ALL_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + ALL_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         log.info("Getting all Users");
@@ -65,7 +69,7 @@ public class UserGatewayController {
         return userDtoList;
     }
 
-    @GetMapping(path = BREAKAGE_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + BREAKAGE_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserShortDto> getAdminAndTechnicianList() {
         log.info("Getting admin and technician list");
@@ -74,7 +78,7 @@ public class UserGatewayController {
         return list;
     }
 
-    @GetMapping(path = CURRENT_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Getting User with Id={}", userId);
@@ -83,12 +87,23 @@ public class UserGatewayController {
         return userDto;
     }
 
-    @PatchMapping(path = DELETE_URL)
+    @PatchMapping(path = ADMIN_URL + USER_URL + DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteUser(@RequestHeader(USER_ID_HEADER) String userId) {
         log.info("Deleting User with Id={}", userId);
         ApiResponse response = userClient.deleteUser(USER_ID_HEADER, userId);
         log.info("User with Id={}, successfully deleted", userId);
+        return response;
+    }
+
+    @PostMapping(path = DEFAULT_URL)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse createDefaultAdmin() {
+        log.info("Creating User with name - admin");
+        UserPasswordDto userPasswordDto = new UserPasswordDto(defaultAdminPassword);
+        ApiResponse response = userClient.createDefaultAdmin(
+                UserUtil.hashUserPasswordDto(userPasswordDto, passwordEncoder));
+        log.info("User with name - admin, successfully created");
         return response;
     }
 }

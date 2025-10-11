@@ -14,13 +14,13 @@ import java.util.List;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @RestController
-@RequestMapping(path = BASE_URL + ADMIN_URL + USER_URL)
+@RequestMapping(path = BASE_URL)
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping(path = ADMIN_URL + USER_URL)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createUser(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
                                   @RequestBody CreateUserDto createUserDto) {
@@ -30,7 +30,7 @@ public class UserController {
         return apiResponse;
     }
 
-    @PatchMapping
+    @PatchMapping(path = ADMIN_URL + USER_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateUser(@RequestHeader (USER_ID_HEADER) String userId,
                                   @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
@@ -41,18 +41,18 @@ public class UserController {
         return apiResponse;
     }
 
-    @PatchMapping(path = PASSWORD_URL)
+    @PatchMapping(path = ADMIN_URL + USER_URL + PASSWORD_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse changeUserPassword(@RequestHeader (USER_ID_HEADER) String userId,
                                           @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
-                                          @RequestBody ChangeUserPasswordDto passwordDto) {
+                                          @RequestBody UserPasswordDto passwordDto) {
         log.info("Change password of User with Id={}", userId);
         ApiResponse apiResponse = userService.changeUserPassword(userId, passwordDto, currentUserId);
         log.info("Password User with Id={}, successfully changed", userId);
         return apiResponse;
     }
 
-    @GetMapping(path = ALL_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + ALL_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         log.info("Getting all Users");
@@ -61,7 +61,7 @@ public class UserController {
         return users;
     }
 
-    @GetMapping(path = BREAKAGE_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + BREAKAGE_URL)
     @ResponseStatus(HttpStatus.OK)
     public List<UserShortDto> getAdminAndTechnicianList() {
         log.info("Getting admin and technician list");
@@ -70,7 +70,7 @@ public class UserController {
         return list;
     }
 
-    @GetMapping(path = CURRENT_URL)
+    @GetMapping(path = ADMIN_URL + USER_URL + CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@RequestHeader (USER_ID_HEADER) String userId) {
         log.info("Getting User with Id={}", userId);
@@ -79,7 +79,7 @@ public class UserController {
         return user;
     }
 
-    @GetMapping(path = "/{username}")
+    @GetMapping(path = ADMIN_URL + USER_URL + "/{username}")
     @ResponseStatus(HttpStatus.OK)
     public User getUserByName(@PathVariable ("username") String username) {
         log.info("Getting User with username - {}", username);
@@ -88,13 +88,22 @@ public class UserController {
         return user;
     }
 
-    @PatchMapping(path = DELETE_URL)
+    @PatchMapping(path = ADMIN_URL + USER_URL + DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deleteUser(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
                                   @RequestHeader (USER_ID_HEADER) String userId) {
         log.info("Deleting User with Id={}", userId);
         ApiResponse apiResponse = userService.deleteUser(userId, currentUserId);
         log.info("User with Id={}, successfully deleted", userId);
+        return apiResponse;
+    }
+
+    @PostMapping(path = DEFAULT_URL)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse createDefaultAdmin(@RequestBody UserPasswordDto userPasswordDto) {
+        log.info("Creating User with name - admin");
+        ApiResponse apiResponse = userService.createDefaultAdmin(userPasswordDto);
+        log.info("User with name - admin, successfully created");
         return apiResponse;
     }
 }
