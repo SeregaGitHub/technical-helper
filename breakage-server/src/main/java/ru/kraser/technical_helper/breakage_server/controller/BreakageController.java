@@ -13,6 +13,7 @@ import ru.kraser.technical_helper.common_module.enums.Role;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
+//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + BREAKAGE_URL)
 @Slf4j

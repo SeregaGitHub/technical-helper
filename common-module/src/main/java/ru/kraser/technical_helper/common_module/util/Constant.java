@@ -10,6 +10,8 @@ public class Constant {
     //public static final String MAIN_SERVER_URL = "http://localhost:12333";
     public static final String BREAKAGE_SERVER_URL = "http://breakage-server:12301";
     //public static final String BREAKAGE_SERVER_URL = "http://localhost:12301";
+    //public static final String GATEWAY_URL = "http://gateway:12344";
+    //public static final String GATEWAY_URL = "http://localhost:12344";
 
     public static final String BASE_URL = "/api/v1";
     public static final String AUTH_URL = "/auth";

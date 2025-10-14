@@ -40,8 +40,8 @@ services:
     build: ./frontend
     image: nginx:stable-alpine
     container_name: th-nginx
-    ports:
-      - "12346:80"
+#    ports:
+#      - "12346:80"
     command: ["nginx", "-g", "daemon off;"]
 
   gateway:

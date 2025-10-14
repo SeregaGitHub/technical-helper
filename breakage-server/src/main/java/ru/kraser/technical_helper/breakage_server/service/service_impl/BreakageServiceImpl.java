@@ -27,7 +27,6 @@ import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.util.AppPageMapper;
 import ru.kraser.technical_helper.common_module.util.AppPageUtil;
-import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
