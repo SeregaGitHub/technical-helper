@@ -44,14 +44,14 @@ public class BreakageServiceImpl implements BreakageService {
 
     @Override
     @Transactional
-    public ApiResponse createBreakage(CreateBreakageDto createBreakageDto, String currentUserId) {
+    public ApiResponse createBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId) {
         try {
-            breakageRepository.saveAndFlush(BreakageMapper.toBreakage(createBreakageDto, currentUserId));
+            breakageRepository.saveAndFlush(BreakageMapper.toBreakage(createBreakageFullDto, currentUserId));
         } catch (Exception e) {
             ThrowBreakageServerException.breakageHandler(e.getMessage());
         }
         return ApiResponse.builder()
-                .message("Заявка о неисправности с темой: " + createBreakageDto.breakageTopic() +
+                .message("Заявка о неисправности с темой: " + createBreakageFullDto.breakageTopic() +
                         ", - была успешно создана.")
                 .status(201)
                 .httpStatus(HttpStatus.CREATED)

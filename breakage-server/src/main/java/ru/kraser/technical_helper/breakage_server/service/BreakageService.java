@@ -8,7 +8,7 @@ import ru.kraser.technical_helper.common_module.enums.Role;
 
 public interface BreakageService {
 
-    ApiResponse createBreakage(CreateBreakageDto createBreakageDto, String currentUserId);
+    ApiResponse createBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId);
 
     ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId, String currentUserId,
                                Role currentUserRole, String currentUserDepartmentId, String currentUsername);

@@ -19,9 +19,16 @@ public class BreakageClient extends BaseClient {
     }
 
     public ApiResponse createBreakage(CreateBreakageDto createBreakageDto) {
+        CreateBreakageFullDto createBreakageFullDto = CreateBreakageFullDto.builder()
+                .room(createBreakageDto.room())
+                .breakageTopic(createBreakageDto.breakageTopic())
+                .breakageText(createBreakageDto.breakageText())
+                .department(SecurityUtil.getCurrentUserDepartment())
+                .build();
+
         return super.post(
                 BREAKAGE_SERVER_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL,
-                createBreakageDto,
+                createBreakageFullDto,
                 ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }

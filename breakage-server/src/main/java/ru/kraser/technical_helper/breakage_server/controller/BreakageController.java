@@ -24,10 +24,10 @@ public class BreakageController {
     @PostMapping(path = EMPLOYEE_URL)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse createBreakage(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
-                                      @RequestBody CreateBreakageDto createBreakageDto) {
-        log.info("Creating Breakage with breakage topic - {}", createBreakageDto.breakageTopic());
-        ApiResponse response = breakageService.createBreakage(createBreakageDto, currentUserId);
-        log.info("Breakage with breakage topic - {}, successfully created", createBreakageDto.breakageTopic());
+                                      @RequestBody CreateBreakageFullDto createBreakageFullDto) {
+        log.info("Creating Breakage with breakage topic - {}", createBreakageFullDto.breakageTopic());
+        ApiResponse response = breakageService.createBreakage(createBreakageFullDto, currentUserId);
+        log.info("Breakage with breakage topic - {}, successfully created", createBreakageFullDto.breakageTopic());
         return response;
     }
 
