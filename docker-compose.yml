@@ -48,7 +48,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     #build: gateway
-    image: th-gateway:0.0.5
+    image: th-gateway:0.0.7
     restart: on-failure
     container_name: th-gateway
     ports:
@@ -57,6 +57,7 @@ services:
       - main-server
       - breakage-server
     environment:
+      HOST_SERVER_IP: 192.168.0.101
       MAIN_SERVER_URL: http://main-server:12333
       TZ: Europe/Moscow
     networks:
