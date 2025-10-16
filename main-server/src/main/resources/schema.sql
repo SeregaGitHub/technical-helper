@@ -7,17 +7,17 @@
 --DROP TABLE IF EXISTS department;
 --------------------- only for develop mode
 
-ALTER TABLE IF EXISTS users
-	DROP CONSTRAINT IF EXISTS fk_user_created_by;
-
-ALTER TABLE IF EXISTS users
-	DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
-
-ALTER TABLE IF EXISTS department
-	DROP CONSTRAINT IF EXISTS fk_department_created_by;
-
-ALTER TABLE IF EXISTS department
-	DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
+--ALTER TABLE IF EXISTS users
+--	DROP CONSTRAINT IF EXISTS fk_user_created_by;
+--
+--ALTER TABLE IF EXISTS users
+--	DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
+--
+--ALTER TABLE IF EXISTS department
+--	DROP CONSTRAINT IF EXISTS fk_department_created_by;
+--
+--ALTER TABLE IF EXISTS department
+--	DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
 
 
 DO
@@ -60,8 +60,12 @@ CREATE TABLE IF NOT EXISTS department (
   created_date      timestamp   NOT NULL,
   last_updated_by   varchar(36) NOT NULL,
   last_updated_date timestamp   NOT NULL,
-  CONSTRAINT pk_department_id   PRIMARY KEY (id),
-  CONSTRAINT uk_department_name UNIQUE (name)
+  CONSTRAINT pk_department_id              PRIMARY KEY (id),
+  CONSTRAINT uk_department_name            UNIQUE (name),
+  CONSTRAINT fk_department_created_by      FOREIGN KEY (created_by)
+  		REFERENCES users (id),
+  CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
+  		REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -75,10 +79,14 @@ CREATE TABLE IF NOT EXISTS users (
   created_date      timestamp    NOT NULL,
   last_updated_by   varchar(36)  NOT NULL,
   last_updated_date timestamp    NOT NULL,
-  CONSTRAINT pk_users_id         PRIMARY KEY (id),
-  CONSTRAINT uk_users_username   UNIQUE (username),
-  CONSTRAINT fk_users_department FOREIGN KEY (department)
-        REFERENCES department (id)
+  CONSTRAINT pk_users_id             PRIMARY KEY (id),
+  CONSTRAINT uk_users_username       UNIQUE (username),
+  CONSTRAINT fk_users_department     FOREIGN KEY (department)
+        REFERENCES department (id),
+  CONSTRAINT fk_user_created_by      FOREIGN KEY (created_by)
+  		REFERENCES users (id),
+  CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
+  		REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS breakage (
@@ -182,21 +190,21 @@ CREATE INDEX IF NOT EXISTS idx_breakage_executor ON breakage(executor);
 CREATE INDEX IF NOT EXISTS idx_breakage_deadline ON breakage(deadline);
 
 
-ALTER TABLE department
-	ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
-		REFERENCES users (id);
-
-ALTER TABLE department
-	ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
-		REFERENCES users (id);
-
-ALTER TABLE users
-	ADD CONSTRAINT fk_user_created_by FOREIGN KEY (created_by)
-		REFERENCES users (id);
-
-ALTER TABLE users
-	ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
-		REFERENCES users (id);
+--ALTER TABLE department
+--	ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
+--		REFERENCES users (id);
+--
+--ALTER TABLE department
+--	ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
+--		REFERENCES users (id);
+--
+--ALTER TABLE users
+--	ADD CONSTRAINT fk_user_created_by FOREIGN KEY (created_by)
+--		REFERENCES users (id);
+--
+--ALTER TABLE users
+--	ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
+--		REFERENCES users (id);
 
 
 CREATE OR REPLACE PROCEDURE drop_constraints()

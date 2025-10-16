@@ -35,6 +35,8 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   authForm: any;
   authError: any;
+  isCreateAdminForm: boolean = false;
+  createAdminMessage: string = '';
 
   private _unsubscribe: Subject<void> = new Subject();
 
@@ -75,6 +77,20 @@ export class AuthComponent implements OnInit, OnDestroy {
           }
         });
   };
+
+  openCreateAdminForm(event: MouseEvent) {
+    if (event.altKey) {
+      this.isCreateAdminForm = true;
+    }
+  }
+
+  closeCreateAdminForm() {
+    this.isCreateAdminForm = false;
+  }
+
+  createDefaultAdmin() {
+    console.log('createDefaultAdmin()')
+  }
 
   // onSubmit() {
   //   console.log(this.authForm.value);  // NEED DELETE !!!
