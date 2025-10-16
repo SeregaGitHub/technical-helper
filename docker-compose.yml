@@ -48,7 +48,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     #build: gateway
-    image: th-gateway:0.0.4
+    image: th-gateway:0.0.5
     restart: on-failure
     container_name: th-gateway
     ports:

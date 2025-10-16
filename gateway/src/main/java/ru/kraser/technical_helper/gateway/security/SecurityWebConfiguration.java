@@ -2,6 +2,7 @@ package ru.kraser.technical_helper.gateway.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -28,6 +29,9 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 public class SecurityWebConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    @Value("${allowed.frontend.url}")
+    private String allowedFrontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,7 +89,8 @@ public class SecurityWebConfiguration {
                 CorsConfiguration cfg = new CorsConfiguration();
                 //cfg.setAllowCredentials(true);
                 //cfg.setAllowedOrigins(List.of("http://localhost:12345"));
-                cfg.setAllowedOrigins(List.of("http://192.168.0.101:12345"));
+                //cfg.setAllowedOrigins(List.of("http://192.168.0.101:12345"));
+                cfg.setAllowedOrigins(List.of(allowedFrontendUrl));
                 //cfg.setAllowedOrigins(Collections.singletonList("*"));
                 cfg.setAllowedMethods(Collections.singletonList("*"));
                 cfg.setAllowedHeaders(Collections.singletonList("*"));
