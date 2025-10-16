@@ -84,8 +84,8 @@ public class SecurityWebConfiguration {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
                 //cfg.setAllowCredentials(true);
-                cfg.setAllowedOrigins(List.of("http://localhost:12345"));
-                //cfg.setAllowedOrigins(List.of("http://192.168.0.101:12345"));
+                //cfg.setAllowedOrigins(List.of("http://localhost:12345"));
+                cfg.setAllowedOrigins(List.of("http://192.168.0.101:12345"));
                 //cfg.setAllowedOrigins(Collections.singletonList("*"));
                 cfg.setAllowedMethods(Collections.singletonList("*"));
                 cfg.setAllowedHeaders(Collections.singletonList("*"));

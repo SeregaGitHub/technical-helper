@@ -1,4 +1,3 @@
-
 services:
 
   frontend:
@@ -49,7 +48,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     #build: gateway
-    image: th-gateway:0.0.3
+    image: th-gateway:0.0.4
     restart: on-failure
     container_name: th-gateway
     ports:
@@ -69,7 +68,7 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-breakage-server:0.0.3
+    image: th-breakage-server:0.0.4
     restart: on-failure
     container_name: th-breakage-server
 #    ports:
@@ -93,7 +92,7 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-main-server:0.0.3
+    image: th-main-server:0.0.4
     restart: on-failure
     container_name: th-main-server
 #    ports:

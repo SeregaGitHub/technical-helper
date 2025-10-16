@@ -11,7 +11,7 @@ import ru.kraser.technical_helper.gateway.security.AuthenticationService;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
-@CrossOrigin(origins = FRONT_URL)
+//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(value = BASE_URL)
 @RequiredArgsConstructor

@@ -13,7 +13,7 @@ import ru.kraser.technical_helper.gateway.client.BreakageClient;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
-@CrossOrigin(origins = FRONT_URL)
+//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + BREAKAGE_URL)
 @RequiredArgsConstructor
