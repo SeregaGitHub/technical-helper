@@ -10,7 +10,8 @@
         </div>
         @if (createAdminMessage != '') {
           <div class="flex justify-center text-center">
-            <p class="alert">Пользователь с правами администратора - уже существует !!</p>
+            <p [ngClass]="createDefaultAdminError ? 'alert' : 'successfully'">
+                {{ createAdminMessage }} </p>
           </div>
         }
         <div class="flex justify-around pt-4">

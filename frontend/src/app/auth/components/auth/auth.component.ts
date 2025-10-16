@@ -11,6 +11,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { UserService } from '../../../services/user.service';
 
 
 @Component({
@@ -37,10 +38,11 @@ export class AuthComponent implements OnInit, OnDestroy {
   authError: any;
   isCreateAdminForm: boolean = false;
   createAdminMessage: string = '';
+  createDefaultAdminError: boolean = true;
 
   private _unsubscribe: Subject<void> = new Subject();
 
-  constructor(private _authService: AuthService, private _router: Router) {
+  constructor(private _authService: AuthService, private _router: Router, private _userService: UserService) {
       this.authForm = new FormGroup({
       username: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)]),
       password: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(64)])
@@ -82,15 +84,42 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (event.altKey) {
       this.isCreateAdminForm = true;
     }
-  }
+  };
 
   closeCreateAdminForm() {
     this.isCreateAdminForm = false;
-  }
+  };
 
   createDefaultAdmin() {
-    console.log('createDefaultAdmin()')
-  }
+    this._userService.createDefaultAdmin()
+      .pipe(takeUntil(this._unsubscribe))
+        .subscribe({
+          next: response => {
+            if (response.status === 201) {
+              this.createDefaultAdminError = false;
+              this.createAdminMessage = response.message;
+              this.deleteCreateAdminMessage();
+            }
+          },
+          error: err => {
+            if (err.status <= 0) {
+              this.createAdminMessage = 'Отказано в подключении к серверу Gateway !!!';
+              this.deleteCreateAdminMessage();
+            } else {
+              this.createAdminMessage = err.error.message;
+              this.deleteCreateAdminMessage();
+            }
+          }
+        });
+  };
+
+  private deleteCreateAdminMessage() {
+      setTimeout(() => {
+        this.createAdminMessage = '';
+        this.createDefaultAdminError = true;
+        this.closeCreateAdminForm();
+      }, 3000);
+  };
 
   // onSubmit() {
   //   console.log(this.authForm.value);  // NEED DELETE !!!

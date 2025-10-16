@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, tap } from 'rxjs';
 import { CreateUserDto } from '../model/user/create-user-dto';
@@ -96,4 +96,19 @@ export class UserService {
 
         return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + DELETE_URL, null, {headers});
     };
+
+    createDefaultAdmin(): Observable<any> {
+
+        return this._http.post(GATEWAY_URL + BASE_URL + '/default', null, { 
+            headers: new HttpHeaders({
+           'Content-Type':  'application/json',
+         }) 
+            })
+            .pipe(
+                tap((defaultAdmin) => {
+                    const currentState = this.userSubject;
+                    this.userSubject.next({...currentState, defaultAdmin});
+                })
+            );
+    }
 }
