@@ -1,4 +1,4 @@
 export const environment = {
-    production: false,
-    GATEWAY_URL: 'http://192.168.0.102:12344',
+    GATEWAY_URL: 'http://192.168.0.101:12344',
+    BASE_URL: '/api/v1'
 }
