@@ -84,7 +84,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     int changeUserPassword(String userId, String newPassword, String currentUserId, LocalDateTime lastUpdatedDate);
 
     @Query(
-            value = GET_USER + "WHERE u.enabled = true ORDER BY u.username"
+            value = GET_USER + "WHERE u.enabled = true ORDER BY u.role, d.name, u.username"
     )
     List<UserDto> getAllUsers();
 

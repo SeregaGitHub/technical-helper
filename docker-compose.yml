@@ -5,7 +5,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     # build: ./frontend
-    image: th-frontend:0.0.6
+    image: th-frontend:0.0.8
     restart: on-failure
     container_name: th-frontend
     ports:
@@ -43,6 +43,7 @@ services:
     #   dockerfile: ./Dockerfile
     build: ./frontend
     image: nginx:stable-alpine
+    restart: on-failure
     container_name: th-nginx
     #    ports:
     #      - "12346:80"
@@ -53,7 +54,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     #build: gateway
-    image: th-gateway:0.0.7
+    image: th-gateway:0.0.8
     restart: on-failure
     container_name: th-gateway
     ports:
@@ -63,7 +64,7 @@ services:
       - breakage-server
     environment:
       HOST_SERVER_IP: 192.168.0.101
-      #      HOST_SERVER_IP: localhost
+      #HOST_SERVER_IP: localhost
       MAIN_SERVER_URL: http://main-server:12333
       TZ: Europe/Moscow
     networks:
@@ -75,7 +76,7 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-breakage-server:0.0.4
+    image: th-breakage-server:0.0.8
     restart: on-failure
     container_name: th-breakage-server
     #    ports:
@@ -99,7 +100,7 @@ services:
       dockerfile: Dockerfile
       # dockerfile: ./servers/main-server/Dockerfile
     # build: ./servers/main-server
-    image: th-main-server:0.0.4
+    image: th-main-server:0.0.8
     restart: on-failure
     container_name: th-main-server
     #    ports:
