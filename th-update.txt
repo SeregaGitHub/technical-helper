@@ -1,4 +1,5 @@
-getAllUsers();
+applyFilter()
+pageIndex = 0;    !!!
 
 =====================================================================
 
@@ -6,5 +7,18 @@ Delete my self -> no error message on frontend
 
 =====================================================================
 
-th-nginx:
-    restart: on-failure
+update <mat-sidenav> height
+
+Назначенные на: -> сделать по-центру ???
+
+=====================================================================
+
+BASE_URL -> to application.properties
+
+=====================================================================
+
+DATE_FORMAT -> \n
+user
+department
+breakage
+breakage_comment
