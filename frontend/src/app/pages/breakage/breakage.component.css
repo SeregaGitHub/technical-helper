@@ -41,8 +41,13 @@ table, mat-paginator {
 } */
 
 .mat-sidenav-container {
-    height: calc(205vh - 119.2vh);
+ /* height = 100vh - (header(4rem) + footer(2.75rem)) */
+    height: calc(100vh - 6.75rem);
 }
+
+/* .mat-sidenav-container {
+    height: calc(205vh - 119.2vh);
+} */
   
 .mat-sidenav {
     width: 15%;
