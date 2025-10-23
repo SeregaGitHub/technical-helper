@@ -229,9 +229,12 @@
                     <!-- createdDate Column -->
                     <ng-container matColumnDef="createdDate">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ createdDate }} </th>
+                        <!-- <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
+                        (click)="getBreakageById(element.id, userProfile.getUserProfile().isEmployee())"
+                        > {{ element.createdDate | date: dateFormat }} </td> -->
                         <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
                         (click)="getBreakageById(element.id, userProfile.getUserProfile().isEmployee())"
-                        > {{ element.createdDate | date: dateFormat }} </td>
+                        > <div class="px-1.5">{{ element.createdDate | date: dateFormat }}</div> </td>
                     </ng-container>
     
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
