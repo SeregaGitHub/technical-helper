@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, tap } from 'rxjs';
-import { ADMIN_URL, ALL_URL, BASE_URL, CURRENT_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_NAME, DEPARTMENT_URL, GATEWAY_URL } from '../util/constant';
+import { ADMIN_URL, ALL_URL, CURRENT_URL, DELETE_URL, DEPARTMENT_ID, DEPARTMENT_URL } from '../util/constant';
 import { DepartmentDto } from '../model/department/department-dto';
 import { HttpHeadersFactory } from '../generator/headers-factory';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class DepartmentService {
 
         const headers = HttpHeadersFactory.createPermanentHeaders();
 
-        return this._http.post(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
+        return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             // .pipe(
             //     tap((newDepartment) => {
             //         const currentState = this.departmentSubject.value;
@@ -41,7 +42,7 @@ export class DepartmentService {
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
-        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
+        return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
             // .pipe(
             //     tap((updatedDepartment) => {
             //         const currentState = this.departmentSubject.value;
@@ -63,7 +64,7 @@ export class DepartmentService {
         
         const headers = HttpHeadersFactory.createPermanentHeaders();
     
-        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
+        return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL, {headers})
             .pipe(
                 tap(
                     (allDepartments) => {
@@ -79,7 +80,7 @@ export class DepartmentService {
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
-        return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
+        return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL, {headers})
             .pipe(
                 tap((departmentById) => {
                     const currentState = this.departmentSubject;
@@ -107,6 +108,6 @@ export class DepartmentService {
         let headers = HttpHeadersFactory.createPermanentHeaders();
         headers = headers.append(DEPARTMENT_ID, id);
 
-        return this._http.patch(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers});
+        return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL, null, {headers});
     };
 }

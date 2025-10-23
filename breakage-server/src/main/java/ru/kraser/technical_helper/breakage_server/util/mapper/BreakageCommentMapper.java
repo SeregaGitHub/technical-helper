@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class BreakageCommentMapper {
     public BreakageComment toBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
-                                             Breakage breakage) {
+                                             Breakage breakage, String currentUserId) {
         BreakageComment breakageComment = new BreakageComment();
 
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        String currentUserId = SecurityUtil.getCurrentUserId();
+        //String currentUserId = SecurityUtil.getCurrentUserId();
 
         breakageComment.setBreakage(breakage);
         breakageComment.setComment(createBreakageCommentDto.comment());

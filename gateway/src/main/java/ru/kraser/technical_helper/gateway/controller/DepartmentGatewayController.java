@@ -14,7 +14,7 @@ import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
-@CrossOrigin(origins = FRONT_URL)
+//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + DEPARTMENT_URL)
 @RequiredArgsConstructor
@@ -25,10 +25,9 @@ public class DepartmentGatewayController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                        @RequestHeader(AUTH_HEADER) String jwt) {
+    public ApiResponse createDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto) {
         log.info("Creating Department with name - {}", createDepartmentDto.name());
-        ApiResponse response = departmentClient.createDepartment(createDepartmentDto, jwt);
+        ApiResponse response = departmentClient.createDepartment(createDepartmentDto);
         log.info("Department with name - {}, successfully created", createDepartmentDto.name());
         return response;
     }
@@ -36,30 +35,28 @@ public class DepartmentGatewayController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@Validated() @RequestBody CreateDepartmentDto createDepartmentDto,
-                                        @RequestHeader(AUTH_HEADER) String jwt,
                                         @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Updating Department with Id={}", departmentId);
         ApiResponse response = departmentClient.updateDepartment(
-                DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto, jwt);
+                DEPARTMENT_ID_HEADER, departmentId, createDepartmentDto);
         log.info("Department with Id={}, successfully updated", departmentId);
         return response;
     }
 
     @GetMapping(path = ALL_URL)
     @ResponseStatus(HttpStatus.OK)
-    public List<DepartmentDto> getAllDepartments(@RequestHeader(AUTH_HEADER) String jwt) {
+    public List<DepartmentDto> getAllDepartments() {
         log.info("Getting all Departments");
-        List<DepartmentDto> departmentDtoList = departmentClient.getAllDepartments(jwt);
+        List<DepartmentDto> departmentDtoList = departmentClient.getAllDepartments();
         log.info("All Departments received successfully");
         return departmentDtoList;
     }
 
     @GetMapping(path = CURRENT_URL)
     @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartmentById(@RequestHeader(AUTH_HEADER) String jwt,
-                                           @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+    public DepartmentDto getDepartmentById(@RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Getting Department with Id={}", departmentId);
-        DepartmentDto departmentDto = departmentClient.getDepartmentById(departmentId, jwt, DEPARTMENT_ID_HEADER);
+        DepartmentDto departmentDto = departmentClient.getDepartmentById(departmentId, DEPARTMENT_ID_HEADER);
         log.info("Department with Id={}, received successfully", departmentId);
         return departmentDto;
     }
@@ -76,10 +73,9 @@ public class DepartmentGatewayController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteDepartment(@RequestHeader(AUTH_HEADER) String jwt,
-                                        @RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader(DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Deleting Department with Id={}", departmentId);
-        ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId, jwt);
+        ApiResponse response = departmentClient.deleteDepartment(DEPARTMENT_ID_HEADER, departmentId);
         log.info("Department with Id={}, successfully deleted", departmentId);
         return response;
     }

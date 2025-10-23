@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS department (
   created_date      timestamp   NOT NULL,
   last_updated_by   varchar(36) NOT NULL,
   last_updated_date timestamp   NOT NULL,
-  CONSTRAINT pk_department_id   PRIMARY KEY (id),
-  CONSTRAINT uk_department_name UNIQUE (name)
+  CONSTRAINT pk_department_id              PRIMARY KEY (id),
+  CONSTRAINT uk_department_name            UNIQUE (name)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -75,9 +75,9 @@ CREATE TABLE IF NOT EXISTS users (
   created_date      timestamp    NOT NULL,
   last_updated_by   varchar(36)  NOT NULL,
   last_updated_date timestamp    NOT NULL,
-  CONSTRAINT pk_users_id         PRIMARY KEY (id),
-  CONSTRAINT uk_users_username   UNIQUE (username),
-  CONSTRAINT fk_users_department FOREIGN KEY (department)
+  CONSTRAINT pk_users_id             PRIMARY KEY (id),
+  CONSTRAINT uk_users_username       UNIQUE (username),
+  CONSTRAINT fk_users_department     FOREIGN KEY (department)
         REFERENCES department (id)
 );
 
@@ -198,6 +198,22 @@ ALTER TABLE users
 	ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
 		REFERENCES users (id);
 
+
+CREATE OR REPLACE PROCEDURE drop_constraints()
+LANGUAGE plpgsql
+AS
+'
+BEGIN
+	ALTER TABLE IF EXISTS users
+		DROP CONSTRAINT IF EXISTS fk_user_created_by;
+	ALTER TABLE IF EXISTS users
+		DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
+	ALTER TABLE IF EXISTS department
+		DROP CONSTRAINT IF EXISTS fk_department_created_by;
+	ALTER TABLE IF EXISTS department
+		DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
+END; '
+;
 
 CREATE OR REPLACE PROCEDURE set_current_id(
 	IN dep_id varchar, IN adm_id varchar,

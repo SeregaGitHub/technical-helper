@@ -13,6 +13,7 @@ import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
+//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + DEPARTMENT_URL)
 @Slf4j
@@ -22,9 +23,10 @@ public class DepartmentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse createDepartment(@RequestBody CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                        @RequestBody CreateDepartmentDto createDepartmentDto) {
         log.info("Creating Department with name - {}", createDepartmentDto.name());
-        ApiResponse apiResponse = departmentService.createDepartment(createDepartmentDto);
+        ApiResponse apiResponse = departmentService.createDepartment(createDepartmentDto, currentUserId);
         log.info("Department with name - {}, successfully created", createDepartmentDto.name());
         return apiResponse;
     }
@@ -32,9 +34,10 @@ public class DepartmentController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse updateDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId,
-                                   @RequestBody CreateDepartmentDto departmentDto) {
+                                        @RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                        @RequestBody CreateDepartmentDto departmentDto) {
         log.info("Updating Department with Id={}", departmentId);
-        ApiResponse apiResponse =  departmentService.updateDepartment(departmentId, departmentDto);
+        ApiResponse apiResponse =  departmentService.updateDepartment(departmentId, departmentDto, currentUserId);
         log.info("Department with Id={}, successfully updated", departmentId);
         return apiResponse;
     }
@@ -68,9 +71,10 @@ public class DepartmentController {
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse deleteDepartment(@RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
+    public ApiResponse deleteDepartment(@RequestHeader (CURRENT_USER_ID_HEADER) String currentUserId,
+                                        @RequestHeader (DEPARTMENT_ID_HEADER) String departmentId) {
         log.info("Deleting Department with Id={}", departmentId);
-        ApiResponse apiResponse =  departmentService.deleteDepartment(departmentId);
+        ApiResponse apiResponse =  departmentService.deleteDepartment(departmentId, currentUserId);
         log.info("Department with Id={}, successfully deleted", departmentId);
         return apiResponse;
     }

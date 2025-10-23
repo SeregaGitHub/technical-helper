@@ -1,4 +1,4 @@
-package ru.kraser.technical_helper.main_server.security;
+package ru.kraser.technical_helper.gateway.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

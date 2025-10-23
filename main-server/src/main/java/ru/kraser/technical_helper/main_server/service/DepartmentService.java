@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface DepartmentService {
 
-    ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto);
+    ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId);
 
-    ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto);
+    ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto, String currentUserId);
 
     List<DepartmentDto> getAllDepartments();
 
     DepartmentDto getDepartment(String headerName, String departmentName);
 
-    ApiResponse deleteDepartment(String departmentId);
+    ApiResponse deleteDepartment(String departmentId, String currentUserId);
 }

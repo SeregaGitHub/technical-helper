@@ -2,9 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, tap } from 'rxjs';
 import { HttpHeadersFactory } from '../generator/headers-factory';
-import { ADMIN_URL, BASE_URL, BREAKAGE_COMMENT_ID_HEADER, BREAKAGE_COMMENT_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
-         DELETE_URL, 
-         DEPARTMENT_ID, EMPLOYEE_URL, EXECUTOR_URL, GATEWAY_URL, TECHNICIAN_URL, USER_URL 
+import { ADMIN_URL, BREAKAGE_COMMENT_ID_HEADER, BREAKAGE_COMMENT_URL, BREAKAGE_ID, BREAKAGE_URL, CURRENT_URL, 
+         DELETE_URL, DEPARTMENT_ID, EMPLOYEE_URL, EXECUTOR_URL, TECHNICIAN_URL, USER_URL 
         } from '../util/constant';
 import { Executor } from '../enum/executor.enum';
 import { CreateBreakageDto } from '../model/breakage/create-breakage-dto';
@@ -12,6 +11,7 @@ import { UpdateBreakagePriorityDto } from '../model/breakage/update-breakage-pri
 import { UpdateBreakageStatusDto } from '../model/breakage/update-breakage-status-dto';
 import { AppointBreakageExecutorDto } from '../model/breakage/appoint-breakage-executor-dto';
 import { CreateBreakageCommentDto } from '../model/breakage/create-breakage-comment-dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +28,7 @@ export class BreakageService {
   
       const headers = HttpHeadersFactory.createPermanentHeaders();
   
-      return this._http.post(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, createBreakageDto, {headers})
+      return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, createBreakageDto, {headers})
           // .pipe(
           //     tap((newBreakage) => {
           //         const currentState = this.breakageSubject.value;
@@ -62,7 +62,7 @@ export class BreakageService {
     );
     const httpOptions = { params: httpParams, headers: headers };
   
-    return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, httpOptions)
+    return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, httpOptions)
       // .pipe(
       //     tap(
       //       (allBreakages) => {
@@ -93,7 +93,7 @@ export class BreakageService {
       //         })
       //     );
 
-      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
+      return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
           .pipe(
               tap((breakage) => {
                   const currentState = this.breakageSubject;
@@ -107,7 +107,7 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
 
-      return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL, {headers})
+      return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL, {headers})
           // .pipe(
           //     tap((breakage) => {
           //         const currentState = this.breakageSubject.value;
@@ -126,7 +126,7 @@ export class BreakageService {
   getAdminAndTechnicianList(): Observable<any> {
       const headers = HttpHeadersFactory.createPermanentHeaders();
 
-      return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL, {headers})
+      return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL, {headers})
       //   .pipe(
       //     tap(
       //       (adminAndTechnicianList) => {
@@ -149,7 +149,8 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
 
-      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', updateBreakagePriorityDto, {headers})
+      return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', 
+                              updateBreakagePriorityDto, {headers})
           // .pipe(
           //     tap((updatedBreakagePriority) => {
           //         const currentState = this.breakageSubject.value;
@@ -171,7 +172,7 @@ export class BreakageService {
       headers = headers.append(BREAKAGE_ID, id);
       headers = headers.append(DEPARTMENT_ID, departmentId);
 
-      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, null, {headers})
+      return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, null, {headers})
           // .pipe(
           //     tap((chancelledBreakage) => {
           //         const currentState = this.breakageSubject.value;
@@ -192,7 +193,8 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
 
-      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', updateBreakageStatusDto, {headers})
+      return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', 
+                              updateBreakageStatusDto, {headers})
           // .pipe(
           //     tap((updatedBreakageStatus) => {
           //         const currentState = this.breakageSubject.value;
@@ -213,7 +215,8 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, breakageId);
 
-      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL, appointBreakageExecutorDto, {headers})
+      return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL, 
+                              appointBreakageExecutorDto, {headers})
           // .pipe(
           //     tap((updatedBreakageExecutor) => {
           //         const currentState = this.breakageSubject.value;
@@ -234,7 +237,8 @@ export class BreakageService {
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
 
-      return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL, null, {headers})
+      return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL, 
+                              null, {headers})
           // .pipe(
           //     tap((dropBreakageExecutor) => {
           //         const currentState = this.breakageSubject.value;
@@ -255,7 +259,8 @@ export class BreakageService {
     let headers = HttpHeadersFactory.createPermanentHeaders();
     headers = headers.append(BREAKAGE_ID, breakageId);
 
-    return this._http.post(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, createBreakageCommentDto, {headers})
+    return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, 
+                           createBreakageCommentDto, {headers})
           // .pipe(
           //     tap((newBreakageComment) => {
           //         const currentState = this.breakageSubject.value;
@@ -276,7 +281,8 @@ export class BreakageService {
     let headers = HttpHeadersFactory.createPermanentHeaders();
     headers = headers.append(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId);
 
-    return this._http.patch(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, createBreakageCommentDto, {headers})
+    return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, 
+                            createBreakageCommentDto, {headers})
           // .pipe(
           //     tap((updatedBreakageComment) => {
           //         const currentState = this.breakageSubject.value;
@@ -297,7 +303,7 @@ export class BreakageService {
     let headers = HttpHeadersFactory.createPermanentHeaders();
     headers = headers.append(BREAKAGE_COMMENT_ID_HEADER, breakageCommentId);
     
-    return this._http.delete(GATEWAY_URL + BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, {headers});
+    return this._http.delete(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, {headers});
   }
 
 }

@@ -2,16 +2,17 @@ package ru.kraser.technical_helper.main_server.service;
 
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
+import ru.kraser.technical_helper.common_module.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    ApiResponse createUser(CreateUserDto createUserDto);
+    ApiResponse createUser(CreateUserDto createUserDto, String currentUserId);
 
-    ApiResponse updateUser(String userId, UpdateUserDto updateUserDto);
+    ApiResponse updateUser(String userId, UpdateUserDto updateUserDto, String currentUserId);
 
-    ApiResponse changeUserPassword(String userId, ChangeUserPasswordDto passwordDto);
+    ApiResponse changeUserPassword(String userId, UserPasswordDto passwordDto, String currentUserId);
 
     List<UserDto> getAllUsers();
 
@@ -19,5 +20,9 @@ public interface UserService {
 
     UserDto getUser(String userId);
 
-    ApiResponse deleteUser(String userId);
+    User getUserByName(String username);
+
+    ApiResponse deleteUser(String userId, String currentUserId);
+
+    ApiResponse createDefaultAdmin(UserPasswordDto userPasswordDto);
 }

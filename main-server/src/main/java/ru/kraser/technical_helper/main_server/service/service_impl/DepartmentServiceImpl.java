@@ -27,9 +27,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto) {
+    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId) {
         try {
-            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto));
+            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId));
         } catch (Exception e) {
             ThrowMainServerException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }
@@ -43,12 +43,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto) {
+    public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
         try {
             response = departmentRepository.updateDepartment(
-                    departmentId, departmentDto.name(), SecurityUtil.getCurrentUserId(), now);
+                    departmentId, departmentDto.name(), currentUserId, now);
             ThrowMainServerException.isExist(response, "отдел");
         } catch (Exception e) {
             ThrowMainServerException.departmentHandler(e.getMessage(), departmentDto.name());
@@ -86,10 +86,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public ApiResponse deleteDepartment(String departmentId) {
+    public ApiResponse deleteDepartment(String departmentId, String currentUserId) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
         int response;
-        response = departmentRepository.deleteDepartment(departmentId, SecurityUtil.getCurrentUserId(), now);
+        response = departmentRepository.deleteDepartment(departmentId, currentUserId, now);
 
         if (response != 1) {
             throw new NotFoundException(DEPARTMENT_NOT_EXIST);

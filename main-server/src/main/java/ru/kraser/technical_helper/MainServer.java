@@ -4,21 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kraser.technical_helper.common_module.enums.Role;
-import ru.kraser.technical_helper.common_module.exception.ServerException;
-import ru.kraser.technical_helper.common_module.model.Department;
-import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 import ru.kraser.technical_helper.main_server.util.data_sours.DataSours;
-
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @SpringBootApplication
 public class MainServer implements CommandLineRunner {
@@ -29,11 +17,11 @@ public class MainServer implements CommandLineRunner {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    //@Autowired
+    //private PasswordEncoder passwordEncoder;
 
     @Autowired
-    DataSours dataSours;
+    DataSours dataSours;  // NEED FOR DELETE THIS CLASS !!!
 
     public static void main(String[] args) {
         SpringApplication.run(MainServer.class, args);
@@ -42,7 +30,9 @@ public class MainServer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        Optional<User> optionalUser = userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+        //System.out.println("Start MainServer...");
+
+        /*Optional<User> optionalUser = userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
 
         if (optionalUser.isEmpty()) {
             LocalDateTime now = LocalDateTime.now().withNano(0);
@@ -128,6 +118,6 @@ public class MainServer implements CommandLineRunner {
                 if (clst != null) clst.close();
                 if (conn != null) conn.close();
             }
-        }
+        }*/
     }
 }

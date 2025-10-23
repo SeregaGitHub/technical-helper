@@ -3,8 +3,11 @@ package ru.kraser.technical_helper.main_server.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.User;
@@ -26,7 +29,22 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findUserByUsername(String username);
 
-    Optional<User> findUserByUsernameAndEnabledTrue(String username);
+    //Optional<User> findUserByUsernameAndEnabledTrue(String username);
+
+    @Query(
+            value = """
+                    SELECT new ru.kraser.technical_helper.common_module.dto.user.UserFullDto
+                    (u.id, u.username, u.password, u.enabled, u.role,
+                    u.createdBy, u.createdDate, u.lastUpdatedBy, u.lastUpdatedDate,
+                    d.id AS departmentId, d.name AS departmentName, d.enabled AS departmentEnabled,
+                    d.createdBy AS departmentCreatedBy, d.createdDate AS departmentCreatedDate,
+                    d.lastUpdatedBy AS departmentLastUpdatedBy, d.lastUpdatedDate AS departmentLastUpdatedDate)
+                    FROM User AS u
+                    JOIN FETCH Department AS d ON d.id = u.department.id
+                    WHERE u.username = :username AND u.enabled = true
+                    """
+    )
+    Optional<UserFullDto> getUserByUsernameAndEnabledTrue(String username);
 
     Optional<User> findTop1ByRoleAndEnabledTrue(Role role);
 
@@ -66,7 +84,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     int changeUserPassword(String userId, String newPassword, String currentUserId, LocalDateTime lastUpdatedDate);
 
     @Query(
-            value = GET_USER + "WHERE u.enabled = true ORDER BY u.username"
+            value = GET_USER + "WHERE u.enabled = true ORDER BY u.role, d.name, u.username"
     )
     List<UserDto> getAllUsers();
 
@@ -98,4 +116,15 @@ public interface UserRepository extends JpaRepository<User, String> {
                     """
     )
     int deleteUser(String userId, String currentUserId, LocalDateTime lastUpdatedDate);
+
+    @Procedure(procedureName = "drop_constraints")
+    void dropConstraints();
+
+    @Procedure(procedureName = "set_current_id")
+    void setCurrentId(@Param("dep_id") String adminDepartmentId, @Param("adm_id") String adminId,
+                      @Param("dep_created_by") String adminDepartmentCreatedBy,
+                      @Param("adm_created_by") String adminCreatedBy,
+                      @Param("dep_last_updated_by") String adminDepartmentLastUpdatedBy,
+                      @Param("adm_last_updated_by") String adminLastUpdatedBy,
+                      @Param("temporary_admin_id") String temporaryAdminId);
 }

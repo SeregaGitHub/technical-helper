@@ -1,6 +1,6 @@
 package ru.kraser.technical_helper.gateway.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationRequest;
-import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationResponse;
+//import ru.kraser.technical_helper.common_module.dto.auth.AuthenticationResponse;
 import ru.kraser.technical_helper.common_module.exception.AuthException;
 import ru.kraser.technical_helper.common_module.exception.ServerException;
+import ru.kraser.technical_helper.common_module.model.User;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -19,11 +20,11 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 @RequiredArgsConstructor
 public class AuthenticationClient {
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
+    //private final ObjectMapper objectMapper;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public User authenticate(AuthenticationRequest request) {
 
-        Mono<AuthenticationResponse> postResponse = webClient
+        Mono<User> postResponse = webClient
                 .post()
                 .uri(MAIN_SERVER_URL + BASE_URL + AUTH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +84,8 @@ public class AuthenticationClient {
                                 return
                             });
                         })*/
-                .bodyToMono(AuthenticationResponse.class);
+                .bodyToMono(User.class);
+                //.bodyToMono(AuthenticationResponse.class);
 
         /*AuthenticationResponse authenticationResponse = postResponse.block();
         assert authenticationResponse != null;

@@ -17,38 +17,34 @@ public class DepartmentClient extends BaseClient {
         super(webClient);
     }
 
-    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String jwt) {
+    public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto) {
         return super.post(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
                 createDepartmentDto,
-                jwt,
                 ParameterizedTypeReference.forType(ApiResponse.class));
     }
 
     public ApiResponse updateDepartment(String departmentHeaderName, String departmentId,
-                                   CreateDepartmentDto createDepartmentDto, String jwt) {
+                                   CreateDepartmentDto createDepartmentDto) {
         return super.patch(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
                 createDepartmentDto,
-                jwt,
                 departmentHeaderName,
                 departmentId,
                 ParameterizedTypeReference.forType(ApiResponse.class)
         );
     }
 
-    public List<DepartmentDto> getAllDepartments(String jwt) {
+    public List<DepartmentDto> getAllDepartments() {
         return super.getAll(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL,
-                jwt,
                 ParameterizedTypeReference.forType(DepartmentDto.class)
         );
     }
 
-    public DepartmentDto getDepartmentById(String departmentId, String jwt, String departmentIdHeader) {
+    public DepartmentDto getDepartmentById(String departmentId, String departmentIdHeader) {
         return super.get(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL,
-                jwt,
                 departmentIdHeader,
                 departmentId,
                 ParameterizedTypeReference.forType(DepartmentDto.class)
@@ -65,10 +61,9 @@ public class DepartmentClient extends BaseClient {
         );
     }*/
 
-    public ApiResponse deleteDepartment(String departmentHeaderName, String departmentId, String jwt) {
+    public ApiResponse deleteDepartment(String departmentHeaderName, String departmentId) {
         return super.delete(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL,
-                jwt,
                 departmentHeaderName,
                 departmentId,
                 ParameterizedTypeReference.forType(ApiResponse.class)

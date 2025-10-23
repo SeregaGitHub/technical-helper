@@ -196,6 +196,7 @@ export class BreakageComponent implements OnInit, OnDestroy{
 
       if (this.searchText.length > 2) {
           this.searchTimer = setTimeout(() => {
+            this.toDefaultPageIndex();
             this.getAllBreakages();
           }, 2000);
       } else if (this.searchText.length > 0) {
