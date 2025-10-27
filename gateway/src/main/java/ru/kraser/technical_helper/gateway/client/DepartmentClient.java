@@ -51,16 +51,6 @@ public class DepartmentClient extends BaseClient {
         );
     }
 
-/*    public DepartmentDto getDepartmentByName(String departmentName, String jwt, String departmentNameHeader) {
-        return super.get(
-                MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL,
-                jwt,
-                departmentNameHeader,
-                departmentName,
-                ParameterizedTypeReference.forType(DepartmentDto.class)
-        );
-    }*/
-
     public ApiResponse deleteDepartment(String departmentHeaderName, String departmentId) {
         return super.delete(
                 MAIN_SERVER_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL,

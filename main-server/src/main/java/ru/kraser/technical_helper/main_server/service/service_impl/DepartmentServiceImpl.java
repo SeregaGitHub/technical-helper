@@ -8,9 +8,7 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
-import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
-import ru.kraser.technical_helper.common_module.util.SecurityUtil;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
@@ -18,7 +16,7 @@ import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.kraser.technical_helper.common_module.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
 
 @Service
 @RequiredArgsConstructor
@@ -70,18 +68,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional(readOnly = true)
     public DepartmentDto getDepartment(String headerName, String dep) {
-/*        if (headerName.equals(DEPARTMENT_NAME_HEADER)) {
-            Department department = departmentRepository.findByNameAndEnabledTrue(dep).orElseThrow(
-                    () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
-            );
-            return DepartmentMapper.toDepartmentDto(department);
-        } else if (headerName.equals(DEPARTMENT_ID_HEADER)) {*/
             return departmentRepository.getDepartmentById(dep).orElseThrow(
                     () -> new NotFoundException(DEPARTMENT_NOT_EXIST)
             );
-/*        } else {
-            throw new NotFoundException(DEPARTMENT_NOT_EXIST);
-        }*/
     }
 
     @Override

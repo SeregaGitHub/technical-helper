@@ -11,16 +11,13 @@ import ru.kraser.technical_helper.common_module.exception.AuthException;
 import ru.kraser.technical_helper.common_module.model.JwtUserDetails;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.gateway.client.AuthenticationClient;
-//import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    //private final UserRepository userRepository;
     private final AuthenticationClient authenticationClient;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    //private final PasswordEncoder passwordEncoder;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
@@ -33,9 +30,7 @@ public class AuthenticationService {
         } catch (AuthenticationException e) {
             throw new AuthException("Неверное имя пользователя или пароль !!!");
         }
-        /*var user = userRepository.findUserByUsernameAndEnabledTrue(request.username()).orElseThrow(
-                () -> new NotFoundException("Пользователь с логином - " + request.username() + ", не был найден.")
-        );*/
+
         User user = authenticationClient.authenticate(request);
 
         var jwtToken = jwtService.generateToken(new JwtUserDetails(user));

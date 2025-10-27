@@ -36,7 +36,6 @@ import { Subject, takeUntil } from 'rxjs';
   ]
 })
 export class DepartmentComponent implements OnDestroy {
-  //export class DepartmentComponent implements AfterViewInit {
 
   number = '№';
   name = 'Отдел';
@@ -68,7 +67,6 @@ export class DepartmentComponent implements OnDestroy {
   private _unsubscribe: Subject<void> = new Subject();
 
   constructor (private _depService: DepartmentService, public dialog: MatDialog) {
-    // this.dataSource = new MatTableDataSource(this.dep);
     this.getAllDepError = ApiResponseFactory.createEmptyApiResponse();
     this.getAllDep();
   }
@@ -77,12 +75,6 @@ export class DepartmentComponent implements OnDestroy {
     this._unsubscribe.next();
     this._unsubscribe.complete();
   }
-
-  // ngAfterViewInit() {
-  //   this.dataSource.paginator = this.paginator;
-  //   this.dataSource.sort = this.sort;
-  // }
-
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

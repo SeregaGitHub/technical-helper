@@ -64,8 +64,6 @@ public class BreakageServiceImpl implements BreakageService {
     public ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId, String currentUserId,
                                       Role currentUserRole, String currentUserDepartmentId, String currentUsername) {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        //Role currentUserRole = SecurityUtil.getCurrentUserRole();
-        //String userDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
 
         if (currentUserDepartmentId.equals(breakageDepartmentId) ||
                 currentUserRole == Role.ADMIN || currentUserRole == Role.TECHNICIAN) {
@@ -237,8 +235,6 @@ public class BreakageServiceImpl implements BreakageService {
             String executor, boolean deadline, String searchText,
             Role currentUserRole, String currentUserDepartmentId, String currentUserId) {
 
-        //Role currentUserRole = SecurityUtil.getCurrentUserRole();
-
         PageRequest pageRequest = AppPageUtil.createPageRequest(pageSize, pageIndex, sortBy, direction);
 
         List<Status> statusList = AppPageUtil.createStatusList(statusNew, statusSolved, statusInProgress,
@@ -248,7 +244,6 @@ public class BreakageServiceImpl implements BreakageService {
                 priorityMedium, priorityLow);
 
         if (currentUserRole == Role.EMPLOYEE) {
-            //String currentUserDepartmentId = SecurityUtil.getCurrentUserDepartment().getId();
             Page<BreakageEmployeeDto> pageEmployeeBreakages;
             if (searchText == null || searchText.length() < 3) {
                 pageEmployeeBreakages = breakageRepository.getAllEmployeeBreakages(
@@ -260,7 +255,6 @@ public class BreakageServiceImpl implements BreakageService {
             return AppPageMapper.toAppPage(pageEmployeeBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_ME.name())) {
-            //String currentUserId = SecurityUtil.getCurrentUserId();
             Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);
@@ -283,7 +277,6 @@ public class BreakageServiceImpl implements BreakageService {
             return AppPageMapper.toAppPage(pageBreakages, currentUserRole);
 
         } else if (executor != null && executor.equals(Executor.APPOINTED_TO_OTHERS.name())) {
-            //String currentUserId = SecurityUtil.getCurrentUserId();
             Page<BreakageTechDto> pageBreakages;
             if (deadline) {
                 LocalDateTime now = LocalDateTime.now().withNano(0);

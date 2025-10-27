@@ -17,13 +17,3 @@ export class CustomBreakagePaginatorIntl extends MatPaginatorIntl {
         return `${start} - ${end} из ${length}`;
     }
 }
-
-
-
-
-
-// this.paginator._intl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-//       const start = page * pageSize + 1;
-//       const end = (page + 1) * pageSize > this.totalCount? this.totalCount: (page + 1) * pageSize;
-//       return `${start} - ${end} of ${this.totalLength}`;
-//     };

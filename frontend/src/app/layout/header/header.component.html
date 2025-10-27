@@ -3,7 +3,6 @@
     <div class="w-1/5 text-michroma">
       <span>{{ title }}</span>
     </div>
-    <!-- <span class="example-spacer"></span> -->
     @if (authService.isAuthenticated) {
       <div appUserProfile #userProfile="userProfile">
         <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="border-none">
@@ -27,14 +26,9 @@
     </mat-button-toggle-group>
     </div>
 
-    <!-- <span class="example-spacer"></span> -->
     <div class="flex w-1/5 justify-between items-center">
       <div class="inline-block">
-        <!-- <button mat-icon-button class="example-icon favorite-icon ml-40" aria-label="Example icon-button with heart icon">
-          <mat-icon>favorite</mat-icon>
-        </button> -->
         <div class="overflow-hidden flex w-44 h-8 text-montserrat border items-center">
-          <!-- <p>{{ nameFromStorage }}</p> -->
            @if (authService.isAuthenticated) {
               <p>{{ authService.getUserProfile().getUserName() }}</p>
            } @else {
@@ -44,25 +38,12 @@
         </div>
       </div>
       
-    <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-      <mat-icon>share</mat-icon>
-    </button> -->
       <div class="inline-block">
         <button (click)="logout()" class="btn button-size black-to-blue-gradient text-montserrat mouse-enter">
           Выход
         </button>
-        <!-- <mat-button-toggle 
-          value="exit" 
-          class="black-to-blue-gradient text-michroma-aquamarine btn button-size mouse-enter" 
-          routerLink="/auth">
-        Выход</mat-button-toggle> -->
       </div>
-    
-    <!-- <mat-button-toggle 
-          value="exit" 
-          class="black-to-blue-gradient text-michroma-aquamarine button-toggle border-none mouse-enter" 
-          routerLink="/auth">
-        Выход</mat-button-toggle> -->
+
     </div>
     }
   </mat-toolbar>

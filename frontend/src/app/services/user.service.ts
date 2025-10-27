@@ -17,19 +17,11 @@ export class UserService {
 
     userSubject = new Subject<any>();
 
-    // userSubject = new BehaviorSubject<any>({});
-
     createUser(createUserDto: CreateUserDto): Observable<any> {
 
         const headers = HttpHeadersFactory.createPermanentHeaders();
 
         return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + USER_URL, createUserDto, {headers})
-            // .pipe(
-            //     tap((newUser) => {
-            //         const currentState = this.userSubject.value;
-            //         this.userSubject.next({...currentState, newUser});
-            //     })
-            // );
 
             .pipe(
                 tap((newUser) => {

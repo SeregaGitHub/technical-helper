@@ -93,7 +93,6 @@
               formControlName="departmentId"
               name="departmentId"
             >
-            <!-- [(ngModel)]="newUser.departmentId" -->
               @for (dep of deps; track dep) {
                 <mat-option [value]="dep.id">{{ dep.name }}</mat-option>
               }
@@ -106,7 +105,6 @@
                 formControlName="role"
                 aria-label="Select an option"
             >
-            <!-- [(ngModel)]="newUser.role" -->
                 <mat-radio-button value="ADMIN">Admin</mat-radio-button>
                 <mat-radio-button value="TECHNICIAN">Technician</mat-radio-button>
                 <mat-radio-button value="EMPLOYEE">Employee</mat-radio-button>

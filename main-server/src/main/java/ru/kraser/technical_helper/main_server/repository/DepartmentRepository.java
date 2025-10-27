@@ -45,23 +45,10 @@ public interface DepartmentRepository extends JpaRepository<Department, String> 
     )
     List<DepartmentDto> getAllDepartments();
 
-//    @Query(
-//            value = """
-//                    SELECT new ru.kraser.technical_helper.common_module.dto.department.DepartmentDto
-//                    (d.id, d.name, d.createdBy, d.createdDate, d.lastUpdatedBy, d.lastUpdatedDate)
-//                    FROM Department as d
-//                    WHERE d.enabled = true
-//                    ORDER BY name
-//                    """
-//    )
-//    List<DepartmentDto> getAllDepartments();
-
     @Query(
             value = GET_DEPARTMENT + "WHERE d.id = :departmentId AND d.enabled = true"
     )
     Optional<DepartmentDto> getDepartmentById(String departmentId);
-
-//    Optional<Department> findByNameAndEnabledTrue(String departmentName);
 
     @Modifying
     @Query(

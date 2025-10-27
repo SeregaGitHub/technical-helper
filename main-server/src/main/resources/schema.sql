@@ -1,12 +1,3 @@
---------------------- only for develop mode
---DROP TABLE IF EXISTS breakage_comment_audit;
---DROP TABLE IF EXISTS breakage_comment;
---DROP TABLE IF EXISTS breakage_audit;
---DROP TABLE IF EXISTS breakage;
---DROP TABLE IF EXISTS users;
---DROP TABLE IF EXISTS department;
---------------------- only for develop mode
-
 ALTER TABLE IF EXISTS users
 	DROP CONSTRAINT IF EXISTS fk_user_created_by;
 

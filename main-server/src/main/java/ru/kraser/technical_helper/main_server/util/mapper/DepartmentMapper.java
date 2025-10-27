@@ -2,7 +2,6 @@ package ru.kraser.technical_helper.main_server.util.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
-import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.LocalDateTime;
@@ -21,15 +20,4 @@ public class DepartmentMapper {
         department.setLastUpdatedDate(now);
         return department;
     }
-
-    /*public DepartmentDto toDepartmentDto(Department department) {
-        return DepartmentDto.builder()
-                .id(department.getId())
-                .name(department.getName())
-                .createdBy(department.getCreatedBy())
-                .createdDate(department.getCreatedDate())
-                .lastUpdatedBy(department.getLastUpdatedBy())
-                .lastUpdatedDate(department.getLastUpdatedDate())
-                .build();
-    }*/
 }

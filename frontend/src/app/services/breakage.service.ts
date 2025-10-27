@@ -20,8 +20,6 @@ export class BreakageService {
 
   constructor(private _http: HttpClient) { }
 
-  // breakageSubject = new BehaviorSubject<any>({});
-
   breakageSubject = new Subject<any>();
 
   createBreakage(createBreakageDto: CreateBreakageDto): Observable<any> {
@@ -29,12 +27,6 @@ export class BreakageService {
       const headers = HttpHeadersFactory.createPermanentHeaders();
   
       return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, createBreakageDto, {headers})
-          // .pipe(
-          //     tap((newBreakage) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, newBreakage});
-          //     })
-          // );
 
           .pipe(
               tap((newBreakage) => {
@@ -63,13 +55,6 @@ export class BreakageService {
     const httpOptions = { params: httpParams, headers: headers };
   
     return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, httpOptions)
-      // .pipe(
-      //     tap(
-      //       (allBreakages) => {
-      //         const currentState = this.breakageSubject.value;
-      //           this.breakageSubject.next({...currentState, allBreakages})
-      //       })
-      // );
 
       .pipe(
           tap(
@@ -84,14 +69,6 @@ export class BreakageService {
       
       let headers = HttpHeadersFactory.createPermanentHeaders();
       headers = headers.append(BREAKAGE_ID, id);
-      
-      // return this._http.get(GATEWAY_URL + BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
-      //     .pipe(
-      //         tap((breakage) => {
-      //             const currentState = this.breakageSubject.value;
-      //             this.breakageSubject.next({...currentState, breakage});
-      //         })
-      //     );
 
       return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL, {headers})
           .pipe(
@@ -108,12 +85,6 @@ export class BreakageService {
       headers = headers.append(BREAKAGE_ID, id);
 
       return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL, {headers})
-          // .pipe(
-          //     tap((breakage) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, breakage});
-          //     })
-          // );
 
           .pipe(
               tap((breakage) => {
@@ -127,13 +98,6 @@ export class BreakageService {
       const headers = HttpHeadersFactory.createPermanentHeaders();
 
       return this._http.get(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL, {headers})
-      //   .pipe(
-      //     tap(
-      //       (adminAndTechnicianList) => {
-      //         const currentState = this.breakageSubject.value;
-      //         this.breakageSubject.next({...currentState, adminAndTechnicianList})
-      //       })
-      // );
 
       .pipe(
           tap(
@@ -151,12 +115,6 @@ export class BreakageService {
 
       return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + '/priority', 
                               updateBreakagePriorityDto, {headers})
-          // .pipe(
-          //     tap((updatedBreakagePriority) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, updatedBreakagePriority});
-          //     })
-          // );
 
           .pipe(
               tap((updatedBreakagePriority) => {
@@ -173,12 +131,6 @@ export class BreakageService {
       headers = headers.append(DEPARTMENT_ID, departmentId);
 
       return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + EMPLOYEE_URL, null, {headers})
-          // .pipe(
-          //     tap((chancelledBreakage) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, chancelledBreakage});
-          //     })
-          // );
 
           .pipe(
               tap((chancelledBreakage) => {
@@ -195,12 +147,6 @@ export class BreakageService {
 
       return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + '/status', 
                               updateBreakageStatusDto, {headers})
-          // .pipe(
-          //     tap((updatedBreakageStatus) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, updatedBreakageStatus});
-          //     })
-          // );
 
           .pipe(
               tap((updatedBreakageStatus) => {
@@ -217,12 +163,6 @@ export class BreakageService {
 
       return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL, 
                               appointBreakageExecutorDto, {headers})
-          // .pipe(
-          //     tap((updatedBreakageExecutor) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, updatedBreakageExecutor});
-          //     })
-          // );
 
           .pipe(
               tap((updatedBreakageExecutor) => {
@@ -239,12 +179,6 @@ export class BreakageService {
 
       return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + ADMIN_URL + EXECUTOR_URL + DELETE_URL, 
                               null, {headers})
-          // .pipe(
-          //     tap((dropBreakageExecutor) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, dropBreakageExecutor});
-          //     })
-          // );
 
           .pipe(
               tap((dropBreakageExecutor) => {
@@ -261,12 +195,6 @@ export class BreakageService {
 
     return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, 
                            createBreakageCommentDto, {headers})
-          // .pipe(
-          //     tap((newBreakageComment) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, newBreakageComment});
-          //     })
-          // );
 
           .pipe(
               tap((newBreakageComment) => {
@@ -283,12 +211,6 @@ export class BreakageService {
 
     return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL, 
                             createBreakageCommentDto, {headers})
-          // .pipe(
-          //     tap((updatedBreakageComment) => {
-          //         const currentState = this.breakageSubject.value;
-          //         this.breakageSubject.next({...currentState, updatedBreakageComment});
-          //     })
-          // );
 
           .pipe(
               tap((updatedBreakageComment) => {

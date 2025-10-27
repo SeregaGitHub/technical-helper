@@ -1,7 +1,6 @@
 package ru.kraser.technical_helper.main_server.util.mapper;
 
 import lombok.experimental.UtilityClass;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -19,10 +18,8 @@ public class UserMapper {
 
         User user = new User();
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        //String currentUserId = SecurityUtil.getCurrentUserId();
 
         user.setUsername(createUserDto.username());
-        //user.setPassword(passwordEncoder.encode(createUserDto.password()));
         user.setPassword(createUserDto.password());
         user.setEnabled(true);
         user.setDepartment(department);
@@ -59,18 +56,4 @@ public class UserMapper {
                 .lastUpdatedDate(userFullDto.lastUpdatedDate())
                 .build();
     }
-
-    /*public UserDto toUserDto (User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .departmentId(user.getDepartment().getId())
-                .department(user.getDepartment().getName())
-                .role(user.getRole())
-                .createdBy(user.getCreatedBy())
-                .createdDate(user.getCreatedDate())
-                .lastUpdatedBy(user.getLastUpdatedBy())
-                .lastUpdatedDate(user.getLastUpdatedDate())
-                .build();
-    }*/
 }

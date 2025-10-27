@@ -1,5 +1,4 @@
 <div class="flex justify-center">
-<!-- <div class="flex justify-center"> -->
 
   <div class="max-w-96">
 
@@ -34,7 +33,6 @@
           <mat-card-title class="text-montserrat !font-bold !text-2xl !tracking-wider">Вход</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <!-- <form #f = 'ngForm' (ngSubmit)="onSubmit(f)" class="example-form mt-2"> -->
               <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="max-w-lg min-w-36 w-full mt-2">
                 <mat-form-field class="w-full">
                   <mat-label>Логин</mat-label>
@@ -79,16 +77,6 @@
                             }
                           </div>
                          }
-                    
-                    <!-- <button
-                    mat-icon-button
-                    matSuffix
-                    (click)="clickEvent($event)"
-                    [attr.aria-label]="'Hide password'"
-                    [attr.aria-pressed]="hide()"
-                  >
-                    <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                  </button> -->
   
                   </mat-form-field>
 
@@ -98,11 +86,6 @@
                     <p class="text-center"> {{ authError }} </p> 
                   </div>
   
-                  <!-- <mat-button-toggle value="Submit" type="submit" class="black-to-blue-gradient text-michroma-aquamarine button-toggle mt-2" [disabled]="f.invalid"> -->
-                    <!--mat-raised-button  [disabled]="authForm.invalid" -->
-                <!-- <mat-button-toggle type="submit" class="black-to-blue-gradient text-michroma-aquamarine mt-2" [disabled]="authForm.invalid">
-                                                                                                                        
-                  Submit</mat-button-toggle> -->
                   <div class="mb-4 flex justify-end">
                     <button type="submit" 
                             class="black-to-blue-gradient text-montserrat button-size btn mouse-enter"
@@ -120,37 +103,3 @@
   </div>
 
 </div>
-  
-  <!-- <div class="flex justify-center">
-  
-      <mat-card class="example-card blue-to-black-gradient mt-40 space-y-12 opacity-90" appearance="outlined">
-          <mat-card-header>
-            <mat-card-title class="text-michroma-aquamarine">Authentication</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            
-                <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="example-form mt-2">
-                  <mat-form-field class="example-full-width">
-                    <mat-label>Username</mat-label>
-                    <input matInput placeholder="Username" formControlName="username">
-                  </mat-form-field>
-                
-                  <mat-form-field class="example-full-width mt-2">
-                      <mat-label>Password</mat-label>
-                      <input matInput type="password" placeholder="Password" formControlName="password">
-                    
-  
-                    </mat-form-field>
-  
-                  <mat-button-toggle mat-raised-button type="submit" class="black-to-blue-gradient text-michroma-aquamarine mt-2" [disabled]="authForm.invalid">
-                    Submit</mat-button-toggle>
-                </form>
-                
-                
-          </mat-card-content>
-        </mat-card>
-  
-  </div> -->
-  
-
-

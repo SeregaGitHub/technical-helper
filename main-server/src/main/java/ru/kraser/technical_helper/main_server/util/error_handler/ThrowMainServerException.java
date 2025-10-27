@@ -27,8 +27,6 @@ public class ThrowMainServerException {
                     " Используйте другое имя !!!");
         } else if (message.contains("fk_users_department") || message.contains("Unable to find")) {
             throw new NotFoundException("Отдел в котором находится сотрудник не существует !!!");
-        } else if (message.contains("ch_users_role")) {
-            throw new NotFoundException("Роль, присвоенная сотруднику - не существует !!!");
         } else if (message.contains("не существует")) {
             throw new NotFoundException(message);
         } else {

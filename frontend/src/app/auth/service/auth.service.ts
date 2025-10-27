@@ -23,11 +23,6 @@ export class AuthService {
     this.userProfile.role = role;
     this.isAuthenticated = true;
   }
-  // public username$ = new Subject<String>();
-  // public userRole$ = new Subject<String>();
-
-  // private username$: any;
-  // private userRole$: any;
 
   constructor(private _http: HttpClient) { }
 
@@ -39,28 +34,8 @@ export class AuthService {
     });
   }
 
-  // setUsername$(name: String) {
-  //   this.username$ = name;
-  // }
-
-  // setUserRole$(role: String) {
-  //   this.userRole$ = role;
-  // }
-
-	// public setUserProfile(username: String, userRole: String) {
-  //  	this.username$.next(username);
-  //   this.userRole$.next(userRole);  
-  // }
-
   logout() {
-    // localStorage.clear();
     localStorage.removeItem('thJwt');
-
-    
-    //localStorage.removeItem('thUn');
-    //localStorage.removeItem('thUr');
-    //this.username$.unsubscribe();
-    //this.userRole$.unsubscribe();
     this.userProfile = null;
     this.isAuthenticated = false; 
   }

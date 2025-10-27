@@ -17,12 +17,7 @@ p {
 
 th, td {
     color: aquamarine;
-    /* font-family: michroma; */
     font-family: montserrat;
-    /* background-color: opacify($color: mediumorchid, $amount: 0.1);  
-    opacity: 20%;
-    background: rgb(8,56,134);
-    background: linear-gradient(90deg, rgba(8,56,134,1) 0%, rgba(0,12,36,1) 80%); */
 }
 
 table, mat-paginator {
@@ -33,21 +28,10 @@ table, mat-paginator {
     opacity: 90%;
 }
 
-/* 
-    The original version
-
-.mat-sidenav-container {
-    height: calc(205vh - 115vh);
-} */
-
 .mat-sidenav-container {
  /* height = 100vh - (header(4rem) + footer(2.75rem)) */
     height: calc(100vh - 6.75rem);
 }
-
-/* .mat-sidenav-container {
-    height: calc(205vh - 119.2vh);
-} */
   
 .mat-sidenav {
     width: 15%;

@@ -14,7 +14,6 @@ import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
-//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + DEPARTMENT_URL)
 @RequiredArgsConstructor
@@ -60,16 +59,6 @@ public class DepartmentGatewayController {
         log.info("Department with Id={}, received successfully", departmentId);
         return departmentDto;
     }
-
-/*    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartmentByName(@RequestHeader(AUTH_HEADER) String jwt,
-                                             @RequestHeader(DEPARTMENT_NAME_HEADER) String departmentName) {
-        log.info("Getting Department with name - {}", departmentName);
-        DepartmentDto departmentDto = departmentClient.getDepartmentByName(departmentName, jwt, DEPARTMENT_NAME_HEADER);
-        log.info("Department with name - {}, received successfully", departmentName);
-        return departmentDto;
-    }*/
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)
