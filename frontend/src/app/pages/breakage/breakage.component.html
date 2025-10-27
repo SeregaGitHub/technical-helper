@@ -143,8 +143,6 @@
         
                     <!-- departmentName Column -->
                     <ng-container matColumnDef="departmentName">  
-                        <!-- <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ departmentName }} </th>
-                        <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line" -->
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             [ngClass]="userProfile.getUserProfile().isEmployee() ? 'max-w-32 min-w-32' : 'max-w-24 min-w-24'"
                             > {{ departmentName }} </th>
@@ -156,8 +154,6 @@
 
                     <!-- room Column -->
                     <ng-container matColumnDef="room">  
-                        <!-- <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-24 min-w-24"> {{ room }} </th>
-                        <td mat-cell *matCellDef="let element" class="max-w-24 min-w-24 one-long-line" -->
                         <th mat-header-cell *matHeaderCellDef mat-sort-header 
                             [ngClass]="userProfile.getUserProfile().isEmployee() ? 'max-w-32 min-w-32' : 'max-w-24 min-w-24'"
                             > {{ room }} </th>
@@ -169,8 +165,6 @@
 
                     <!-- breakageTopic Column -->
                     <ng-container matColumnDef="breakageTopic">  
-                        <!-- <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-32 min-w-32"> {{ breakageTopic }} </th>
-                        <td mat-cell *matCellDef="let element" class="max-w-32 min-w-32 one-long-line" -->
                         <th mat-header-cell *matHeaderCellDef mat-sort-header 
                             [ngClass]="userProfile.getUserProfile().isEmployee() ? 'max-w-40 min-w-40' : 'max-w-32 min-w-32'"
                             > {{ breakageTopic }} </th>
@@ -229,9 +223,6 @@
                     <!-- createdDate Column -->
                     <ng-container matColumnDef="createdDate">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header class="max-w-20 min-w-20"> {{ createdDate }} </th>
-                        <!-- <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
-                        (click)="getBreakageById(element.id, userProfile.getUserProfile().isEmployee())"
-                        > {{ element.createdDate | date: dateFormat }} </td> -->
                         <td mat-cell *matCellDef="let element" class="max-w-20 min-w-20"
                         (click)="getBreakageById(element.id, userProfile.getUserProfile().isEmployee())"
                         > <div class="px-1.5">{{ element.createdDate | date: dateFormat }}</div> </td>
@@ -259,12 +250,10 @@
                       class="text-montserrat">
                 </mat-paginator>
 
-                <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator> -->
             </div>
         </div>
 
         <div class="fixed top-48 right-4">
-        <!-- <div class="float-right mt-20 mr-3"> -->
             <button class="btn button-size black-to-blue-gradient text-montserrat mouse-enter" (click)="createBreakage()">
             Создать
             </button>

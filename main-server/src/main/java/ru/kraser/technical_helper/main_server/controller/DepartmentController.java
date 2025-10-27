@@ -13,7 +13,6 @@ import java.util.List;
 
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
-//@CrossOrigin(origins = FRONT_URL)
 @RestController
 @RequestMapping(path = BASE_URL + ADMIN_URL + DEPARTMENT_URL)
 @Slf4j
@@ -59,15 +58,6 @@ public class DepartmentController {
         log.info("Department with Id={}, received successfully", departmentId);
         return department;
     }
-
-/*    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public DepartmentDto getDepartmentByName(@RequestHeader (DEPARTMENT_NAME_HEADER) String departmentName) {
-        log.info("Getting Department with name - {}", departmentName);
-        DepartmentDto department =  departmentService.getDepartment(DEPARTMENT_NAME_HEADER, departmentName);
-        log.info("Department with name - {}, received successfully", departmentName);
-        return department;
-    }*/
 
     @PatchMapping(path = DELETE_URL)
     @ResponseStatus(HttpStatus.OK)

@@ -6,7 +6,7 @@
     <parent>
         <groupId>ru.kraser</groupId>
         <artifactId>technical-helper</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>breakage-server</artifactId>
@@ -30,13 +30,13 @@
         <dependency>
             <groupId>ru.kraser</groupId>
             <artifactId>common-module</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ru.kraser</groupId>
             <artifactId>main-server</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

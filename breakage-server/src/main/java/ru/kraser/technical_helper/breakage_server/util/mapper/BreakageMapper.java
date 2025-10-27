@@ -18,10 +18,7 @@ public class BreakageMapper {
 
     public Breakage toBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId) {
         Breakage breakage = new Breakage();
-
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        //Department currentUserDepartment = SecurityUtil.getCurrentUserDepartment();
-        //String currentUserId = SecurityUtil.getCurrentUserId();
 
         breakage.setDepartment(createBreakageFullDto.department());
         breakage.setRoom(createBreakageFullDto.room());
@@ -40,7 +37,6 @@ public class BreakageMapper {
 
     public BreakageFullDto toBreakageFullDto(
             BreakageDto breakageDto, List<BreakageCommentBackendDto> backComments, String currentUserId) {
-        //String currentUserId = SecurityUtil.getCurrentUserId();
         List<BreakageCommentFrontDto> comments = backComments.stream()
                 .map(comment -> toFrontCommentDto(comment, currentUserId))
                 .toList();

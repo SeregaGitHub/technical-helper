@@ -15,19 +15,11 @@ export class DepartmentService {
 
     departmentSubject = new Subject<any>();
 
-    // departmentSubject = new BehaviorSubject<any>({});
-
     createDep(departmentDto: DepartmentDto): Observable<any> {
 
         const headers = HttpHeadersFactory.createPermanentHeaders();
 
         return this._http.post(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
-            // .pipe(
-            //     tap((newDepartment) => {
-            //         const currentState = this.departmentSubject.value;
-            //         this.departmentSubject.next({...currentState, newDepartment});
-            //     })
-            // );
 
             .pipe(
                 tap((newDepartment) => {
@@ -43,13 +35,6 @@ export class DepartmentService {
         headers = headers.append(DEPARTMENT_ID, id);
 
         return this._http.patch(environment.GATEWAY_URL + environment.BASE_URL + ADMIN_URL + DEPARTMENT_URL, departmentDto, {headers})
-            // .pipe(
-            //     tap((updatedDepartment) => {
-            //         const currentState = this.departmentSubject.value;
-
-            //         this.departmentSubject.next({...currentState, updatedDepartment});
-            //     })
-            // );
 
             .pipe(
                 tap((updatedDepartment) => {
@@ -88,20 +73,6 @@ export class DepartmentService {
                 })
             );
     };
-
-    // getDep(name: string): Observable<any> {
-
-    //     let headers = HttpHeadersFactory.createPermanentHeaders();
-    //     headers = headers.append(DEPARTMENT_NAME, name);
-
-    //     return this._http.get(GATEWAY_URL + BASE_URL + ADMIN_URL + DEPARTMENT_URL, {headers})
-    //         .pipe(
-    //             tap((departmentByName) => {
-    //                 const currentState = this.departmentSubject;
-    //                 this.departmentSubject.next({...currentState, departmentByName});
-    //             })
-    //         );
-    // };
 
     deleteDep(id: string): Observable<any> {
 

@@ -15,14 +15,4 @@ import { FooterComponent } from "./layout/footer/footer.component";
 })
 export class AppComponent {
 
-
-  //constructor(private service: AuthService) {}
-
-  
-
-    // ngOnInit(): void {
-    //   console.log('AppComponent - ' + this.service.username$)
-    //   console.log(this.service.username$.subscribe())
-    //   console.log('AppComponent - ' + this.service.username$)
-    // }
 }

@@ -33,18 +33,6 @@ public class MainServerErrorHandler {
     public ResponseEntity<?> handleNoAccess(WebClientResponseException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception);
     }
-/*
-    @ExceptionHandler(MalformedJwtException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<?> handleNotValidToken(MalformedJwtException exception) {
-        ApiError httpStatus = ApiError.builder()
-                .message(exception.getMessage())
-                .status(HttpStatus.FORBIDDEN.value())
-                .httpStatus(HttpStatus.FORBIDDEN)
-                .timestamp(LocalDateTime.now().withNano(0))
-                .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(httpStatus);
-    }*/
 
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

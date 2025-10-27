@@ -15,13 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kraser.technical_helper.common_module.model.JwtUserDetails;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.gateway.client.UserClient;
-//import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityAppConfiguration {
-    //private final UserRepository userRepository;
-    //private final AuthenticationClient authenticationClient;
     private final UserClient userClient;
 
     @Bean
@@ -29,9 +26,6 @@ public class SecurityAppConfiguration {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                /*User user = userRepository.findUserByUsernameAndEnabledTrue(username).orElseThrow(
-                        () -> new NotFoundException("Пользователь с логином - " + username + ", не был найден.")
-                );*/
                 User user = userClient.getUserByName(username);
                 return new JwtUserDetails(user);
             }

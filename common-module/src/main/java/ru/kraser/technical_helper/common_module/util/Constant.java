@@ -4,14 +4,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constant {
-    //public static final String FRONT_URL = "http://192.168.0.101:12345";
-    //public static final String FRONT_URL = "http://localhost:12345";
     public static final String MAIN_SERVER_URL = "http://main-server:12333";
-    //public static final String MAIN_SERVER_URL = "http://localhost:12333";
     public static final String BREAKAGE_SERVER_URL = "http://breakage-server:12301";
-    //public static final String BREAKAGE_SERVER_URL = "http://localhost:12301";
-    //public static final String GATEWAY_URL = "http://gateway:12344";
-    //public static final String GATEWAY_URL = "http://localhost:12344";
 
     public static final String BASE_URL = "/api/v1";
     public static final String AUTH_URL = "/auth";
@@ -38,7 +32,6 @@ public class Constant {
     public static final String USER_ROLE_HEADER = "X-User-Role";
     public static final String DEPARTMENT_ID_HEADER = "X-Department-Id";
     public static final String USER_DEPARTMENT_ID_HEADER = "X-UserDepartment-Id";
-    // public static final String DEPARTMENT_NAME_HEADER = "X-Department-Name";
     public static final String BREAKAGE_ID_HEADER = "X-Breakage-Id";
     public static final String BREAKAGE_COMMENT_ID_HEADER = "X-BreakageComment-Id";
 

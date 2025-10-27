@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { User } from '../../model/user/user';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DATE_FORMAT } from '../../util/constant';

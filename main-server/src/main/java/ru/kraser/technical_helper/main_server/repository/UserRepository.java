@@ -29,8 +29,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findUserByUsername(String username);
 
-    //Optional<User> findUserByUsernameAndEnabledTrue(String username);
-
     @Query(
             value = """
                     SELECT new ru.kraser.technical_helper.common_module.dto.user.UserFullDto

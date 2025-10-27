@@ -29,7 +29,6 @@ import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EX
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
-    //private final PasswordEncoder passwordEncoder;
 
     @Value("${default.admin.name}")
     private String defaultAdminName;
@@ -89,7 +88,6 @@ public class UserServiceImpl implements UserService {
         int response;
         response = userRepository.changeUserPassword(
                 userId,
-                //passwordEncoder.encode(passwordDto.newPassword()),
                 passwordDto.newPassword(),
                 currentUserId,
                 now
@@ -129,9 +127,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User getUserByName(String username) {
-        /*return userRepository.findUserByUsernameAndEnabledTrue(username).orElseThrow(
-                () -> new NotFoundException(USER_NOT_EXIST)
-        );*/
         UserFullDto userFullDto = userRepository.getUserByUsernameAndEnabledTrue(username).orElseThrow(
                 () -> new NotFoundException(USER_NOT_EXIST)
         );
