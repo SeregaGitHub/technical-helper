@@ -43,34 +43,36 @@
                                               ></mat-slide-toggle></p>
         </div>
         
+        @if (!userProfile.getUserProfile().isEmployee()) {
+            <p class="mt-2 text-2xl underline">Приоритет</p>
 
-        <p class="mt-2 text-2xl underline">Приоритет</p>
+            <div class="text-left ml-6 mb-4">
+                <p class="text-lg">Важный</p>
+                <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityUrgently" 
+                                                  (click)="getAllBreakages()"
+                                                  (ngModelChange)="toDefaultPageIndex()"
+                                                  ></mat-slide-toggle></p>
 
-        <div class="text-left ml-6 mb-4">
-            <p class="text-lg">Важный</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityUrgently" 
-                                              (click)="getAllBreakages()"
-                                              (ngModelChange)="toDefaultPageIndex()"
-                                              ></mat-slide-toggle></p>
+                <p class="text-lg">Высокий</p>
+                <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityHigh" 
+                                                  (click)="getAllBreakages()"
+                                                  (ngModelChange)="toDefaultPageIndex()"
+                                                  ></mat-slide-toggle></p>
 
-            <p class="text-lg">Высокий</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityHigh" 
-                                              (click)="getAllBreakages()"
-                                              (ngModelChange)="toDefaultPageIndex()"
-                                              ></mat-slide-toggle></p>
+                <p class="text-lg">Средний</p>
+                <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityMedium" 
+                                                  (click)="getAllBreakages()"
+                                                  (ngModelChange)="toDefaultPageIndex()"
+                                                  ></mat-slide-toggle></p>
 
-            <p class="text-lg">Средний</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityMedium" 
-                                              (click)="getAllBreakages()"
-                                              (ngModelChange)="toDefaultPageIndex()"
-                                              ></mat-slide-toggle></p>
-
-            <p class="text-lg">Низкий</p>
-            <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" 
-                                              (click)="getAllBreakages()"
-                                              (ngModelChange)="toDefaultPageIndex()"
-                                              ></mat-slide-toggle></p>
-        </div>
+                <p class="text-lg">Низкий</p>
+                <p class="mb-2"><mat-slide-toggle [(ngModel)]="priorityLow" 
+                                                  (click)="getAllBreakages()"
+                                                  (ngModelChange)="toDefaultPageIndex()"
+                                                  ></mat-slide-toggle></p>
+            </div>
+        }
+        
         
         @if (!userProfile.getUserProfile().isEmployee()) {
             <p class="mt-2 text-2xl underline">Параметры</p>
