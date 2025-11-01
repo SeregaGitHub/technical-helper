@@ -1,3 +1,4 @@
+export const BASE_URL = '/api/v1';
 export const AUTH_URL = '/auth';
 export const ADMIN_URL = '/admin';
 export const TECHNICIAN_URL = '/technician';

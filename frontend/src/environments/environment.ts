@@ -1,4 +1,5 @@
+declare const GATEWAY_URL: string;
+
 export const environment = {
-    GATEWAY_URL: 'http://192.168.0.101:12344',
-    BASE_URL: '/api/v1'
-}
+      GATEWAY_URL
+    };
