@@ -21,26 +21,26 @@ END
 '
 ;
 
-DO
-'
-BEGIN
-    CREATE TYPE breakage_status AS ENUM (
-                ''NEW'', ''IN_PROGRESS'', ''PAUSED'', ''REDIRECTED'', ''SOLVED'', ''CANCELLED'');
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END
-'
-;
+--DO
+--'
+--BEGIN
+--    CREATE TYPE breakage_status AS ENUM (
+--                ''NEW'', ''IN_PROGRESS'', ''PAUSED'', ''REDIRECTED'', ''SOLVED'', ''CANCELLED'');
+--EXCEPTION
+--    WHEN duplicate_object THEN null;
+--END
+--'
+--;
 
-DO
-'
-BEGIN
-    CREATE TYPE breakage_priority AS ENUM (''URGENTLY'', ''HIGH'', ''MEDIUM'', ''LOW'');
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END
-'
-;
+--DO
+--'
+--BEGIN
+--    CREATE TYPE breakage_priority AS ENUM (''URGENTLY'', ''HIGH'', ''MEDIUM'', ''LOW'');
+--EXCEPTION
+--    WHEN duplicate_object THEN null;
+--END
+--'
+--;
 
 
 CREATE TABLE IF NOT EXISTS department (
@@ -72,105 +72,105 @@ CREATE TABLE IF NOT EXISTS users (
         REFERENCES department (id)
 );
 
-CREATE TABLE IF NOT EXISTS breakage (
-  id                         varchar(36)       NOT NULL,
-  department                 varchar(36)       NOT NULL,
-  room                       varchar(128)      NOT NULL,
-  breakage_topic             varchar(128)      NOT NULL,
-  breakage_text              varchar(2048)     NOT NULL,
-  status                     breakage_status   NOT NULL,
-  priority                   breakage_priority NOT NULL,
-  executor                   varchar(36),
-  executor_appointed_by      varchar(36),
-  deadline                   timestamp,
-  created_by                 varchar(36)       NOT NULL,
-  created_date               timestamp         NOT NULL,
-  last_updated_by            varchar(36)       NOT NULL,
-  last_updated_date          timestamp         NOT NULL,
-  CONSTRAINT pk_breakage_id                    PRIMARY KEY (id),
-  CONSTRAINT fk_breakage_department            FOREIGN KEY (department)
-        REFERENCES department (id),
-  CONSTRAINT fk_breakage_executor              FOREIGN KEY (executor)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_executor_appointed_by FOREIGN KEY (executor_appointed_by)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_created_by            FOREIGN KEY (created_by)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_last_updated_by       FOREIGN KEY (last_updated_by)
-        REFERENCES users (id)
-);
+--CREATE TABLE IF NOT EXISTS breakage (
+--  id                         varchar(36)       NOT NULL,
+--  department                 varchar(36)       NOT NULL,
+--  room                       varchar(128)      NOT NULL,
+--  breakage_topic             varchar(128)      NOT NULL,
+--  breakage_text              varchar(2048)     NOT NULL,
+--  status                     breakage_status   NOT NULL,
+--  priority                   breakage_priority NOT NULL,
+--  executor                   varchar(36),
+--  executor_appointed_by      varchar(36),
+--  deadline                   timestamp,
+--  created_by                 varchar(36)       NOT NULL,
+--  created_date               timestamp         NOT NULL,
+--  last_updated_by            varchar(36)       NOT NULL,
+--  last_updated_date          timestamp         NOT NULL,
+--  CONSTRAINT pk_breakage_id                    PRIMARY KEY (id),
+--  CONSTRAINT fk_breakage_department            FOREIGN KEY (department)
+--        REFERENCES department (id),
+--  CONSTRAINT fk_breakage_executor              FOREIGN KEY (executor)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_executor_appointed_by FOREIGN KEY (executor_appointed_by)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_created_by            FOREIGN KEY (created_by)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_last_updated_by       FOREIGN KEY (last_updated_by)
+--        REFERENCES users (id)
+--);
+--
+--CREATE TABLE IF NOT EXISTS breakage_audit (
+--  operation                  char(1)           NOT NULL,
+--  breakage                   varchar(36)       NOT NULL,
+--  department                 varchar(36)       NOT NULL,
+--  room                       varchar(128)      NOT NULL,
+--  breakage_topic             varchar(128)      NOT NULL,
+--  breakage_text              varchar(2048)     NOT NULL,
+--  status                     breakage_status   NOT NULL,
+--  priority                   breakage_priority NOT NULL,
+--  executor                   varchar(36),
+--  executor_appointed_by      varchar(36),
+--  deadline                   timestamp,
+--  last_updated_by            varchar(36)       NOT NULL,
+--  last_updated_date          timestamp         NOT NULL,
+--  CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
+--  CONSTRAINT fk_breakage_audit_breakage_id           FOREIGN KEY (breakage)
+--        REFERENCES breakage (id),
+--  CONSTRAINT fk_breakage_audit_department            FOREIGN KEY (department)
+--        REFERENCES department (id),
+--  CONSTRAINT fk_breakage_audit_executor              FOREIGN KEY (executor)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_audit_executor_appointed_by FOREIGN KEY (executor_appointed_by)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_audit_last_updated_by       FOREIGN KEY (last_updated_by)
+--        REFERENCES users (id)
+--);
+--
+--CREATE TABLE IF NOT EXISTS breakage_comment (
+--  id                varchar(36) NOT NULL,
+--  breakage          varchar(36) NOT NULL,
+--  comment           text        NOT NULL,
+--  created_by        varchar(36) NOT NULL,
+--  created_date      timestamp   NOT NULL,
+--  last_updated_by   varchar(36) NOT NULL,
+--  last_updated_date timestamp   NOT NULL,
+--  CONSTRAINT pk_breakage_comment_id              PRIMARY KEY (id),
+--  CONSTRAINT fk_breakage_comment_breakage_id     FOREIGN KEY (breakage)
+--        REFERENCES breakage (id),
+--  CONSTRAINT fk_breakage_comment_created_by      FOREIGN KEY (created_by)
+--        REFERENCES users (id),
+--  CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
+--        REFERENCES users (id)
+--);
+--
+--CREATE TABLE IF NOT EXISTS breakage_comment_audit (
+--  operation         char(1)     NOT NULL,
+--  breakage_comment  varchar(36) NOT NULL,
+--  breakage          varchar(36) NOT NULL,
+--  comment           text        NOT NULL,
+--  last_updated_by   varchar(36) NOT NULL,
+--  last_updated_date timestamp   NOT NULL,
+--  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date, last_updated_by),
+--  CONSTRAINT fk_breakage_comment_audit_breakage_id FOREIGN KEY (breakage)
+--        REFERENCES breakage (id),
+--  CONSTRAINT fk_breakage_audit_last_updated_by     FOREIGN KEY (last_updated_by)
+--        REFERENCES users (id)
+--);
 
-CREATE TABLE IF NOT EXISTS breakage_audit (
-  operation                  char(1)           NOT NULL,
-  breakage                   varchar(36)       NOT NULL,
-  department                 varchar(36)       NOT NULL,
-  room                       varchar(128)      NOT NULL,
-  breakage_topic             varchar(128)      NOT NULL,
-  breakage_text              varchar(2048)     NOT NULL,
-  status                     breakage_status   NOT NULL,
-  priority                   breakage_priority NOT NULL,
-  executor                   varchar(36),
-  executor_appointed_by      varchar(36),
-  deadline                   timestamp,
-  last_updated_by            varchar(36)       NOT NULL,
-  last_updated_date          timestamp         NOT NULL,
-  CONSTRAINT pk_breakage_audit_id                    PRIMARY KEY (breakage, last_updated_date, last_updated_by),
-  CONSTRAINT fk_breakage_audit_breakage_id           FOREIGN KEY (breakage)
-        REFERENCES breakage (id),
-  CONSTRAINT fk_breakage_audit_department            FOREIGN KEY (department)
-        REFERENCES department (id),
-  CONSTRAINT fk_breakage_audit_executor              FOREIGN KEY (executor)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_audit_executor_appointed_by FOREIGN KEY (executor_appointed_by)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_audit_last_updated_by       FOREIGN KEY (last_updated_by)
-        REFERENCES users (id)
-);
 
-CREATE TABLE IF NOT EXISTS breakage_comment (
-  id                varchar(36) NOT NULL,
-  breakage          varchar(36) NOT NULL,
-  comment           text        NOT NULL,
-  created_by        varchar(36) NOT NULL,
-  created_date      timestamp   NOT NULL,
-  last_updated_by   varchar(36) NOT NULL,
-  last_updated_date timestamp   NOT NULL,
-  CONSTRAINT pk_breakage_comment_id              PRIMARY KEY (id),
-  CONSTRAINT fk_breakage_comment_breakage_id     FOREIGN KEY (breakage)
-        REFERENCES breakage (id),
-  CONSTRAINT fk_breakage_comment_created_by      FOREIGN KEY (created_by)
-        REFERENCES users (id),
-  CONSTRAINT fk_breakage_comment_last_updated_by FOREIGN KEY (last_updated_by)
-        REFERENCES users (id)
-);
-
-CREATE TABLE IF NOT EXISTS breakage_comment_audit (
-  operation         char(1)     NOT NULL,
-  breakage_comment  varchar(36) NOT NULL,
-  breakage          varchar(36) NOT NULL,
-  comment           text        NOT NULL,
-  last_updated_by   varchar(36) NOT NULL,
-  last_updated_date timestamp   NOT NULL,
-  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date, last_updated_by),
-  CONSTRAINT fk_breakage_comment_audit_breakage_id FOREIGN KEY (breakage)
-        REFERENCES breakage (id),
-  CONSTRAINT fk_breakage_audit_last_updated_by     FOREIGN KEY (last_updated_by)
-        REFERENCES users (id)
-);
-
-
-CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE INDEX IF NOT EXISTS idx_breakage_breakage_text ON breakage USING gist (breakage_text gist_trgm_ops);
-
-CREATE INDEX IF NOT EXISTS idx_breakage_department ON breakage(department);
-
-CREATE INDEX IF NOT EXISTS idx_breakage_status ON breakage(status);
-
-CREATE INDEX IF NOT EXISTS idx_breakage_executor ON breakage(executor);
-
-CREATE INDEX IF NOT EXISTS idx_breakage_deadline ON breakage(deadline);
+--CREATE INDEX IF NOT EXISTS idx_breakage_comment_breakage ON breakage_comment(breakage);
+--
+--CREATE EXTENSION IF NOT EXISTS pg_trgm;
+--CREATE INDEX IF NOT EXISTS idx_breakage_breakage_text ON breakage USING gist (breakage_text gist_trgm_ops);
+--
+--CREATE INDEX IF NOT EXISTS idx_breakage_department ON breakage(department);
+--
+--CREATE INDEX IF NOT EXISTS idx_breakage_status ON breakage(status);
+--
+--CREATE INDEX IF NOT EXISTS idx_breakage_executor ON breakage(executor);
+--
+--CREATE INDEX IF NOT EXISTS idx_breakage_deadline ON breakage(deadline);
 
 
 ALTER TABLE department
@@ -265,76 +265,76 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION audit_breakage() RETURNS trigger AS '
-BEGIN
-    IF TG_OP = ''INSERT'' THEN
-	    INSERT INTO breakage_audit
-	        SELECT ''I'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
-	            nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
-	        FROM new_table AS nt;
-	ELSEIF TG_OP = ''UPDATE'' THEN
-	    INSERT INTO breakage_audit
-	        SELECT ''U'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
-        	    nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
-        	FROM new_table AS nt;
-    END IF;
-	RETURN NULL;
-END
-' LANGUAGE plpgsql;
+--CREATE OR REPLACE FUNCTION audit_breakage() RETURNS trigger AS '
+--BEGIN
+--    IF TG_OP = ''INSERT'' THEN
+--	    INSERT INTO breakage_audit
+--	        SELECT ''I'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
+--	            nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
+--	        FROM new_table AS nt;
+--	ELSEIF TG_OP = ''UPDATE'' THEN
+--	    INSERT INTO breakage_audit
+--	        SELECT ''U'', nt.id, nt.department, nt.room, nt.breakage_topic, nt.breakage_text, nt.status, nt.priority,
+--        	    nt.executor, nt.executor_appointed_by, nt.deadline, nt.last_updated_by, nt.last_updated_date
+--        	FROM new_table AS nt;
+--    END IF;
+--	RETURN NULL;
+--END
+--' LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION audit_breakage_comment() RETURNS trigger AS '
-BEGIN
-    IF TG_OP = ''INSERT'' THEN
-	    INSERT INTO breakage_comment_audit
-	        SELECT ''I'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
-	        FROM new_table AS nt;
-	ELSEIF TG_OP = ''UPDATE'' THEN
-	    INSERT INTO breakage_comment_audit
-	        SELECT ''U'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
-        	FROM new_table AS nt;
-    ELSEIF TG_OP = ''DELETE'' THEN
-    	INSERT INTO breakage_comment_audit
-    	    SELECT ''D'', ot.id, ot.breakage, ot.comment, ot.last_updated_by, NOW()::timestamp
-            FROM old_table AS ot;
-    END IF;
-	RETURN NULL;
-END
-' LANGUAGE plpgsql;
+--CREATE OR REPLACE FUNCTION audit_breakage_comment() RETURNS trigger AS '
+--BEGIN
+--    IF TG_OP = ''INSERT'' THEN
+--	    INSERT INTO breakage_comment_audit
+--	        SELECT ''I'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
+--	        FROM new_table AS nt;
+--	ELSEIF TG_OP = ''UPDATE'' THEN
+--	    INSERT INTO breakage_comment_audit
+--	        SELECT ''U'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
+--        	FROM new_table AS nt;
+--    ELSEIF TG_OP = ''DELETE'' THEN
+--    	INSERT INTO breakage_comment_audit
+--    	    SELECT ''D'', ot.id, ot.breakage, ot.comment, ot.last_updated_by, NOW()::timestamp
+--            FROM old_table AS ot;
+--    END IF;
+--	RETURN NULL;
+--END
+--' LANGUAGE plpgsql;
 
 
 DROP TRIGGER IF EXISTS delete_all_users_from_department ON department;
 
-DROP TRIGGER IF EXISTS audit_breakage_create ON breakage;
-
-DROP TRIGGER IF EXISTS audit_breakage_update ON breakage;
-
-DROP TRIGGER IF EXISTS audit_breakage_comment_create ON breakage_comment;
-
-DROP TRIGGER IF EXISTS audit_breakage_comment_update ON breakage_comment;
-
-DROP TRIGGER IF EXISTS audit_breakage_comment_delete ON breakage_comment;
+--DROP TRIGGER IF EXISTS audit_breakage_create ON breakage;
+--
+--DROP TRIGGER IF EXISTS audit_breakage_update ON breakage;
+--
+--DROP TRIGGER IF EXISTS audit_breakage_comment_create ON breakage_comment;
+--
+--DROP TRIGGER IF EXISTS audit_breakage_comment_update ON breakage_comment;
+--
+--DROP TRIGGER IF EXISTS audit_breakage_comment_delete ON breakage_comment;
 
 
 CREATE TRIGGER delete_all_users_from_department AFTER UPDATE OF enabled ON department
 FOR EACH ROW EXECUTE PROCEDURE delete_all_users_from_department();
 
-CREATE TRIGGER audit_breakage_create AFTER INSERT ON breakage
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
-
-CREATE TRIGGER audit_breakage_update AFTER UPDATE ON breakage
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
-
-CREATE TRIGGER audit_breakage_comment_create AFTER INSERT ON breakage_comment
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
-
-CREATE TRIGGER audit_breakage_comment_update AFTER UPDATE ON breakage_comment
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
-
-CREATE TRIGGER audit_breakage_comment_delete AFTER DELETE ON breakage_comment
-REFERENCING OLD TABLE AS old_table
-FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+--CREATE TRIGGER audit_breakage_create AFTER INSERT ON breakage
+--REFERENCING NEW TABLE AS new_table
+--FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
+--
+--CREATE TRIGGER audit_breakage_update AFTER UPDATE ON breakage
+--REFERENCING NEW TABLE AS new_table
+--FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage();
+--
+--CREATE TRIGGER audit_breakage_comment_create AFTER INSERT ON breakage_comment
+--REFERENCING NEW TABLE AS new_table
+--FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+--
+--CREATE TRIGGER audit_breakage_comment_update AFTER UPDATE ON breakage_comment
+--REFERENCING NEW TABLE AS new_table
+--FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+--
+--CREATE TRIGGER audit_breakage_comment_delete AFTER DELETE ON breakage_comment
+--REFERENCING OLD TABLE AS old_table
+--FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
 

@@ -1,0 +1,63 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1_1-create-breakage_comment-table" author="Sergei Kraev">
+        <!--если таблица не существует - будет выполнено действие onFail="MARK_RAN" (запустится скрипт)-->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="breakage_comment"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="breakage_comment">
+            <column name="id" type="varchar(36)">
+                <constraints
+                        primaryKey="true"
+                        primaryKeyName="pk_breakage_comment_id"
+                        nullable="false"/>
+            </column>
+            <column name="breakage" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_comment_breakage_id"
+                        references="breakage(id)"
+                        nullable="false"/>
+            </column>
+            <column name="comment" type="text">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_comment_created_by"
+                        references="users(id)"
+                        nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="last_updated_by" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_comment_last_updated_by"
+                        references="users(id)"
+                        nullable="false"/>
+            </column>
+            <column name="last_updated_date" type="timestamp">
+                <constraints
+                        nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v1_1-create-index-idx_breakage_comment_breakage" author="Sergei Kraev">
+        <createIndex
+                indexName="idx_breakage_comment_breakage"
+                schemaName="public"
+                tableName="breakage_comment">
+            <column name="breakage"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

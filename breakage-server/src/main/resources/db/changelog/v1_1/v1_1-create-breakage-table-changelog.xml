@@ -1,0 +1,162 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1_1-create-breakage_status-enum" author="Sergei Kraev">
+        <sql>
+            CREATE TYPE breakage_status AS ENUM (
+                'NEW', 'IN_PROGRESS', 'PAUSED', 'REDIRECTED', 'SOLVED', 'CANCELLED');
+        </sql>
+    </changeSet>
+
+    <changeSet id="v1_1-create-breakage_priority-enum" author="Sergei Kraev">
+        <!-- DO ... WHEN duplicate_object THEN null: при использовании liquibase - необязательно !!! -->
+        <sql>
+            DO
+            $$
+            BEGIN
+                CREATE TYPE breakage_priority AS ENUM (
+                    'URGENTLY', 'HIGH', 'MEDIUM', 'LOW');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END
+            $$
+            ;
+        </sql>
+    </changeSet>
+
+    <changeSet id="v1_1-create-breakage-table" author="Sergei Kraev">
+        <!--если таблица не существует - будет выполнено действие onFail="MARK_RAN" (запустится скрипт)-->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="breakage"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="breakage">
+            <column name="id" type="varchar(36)">
+                <constraints
+                        primaryKey="true"
+                        primaryKeyName="pk_breakage_id"
+                        nullable="false"/>
+            </column>
+            <column name="department" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_department"
+                        references="department(id)"
+                        nullable="false"/>
+            </column>
+            <column name="room" type="varchar(128)">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="breakage_topic" type="varchar(128)">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="breakage_text" type="varchar(2048)">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="status" type="breakage_status">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="priority" type="breakage_priority">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="executor" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_executor"
+                        references="users(id)"/>
+            </column>
+            <column name="executor_appointed_by" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_executor_appointed_by"
+                        references="users(id)"/>
+            </column>
+            <column name="deadline" type="timestamp">
+            </column>
+            <column name="created_by" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_created_by"
+                        references="users(id)"
+                        nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp">
+                <constraints
+                        nullable="false"/>
+            </column>
+            <column name="last_updated_by" type="varchar(36)">
+                <constraints
+                        foreignKeyName="fk_breakage_last_updated_by"
+                        references="users(id)"
+                        nullable="false"/>
+            </column>
+            <column name="last_updated_date" type="timestamp">
+                <constraints
+                        nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!--    INSERT данных из файла breakage-data.csv, если таблица пустая-->
+    <!--    <changeSet id="v1_1-1-data" author="Sergei Kraev">-->
+    <!--        <preConditions onFail="MARK_RAN">-->
+    <!--            <tableIsEmpty tableName="breakage"/>-->
+    <!--        </preConditions>-->
+
+    <!--        <loadData tableName="breakage" file="db/data/breakage-data.csv"/>-->
+    <!--    </changeSet>-->
+
+    <changeSet id="v1_1-create-index-idx_breakage_department" author="Sergei Kraev">
+        <createIndex
+                indexName="idx_breakage_department"
+                schemaName="public"
+                tableName="breakage">
+            <column name="department"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="v1_1-create-index-idx_breakage_status" author="Sergei Kraev">
+        <createIndex
+                indexName="idx_breakage_status"
+                schemaName="public"
+                tableName="breakage">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="v1_1-create-index-idx_breakage_executor" author="Sergei Kraev">
+        <createIndex
+                indexName="idx_breakage_executor"
+                schemaName="public"
+                tableName="breakage">
+            <column name="executor"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="v1_1-create-index-idx_breakage_deadline" author="Sergei Kraev">
+        <createIndex
+                indexName="idx_breakage_deadline"
+                schemaName="public"
+                tableName="breakage">
+            <column name="deadline"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="v1_1-create-extension-pg_trgm" author="Sergei Kraev">
+        <sql>
+            CREATE EXTENSION IF NOT EXISTS pg_trgm;
+        </sql>
+    </changeSet>
+
+    <changeSet id="v1_1-create-idx_breakage_breakage_text" author="Sergei Kraev">
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_breakage_breakage_text ON breakage USING gist (breakage_text gist_trgm_ops);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>    
