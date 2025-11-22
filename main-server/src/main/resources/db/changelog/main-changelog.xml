@@ -1,0 +1,14 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="0" author="Sergei Kraev">
+        <tagDatabase tag="db_init"/>
+    </changeSet>
+
+    <!--указываем путь относительно папки, где лежит файл main-changelog.xml - relativeToChangelogFile="true"-->
+    <include file="v1_1/v1_1-accumulate-changelog.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
+

@@ -1,0 +1,39 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="v1_1-create-user-and-department-table" author="Sergei Kraev">
+
+        <!-- sqlFile для создания таблиц -->
+
+        <!-- dbms= тип СУБД -->
+        <!-- encoding= тип кодировки - utf8 -->
+        <!-- endDelimiter= разделение sql скриптов - новая строка и GO -->
+        <!-- relativeToChangelogFile= относительный путь до файла -->
+        <!-- splitStatements= будет ли Liquibase разделять SQL-операторы на символ «;» или «GO» -->
+        <!-- stripComments= вырезание комментариев в sql файле -->
+        <!-- path= путь до файла -->
+        <sqlFile
+                dbms="postgresql"
+                encoding="utf8"
+                endDelimiter="\nGO"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"
+                path="sql_scripts/v1_1-create-user-and-department-table.sql"/>
+
+        <!-- sqlFile для отката изменений (удаления таблиц) -->
+        <rollback>
+            <sqlFile
+                    dbms="postgresql"
+                    encoding="utf8"
+                    endDelimiter="\nGO"
+                    relativeToChangelogFile="true"
+                    splitStatements="true"
+                    stripComments="true"
+                    path="sql_scripts/v1_1-drop-user-and-department-table.sql"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
