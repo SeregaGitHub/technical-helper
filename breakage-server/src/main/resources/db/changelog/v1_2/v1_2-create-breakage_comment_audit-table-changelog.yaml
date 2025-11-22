@@ -1,0 +1,109 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1_2-create-breakage_comment_audit-table
+      author: Sergei Kraev
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: breakage_comment_audit
+      changes:
+        - createTable:
+            tableName: breakage_comment_audit
+            columns:
+              - column:
+                  name: operation
+                  type: char(1)
+                  constraints:
+                    nullable: false
+                  #  primaryKey: true
+              #  autoIncrement: true
+              - column:
+                  name: breakage_comment
+                  type: varchar(36)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: breakage
+                  type: varchar(36)
+                  constraints:
+                    foreignKeyName: fk_breakage_comment_audit_breakage_id
+                    referencedTableName: breakage
+                    referencedColumnNames: id
+                    nullable: false
+              - column:
+                  name: comment
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_updated_by
+                  type: varchar(36)
+                  constraints:
+                    foreignKeyName: fk_breakage_comment_audit_last_updated_by
+                    referencedTableName: users
+                    referencedColumnNames: id
+                    nullable: false
+              - column:
+                  name: last_updated_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            # catalogName: cat
+            columnNames: breakage_comment, last_updated_date, last_updated_by
+            constraintName: pk_breakage_comment_audit_id
+            # forIndexName: A String
+            schemaName: public
+            tableName: breakage_comment_audit
+            # tablespace: A String
+            validate: true
+
+  - changeSet:
+      id: v1_2-create-audit_breakage_comment-function
+      author: Sergei Kraev
+      changes:
+        - sql:  CREATE OR REPLACE FUNCTION audit_breakage_comment() RETURNS trigger AS
+                '
+                BEGIN
+                  IF TG_OP = ''INSERT'' THEN
+                    INSERT INTO breakage_comment_audit
+                      SELECT ''I'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
+                      FROM new_table AS nt;
+                  ELSEIF TG_OP = ''UPDATE'' THEN
+                    INSERT INTO breakage_comment_audit
+                      SELECT ''U'', nt.id, nt.breakage, nt.comment, nt.last_updated_by, nt.last_updated_date
+                      FROM new_table AS nt;
+                  ELSEIF TG_OP = ''DELETE'' THEN
+                    INSERT INTO breakage_comment_audit
+                      SELECT ''D'', ot.id, ot.breakage, ot.comment, ot.last_updated_by, NOW()::timestamp
+                      FROM old_table AS ot;
+                  END IF;
+                  RETURN NULL;
+                END
+                ' 
+                LANGUAGE plpgsql;
+
+  - changeSet:
+      id: v1_2-create-audit_breakage_comment_create-function
+      author: Sergei Kraev
+      changes:
+        - sql:  CREATE TRIGGER audit_breakage_comment_create AFTER INSERT ON breakage_comment
+                REFERENCING NEW TABLE AS new_table
+                FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+
+  - changeSet:
+      id: v1_2-create-audit_breakage_comment_update-function
+      author: Sergei Kraev
+      changes:
+        - sql:  CREATE TRIGGER audit_breakage_comment_update AFTER UPDATE ON breakage_comment
+                REFERENCING NEW TABLE AS new_table
+                FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();
+
+  - changeSet:
+      id: v1_2-create-audit_breakage_comment_delete-function
+      author: Sergei Kraev
+      changes:
+        - sql:  CREATE TRIGGER audit_breakage_comment_delete AFTER DELETE ON breakage_comment
+                REFERENCING OLD TABLE AS old_table
+                FOR EACH STATEMENT EXECUTE PROCEDURE audit_breakage_comment();

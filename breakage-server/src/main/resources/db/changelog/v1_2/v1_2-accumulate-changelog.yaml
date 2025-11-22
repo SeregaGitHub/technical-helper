@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: v1_2-create-breakage_audit-table-changelog.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: v1_2-create-breakage_comment_audit-table-changelog.yaml
+      relativeToChangelogFile: true

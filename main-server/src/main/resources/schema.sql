@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS users (
 --  CONSTRAINT pk_breakage_comment_audit_id          PRIMARY KEY (breakage_comment, last_updated_date, last_updated_by),
 --  CONSTRAINT fk_breakage_comment_audit_breakage_id FOREIGN KEY (breakage)
 --        REFERENCES breakage (id),
---  CONSTRAINT fk_breakage_audit_last_updated_by     FOREIGN KEY (last_updated_by)
+--  CONSTRAINT fk_breakage_comment_audit_last_updated_by     FOREIGN KEY (last_updated_by)
 --        REFERENCES users (id)
 --);
 
