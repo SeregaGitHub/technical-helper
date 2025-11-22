@@ -3,12 +3,44 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
+    <!-- <tagDatabase tag="db_init"/> для отката изменений -->
+
+    <!-- в папке resources создать файл liquibase.properties -->
+<!--
+    в файле прописать:
+
+    classpath=
+    changeLogFile= db/changelog/main-changelog.xml
+    url= jdbc:postgresql://localhost:5432/technical_helper_lb
+    username= sa
+    password= sapassword
+    driver= org.postgresql.Driver
+
+    -->
+
+<!--
+    в плагине liquibase-maven-plugin добавить:
+
+    <configuration>
+        <propertyFile>
+            ${project.basedir}/src/main/resources/liquibase.properties
+        </propertyFile>
+    </configuration>
+
+    -->
+
+<!-- SELECT * FROM databasechangelog -> скопировать tag. Или скопировать из <changeSet <tagDatabase tag="tag_name"/> -->
+    <!-- чтобы откатить: Run -> Edit Configuration -> + -> Maven -->
+    <!-- чтобы откатить: Run -> Edit Configuration -> + -> Maven -->
+    <!-- Command line: liquibase:rollback -Dliquibase.rollbackTag=tag_name -->
     <changeSet id="0" author="Sergei Kraev">
         <tagDatabase tag="db_init"/>
     </changeSet>
+
+    <!-- чтобы восстановить все changeSet -->
+    <!-- Command line: liquibase:update -->
 
     <!--указываем путь относительно папки, где лежит файл main-changelog.xml - relativeToChangelogFile="true"-->
     <include file="v1_1/v1_1-accumulate-changelog.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
-
