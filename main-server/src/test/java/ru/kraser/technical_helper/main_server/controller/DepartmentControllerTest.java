@@ -286,6 +286,30 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void deleteDepartment() {
+    void whenDeleteDepartmentThenReturnOk() {
+
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+        String responseMessage = "Отдел - был успешно удалён.";
+
+        when(departmentService.deleteDepartment(department.getId(), currentUserId))
+                .thenReturn(ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(now)
+                        .build());
+
+        ApiResponse apiResponse = departmentController.deleteDepartment(
+                currentUserId, department.getId());
+
+        assertEquals(responseMessage, apiResponse.message());
+        assertEquals(200, apiResponse.status());
+        assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+        assertEquals(now, apiResponse.timestamp());
+
+        verify(departmentService, times(1))
+                .deleteDepartment(department.getId(), currentUserId);
     }
 }
