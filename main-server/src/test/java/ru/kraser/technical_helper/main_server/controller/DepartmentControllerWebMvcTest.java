@@ -168,7 +168,135 @@ class DepartmentControllerWebMvcTest {
         }
     }
 
+    @Nested
+    class WhenDepartmentUpdating {
 
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnOk() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentService.updateDepartment(
+                    department.getId(), createDepartmentDto, currentUserId)
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(DEPARTMENT_ID_HEADER, department.getId())
+                            .content(objectMapper.writeValueAsString(createDepartmentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnUnprocessableEntity() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(422)
+                    .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentService.updateDepartment(
+                    department.getId(), createDepartmentDto, currentUserId)
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(DEPARTMENT_ID_HEADER, department.getId())
+                            .content(objectMapper.writeValueAsString(createDepartmentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status")
+                            .value(422))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus")
+                            .value("UNPROCESSABLE_ENTITY"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp")
+                            .value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnNotFound() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Данный отдел не существует !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentService.updateDepartment(
+                    department.getId(), createDepartmentDto, currentUserId)
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(DEPARTMENT_ID_HEADER, department.getId())
+                            .content(objectMapper.writeValueAsString(createDepartmentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status")
+                            .value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus")
+                            .value("NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp")
+                            .value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+        }
+    }
 
 //    @Test
 //    void getAllDepartments() {
