@@ -298,13 +298,80 @@ class DepartmentControllerWebMvcTest {
         }
     }
 
-//    @Test
-//    void getAllDepartments() {
-//    }
-//
-//    @Test
-//    void getDepartmentById() {
-//    }
+    @Nested
+    class WhenGetMethodsAreExecuting {
+
+        DepartmentDto expectedDepartmentDto;
+
+        @BeforeEach
+        void initializeDepartmentDto() {
+            expectedDepartmentDto = DepartmentDto.builder()
+                    .id(department.getId())
+                    .name(department.getName())
+                    .createdBy(department.getCreatedBy())
+                    .createdDate(department.getCreatedDate())
+                    .lastUpdatedBy(department.getLastUpdatedBy())
+                    .lastUpdatedDate(department.getLastUpdatedDate())
+                    .build();
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
+
+            when(departmentService.getAllDepartments()).thenReturn(List.of(expectedDepartmentDto));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(1)))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
+                            .value(expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].name")
+                            .value(expectedDepartmentDto.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].createdBy")
+                            .value(expectedDepartmentDto.createdBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].createdDate")
+                            .value(dtf.format(expectedDepartmentDto.createdDate())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].lastUpdatedBy")
+                            .value(expectedDepartmentDto.lastUpdatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].lastUpdatedDate")
+                            .value(dtf.format(expectedDepartmentDto.lastUpdatedDate())));
+
+            verify(departmentService ,times(1)).getAllDepartments();
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetDepartmentByIdThenReturnDepartmentDto() {
+
+            when(departmentService.getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .thenReturn(expectedDepartmentDto);
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                            .value(expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                            .value(expectedDepartmentDto.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdBy")
+                            .value(expectedDepartmentDto.createdBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdDate")
+                            .value(dtf.format(expectedDepartmentDto.createdDate())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedBy")
+                            .value(expectedDepartmentDto.lastUpdatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedDate")
+                            .value(dtf.format(expectedDepartmentDto.lastUpdatedDate())));
+
+            verify(departmentService ,times(1))
+                    .getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id());
+        }
+    }
+
 //
 //    @Test
 //    void deleteDepartment() {
