@@ -372,8 +372,43 @@ class DepartmentControllerWebMvcTest {
         }
     }
 
-//
-//    @Test
-//    void deleteDepartment() {
-//    }
+    @SneakyThrows
+    @Test
+    void whenDeleteDepartmentThenReturnOk() {
+
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+        String responseMessage = "Отдел - был успешно удалён.";
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .message(responseMessage)
+                .status(200)
+                .httpStatus(HttpStatus.OK)
+                .timestamp(now)
+                .build();
+
+        when(departmentService.deleteDepartment(
+                department.getId(), currentUserId)
+        ).thenReturn(apiResponse);
+
+        String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(CURRENT_USER_ID_HEADER, currentUserId)
+                        .header(DEPARTMENT_ID_HEADER, department.getId()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+        verify(departmentService, times(1))
+                .deleteDepartment(department.getId(), currentUserId);
+    }
+
 }
