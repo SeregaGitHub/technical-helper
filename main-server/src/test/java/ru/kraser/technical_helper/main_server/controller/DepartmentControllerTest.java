@@ -234,12 +234,55 @@ class DepartmentControllerTest {
         }
     }
 
-    @Test
-    void getAllDepartments() {
-    }
+    @Nested
+    class WhenGetMethodsAreExecuting {
 
-    @Test
-    void getDepartmentById() {
+        DepartmentDto expectedDepartmentDto;
+
+        @BeforeEach
+        void initializeDepartmentDto() {
+            expectedDepartmentDto = DepartmentDto.builder()
+                    .id(department.getId())
+                    .name(department.getName())
+                    .createdBy(department.getCreatedBy())
+                    .createdDate(department.getCreatedDate())
+                    .lastUpdatedBy(department.getLastUpdatedBy())
+                    .lastUpdatedDate(department.getLastUpdatedDate())
+                    .build();
+        }
+
+        @Test
+        void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
+
+            List<DepartmentDto> expectedDepartmentDtoList = List.of(expectedDepartmentDto);
+
+            when(departmentService.getAllDepartments()).thenReturn(expectedDepartmentDtoList);
+
+            List<DepartmentDto> departmentDtoList = departmentService.getAllDepartments();
+
+            assertEquals(expectedDepartmentDtoList, departmentDtoList);
+
+            verify(departmentService, times(1)).getAllDepartments();
+        }
+
+        @Test
+        void whenGetDepartmentByIdThenReturnDepartmentDto() {
+
+            when(departmentService.getDepartment(
+                    DEPARTMENT_ID_HEADER,
+                    department.getId())
+            ).thenReturn(expectedDepartmentDto);
+
+            DepartmentDto departmentDto = departmentService.getDepartment(
+                    DEPARTMENT_ID_HEADER, department.getId()
+            );
+
+            assertEquals(expectedDepartmentDto, departmentDto);
+
+            verify(departmentService, times(1)).getDepartment(
+                    DEPARTMENT_ID_HEADER, department.getId()
+            );
+        }
     }
 
     @Test
