@@ -144,7 +144,95 @@ class DepartmentControllerTest {
         }
     }
 
+    @Nested
+    class WhenDepartmentUpdating {
 
+        @Test
+        void whenUpdateDepartmentNameThenReturnOk() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
+
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, currentUserId))
+                    .thenReturn(ApiResponse.builder()
+                            .message(responseMessage)
+                            .status(200)
+                            .httpStatus(HttpStatus.OK)
+                            .timestamp(now)
+                            .build());
+
+            ApiResponse apiResponse = departmentController.updateDepartment(
+                    department.getId(), currentUserId, createDepartmentDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+
+        }
+
+        @Test
+        void whenUpdateDepartmentThenReturnUnprocessableEntity() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, currentUserId))
+                    .thenReturn(ApiResponse.builder()
+                            .message(responseMessage)
+                            .status(422)
+                            .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                            .timestamp(now)
+                            .build());
+
+            ApiResponse apiResponse = departmentController.updateDepartment(
+                    department.getId(), currentUserId, createDepartmentDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(422, apiResponse.status());
+            assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+        }
+
+        @Test
+        void whenUpdateDepartmentThenReturnNotFound() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Данный отдел не существует !!!";
+
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, currentUserId))
+                    .thenReturn(ApiResponse.builder()
+                            .message(responseMessage)
+                            .status(404)
+                            .httpStatus(HttpStatus.NOT_FOUND)
+                            .timestamp(now)
+                            .build());
+
+            ApiResponse apiResponse = departmentController.updateDepartment(
+                    department.getId(), currentUserId, createDepartmentDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+        }
+    }
 
     @Test
     void getAllDepartments() {
