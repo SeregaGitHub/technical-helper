@@ -30,7 +30,6 @@ import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-
 class DepartmentControllerTest {
 
     @Mock
