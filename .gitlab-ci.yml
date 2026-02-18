@@ -19,7 +19,7 @@ build-backend-job:
   after_script:
     - echo "========== finish build-backend-job =========="
     - cd ../../..
-    - echo pwd
+    - pwd
     - echo "========== finish build-backend-job =========="
   script:
     - mvn clean compile
