@@ -1,0 +1,24 @@
+stages:
+  - build
+  - test
+#  - deploy
+
+cache:
+  paths:
+    #    - ../../../root/.m2/repository/
+    - main-server/target/
+    - breakage-server/target/
+    - gateway/target/
+    - common-module/target/
+
+build-backend-job:
+  stage: build
+  image: maven:3.9-amazoncorretto-21-alpine
+  before_script:
+    - echo "========== start build-backend-job =========="
+  after_script:
+    - echo "========== finish build-backend-job =========="
+    - cd ../../..
+    - echo ls -la
+  script:
+    - mvn clean compile
