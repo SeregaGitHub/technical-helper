@@ -18,7 +18,7 @@ build-backend-job:
     - echo "========== start build-backend-job =========="
   after_script:
     - echo "========== finish build-backend-job =========="
-    - cd ../../../root/.m2/
+    - cd ../../../root/.m2/repository/
     - pwd
     - ls -la
     - echo "========== finish build-backend-job =========="
