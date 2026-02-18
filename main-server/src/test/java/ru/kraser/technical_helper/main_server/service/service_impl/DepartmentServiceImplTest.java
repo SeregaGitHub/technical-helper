@@ -1,0 +1,381 @@
+package ru.kraser.technical_helper.main_server.service.service_impl;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.model.Department;
+import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
+import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_ID_HEADER;
+import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
+
+@ExtendWith(MockitoExtension.class)
+class DepartmentServiceImplTest {
+
+    @Mock
+    private Clock clock;
+    @Mock
+    private DepartmentRepository departmentRepository;
+    @InjectMocks
+    private DepartmentServiceImpl departmentService;
+
+    private Department department;
+    private LocalDateTime now;
+    private final String currentUserId = "u1u11111-11u1-1u11-1111-u111111u1111";
+
+    private static final ZonedDateTime NOW_ZDT = ZonedDateTime.of(
+            2025,
+            9,
+            29,
+            13,
+            0,
+            0,
+            0,
+            ZoneId.of("UTC")
+    );
+
+    @BeforeEach
+    void setUp() {
+
+        now = LocalDateTime.of(
+                2025,
+                9,
+                29,
+                13,
+                0,
+                0);
+
+        department = Department.builder()
+                .id("d1d11111-11d1-1d11-1111-d111111d1111")
+                .name("test_department")
+                .enabled(true)
+                .createdBy(currentUserId)
+                .createdDate(now)
+                .lastUpdatedBy(currentUserId)
+                .lastUpdatedDate(now)
+                .build();
+    }
+
+    @Nested
+    class WhenDepartmentCreating {
+
+        private CreateDepartmentDto createDepartmentDto;
+
+        @BeforeEach
+        void setUp() {
+
+            createDepartmentDto = new CreateDepartmentDto(department.getName());
+        }
+
+        @Test
+        void whenCreateDepartmentThenReturnCreated() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + department.getName() + ", - был успешно создан.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(201)
+                    .httpStatus(HttpStatus.CREATED)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now)))
+                    .thenReturn(department);
+
+            ApiResponse returnedApiResponse = departmentService.createDepartment(createDepartmentDto, currentUserId);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(departmentRepository, times(1))
+                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now));
+        }
+
+        @Test
+        void whenCreateDepartmentWithNotUniqueNameThenThrowAlreadyExistsException() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            when(departmentRepository.saveAndFlush(
+                    DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now))
+            ).thenThrow(new DataIntegrityViolationException(
+                            "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"uk_department_name\""
+                    )
+            );
+
+            AlreadyExistsException exception = assertThrows(
+                    AlreadyExistsException.class,
+                    () -> departmentService.createDepartment(createDepartmentDto, currentUserId)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(departmentRepository, times(1))
+                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now));
+        }
+    }
+
+    @Nested
+    class WhenDepartmentUpdating {
+
+        CreateDepartmentDto updateDepartmentDto;
+
+        @BeforeEach
+        void setUp() {
+
+            updateDepartmentDto = new CreateDepartmentDto("updated_department_name");
+        }
+
+        @Test
+        void whenUpdateDepartmentThenReturnOk() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentRepository.updateDepartment(
+                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = departmentService.updateDepartment(
+                    department.getId(), updateDepartmentDto, currentUserId);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(departmentRepository, times(1))
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+        }
+
+        @Test
+        void whenUpdateDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Данный отдел не существует !!!";
+
+            when(departmentRepository.updateDepartment(
+                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+            ).thenThrow(new NotFoundException(responseMessage));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, currentUserId)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(departmentRepository, times(1))
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+        }
+
+        @Test
+        void whenUpdateDepartmentIfNotUniqueNameThenThrowAlreadyExistsException() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + updateDepartmentDto.name() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            when(departmentRepository.updateDepartment(
+                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+            ).thenThrow(new DataIntegrityViolationException(
+                            "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"uk_department_name\""
+                    )
+            );
+
+            AlreadyExistsException exception = assertThrows(
+                    AlreadyExistsException.class,
+                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, currentUserId)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(departmentRepository, times(1))
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+        }
+    }
+
+    @Nested
+    class WhenGetAllDepartments {
+
+        private DepartmentDto departmentDto;
+
+        @BeforeEach
+        void setUp() {
+
+            departmentDto = DepartmentDto.builder()
+                    .id(department.getId())
+                    .name(department.getName())
+                    .createdBy(department.createdBy)
+                    .createdDate(department.createdDate)
+                    .lastUpdatedBy(department.lastUpdatedBy)
+                    .lastUpdatedDate(department.lastUpdatedDate)
+                    .build();
+        }
+
+        @Test
+        void whenGetAllDepartmentsThenReturnListOfDepartments() {
+
+            when(departmentRepository.getAllDepartments()).thenReturn(List.of(departmentDto));
+
+            List<DepartmentDto> returnedList = departmentRepository.getAllDepartments();
+
+            assertEquals(1, returnedList.size());
+            assertEquals(departmentDto.id(), returnedList.getFirst().id());
+            assertEquals(departmentDto.name(), returnedList.getFirst().name());
+            assertEquals(departmentDto.createdBy(), returnedList.getFirst().createdBy());
+            assertEquals(departmentDto.createdDate(), returnedList.getFirst().createdDate());
+            assertEquals(departmentDto.lastUpdatedBy(), returnedList.getFirst().lastUpdatedBy());
+            assertEquals(departmentDto.lastUpdatedDate(), returnedList.getFirst().lastUpdatedDate());
+
+            verify(departmentRepository, times(1)).getAllDepartments();
+        }
+
+        @Test
+        void whenGetAllDepartmentsThenReturnEmptyList() {
+
+            when(departmentRepository.getAllDepartments()).thenReturn(new ArrayList<>());
+
+            List<DepartmentDto> returnedList = departmentRepository.getAllDepartments();
+
+            assertEquals(0, returnedList.size());
+
+            verify(departmentRepository, times(1)).getAllDepartments();
+        }
+    }
+
+    @Nested
+    class WhenGetDepartment {
+
+        private DepartmentDto departmentDto;
+
+        @BeforeEach
+        void setUp() {
+
+            departmentDto = DepartmentDto.builder()
+                    .id(department.getId())
+                    .name(department.getName())
+                    .createdBy(department.createdBy)
+                    .createdDate(department.createdDate)
+                    .lastUpdatedBy(department.lastUpdatedBy)
+                    .lastUpdatedDate(department.lastUpdatedDate)
+                    .build();
+        }
+
+        @Test
+        void whenGetDepartmentThenReturnDepartmentDto() {
+
+            when(departmentRepository.getDepartmentById(department.getId())).thenReturn(Optional.of(departmentDto));
+
+            DepartmentDto returnedDepartment = departmentService.getDepartment(DEPARTMENT_ID_HEADER, department.getId());
+
+            assertEquals(departmentDto, returnedDepartment);
+
+            verify(departmentRepository, times(1)).getDepartmentById(department.getId());
+        }
+
+        @Test
+        void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(departmentRepository.getDepartmentById(department.getId())).thenReturn(Optional.of(departmentDto));
+
+            DepartmentDto returnedDepartment = departmentService.getDepartment(DEPARTMENT_ID_HEADER, department.getId());
+
+            assertEquals(departmentDto, returnedDepartment);
+
+            verify(departmentRepository, times(1)).getDepartmentById(department.getId());
+        }
+    }
+
+    @Nested
+    class WhenDepartmentDeleting {
+
+        @Test
+        void whenDeleteDepartmentThenReturnOk() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел - был успешно удалён.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentRepository.deleteDepartment(
+                    department.getId(), currentUserId, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = departmentService.deleteDepartment(
+                    department.getId(), currentUserId);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(departmentRepository, times(1))
+                    .deleteDepartment(department.getId(), currentUserId, now);
+        }
+
+        @Test
+        void whenDeleteDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            when(departmentRepository.deleteDepartment(
+                    department.getId(), currentUserId, now)
+            ).thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> departmentService.deleteDepartment(department.getId(), currentUserId)
+            );
+
+            assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
+
+            verify(departmentRepository, times(1))
+                    .deleteDepartment(department.getId(), currentUserId, now);
+        }
+    }
+}
