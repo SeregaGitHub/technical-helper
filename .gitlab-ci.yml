@@ -24,6 +24,9 @@ build-backend-job:
     - cd root
     - pwd
     - ls -la
+    - cd .m2
+    - pwd
+    - ls -la
     - echo "========== finish build-backend-job =========="
   script:
     - mvn clean compile
