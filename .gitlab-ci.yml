@@ -5,7 +5,8 @@ stages:
 
 cache:
   paths:
-    - ../../../root/.m2/repository/
+    #- ../../../root/.m2/repository/
+    - .m2/repository/
     - main-server/target/
     - breakage-server/target/
     - gateway/target/
