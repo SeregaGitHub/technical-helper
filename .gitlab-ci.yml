@@ -20,6 +20,9 @@ build-backend-job:
     - echo "========== finish build-backend-job =========="
     - cd ../../..
     - pwd
+    - ls -la
+    - cd root
+    - pwd
     - echo "========== finish build-backend-job =========="
   script:
     - mvn clean compile
