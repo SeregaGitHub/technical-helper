@@ -1,6 +1,6 @@
 stages:
   - build
-#  - test
+  - test
 #  - deploy
 
 variables:
@@ -23,3 +23,13 @@ build-job:
     - echo "========== finish build-job =========="
   script:
     - mvn clean compile
+
+test-job:
+  stage: test
+  image: maven:3.9-amazoncorretto-21-alpine
+  before_script:
+    - echo "========== start test-job =========="
+  after_script:
+    - echo "========== finish test-job =========="
+  script:
+    - mvn test
