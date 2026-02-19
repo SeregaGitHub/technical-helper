@@ -1,23 +1,25 @@
 stages:
   - build
-  - test
+#  - test
 #  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
 cache:
   paths:
-    #- ../../../root/.m2/repository/
     - .m2/repository/
     - main-server/target/
     - breakage-server/target/
     - gateway/target/
     - common-module/target/
 
-build-backend-job:
+build-job:
   stage: build
   image: maven:3.9-amazoncorretto-21-alpine
   before_script:
-    - echo "========== start build-backend-job =========="
+    - echo "========== start build-job =========="
   after_script:
-    - echo "========== finish build-backend-job =========="
+    - echo "========== finish build-job =========="
   script:
     - mvn clean compile
