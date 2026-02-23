@@ -13,11 +13,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(classes = MainServer.class)
 public class MainServerTests {
 
-    /*@Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");*/
-
     @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
+
+    /*@Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             "postgres:17-alpine")
             .withDatabaseName("technical_helper")
@@ -30,7 +30,7 @@ public class MainServerTests {
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
+    }*/
 
 
     @Test
