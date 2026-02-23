@@ -27,8 +27,8 @@ build-job:
 
 test-job:
   stage: test
-  variables:
-    DOCKER_HOST: "unix:///var/run/docker.sock"
+  variables:                                    # можно использовать сокет хоста (более производительно)
+    DOCKER_HOST: "unix:///var/run/docker.sock"  # тогда gitlab-runner должен быть настроен на проброс /var/run/docker.sock
   image: maven:3.9-amazoncorretto-21-alpine
   services:
     - docker:27-dind   # сервис Docker-in-Docker
