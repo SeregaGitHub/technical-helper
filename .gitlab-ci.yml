@@ -3,6 +3,7 @@ stages:
   - test
 #  - deploy
 
+# This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
@@ -32,4 +33,4 @@ test-job:
   after_script:
     - echo "========== finish test-job =========="
   script:
-    - mvn test
+    - mvn clean test
