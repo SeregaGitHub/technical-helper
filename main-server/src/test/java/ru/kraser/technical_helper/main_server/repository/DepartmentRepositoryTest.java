@@ -5,8 +5,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -179,12 +181,88 @@ class DepartmentRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenDepartmentUpdating {
 
-//
-//    @Test
-//    void updateDepartment() {
-//    }
-//
+        private Department toSaveDepartment;
+
+        @BeforeEach
+        void setUp() {
+
+            toSaveDepartment = Department.builder()
+                    .name("some_name")
+                    .enabled(true)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            departmentRepository.saveAndFlush(toSaveDepartment);
+        }
+
+        @AfterEach
+        @SneakyThrows
+        void tearDown() {
+            departmentRepository.deleteById(toSaveDepartment.getId());
+        }
+
+        @Test
+        @Transactional()
+        @Modifying(clearAutomatically = true)
+        void whenUpdateDepartmentThenReturnOne() {
+
+            int response = departmentRepository.updateDepartment(
+                    toSaveDepartment.getId(),
+                    "updated_department_name",
+                    defaultAdminUser.getId(),
+                    now);
+
+            assertThat(response).isEqualTo(1);
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenUpdateDepartmentWhichNotExistThenReturnZero() {
+
+            int response = departmentRepository.updateDepartment(
+                    "some_non-existent_id",
+                    "updated_department_name",
+                    defaultAdminUser.getId(),
+                    now);
+
+            assertThat(response).isEqualTo(0);
+        }
+
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenUpdateDepartmentWithNotUniqueNameThenThrowException() {
+
+            String existDepartmentName = defaultAdminDepartment.getName();
+
+            assertThrows(
+                    DataIntegrityViolationException.class,
+                    () -> departmentRepository.updateDepartment(
+                            toSaveDepartment.getId(),
+                            existDepartmentName,
+                            defaultAdminUser.getId(),
+                            now)
+            );
+        }
+    }
+
+/*    @Test
+    void whenGetAllDepartmentsThenReturnListOfDepartments() {
+
+        List<DepartmentDto> departmentDtoList = departmentRepository.getAllDepartments();
+
+        assertThat(departmentDtoList.size()).isEqualTo(1);
+    }*/
+
+
 //    @Test
 //    void getAllDepartments() {
 //    }

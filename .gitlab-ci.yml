@@ -37,6 +37,6 @@ test-job:
   after_script:
     - echo "========== finish test-job =========="
   script:
-    - mvn clean test
+    - mvn test
   only:
-    - main                                       #  Джоба запустится, только если была изменена ветка - main
+    - add-main-server-department-tests                                       #  Джоба запустится, только если была изменена ветка - main
