@@ -38,3 +38,5 @@ test-job:
     - echo "========== finish test-job =========="
   script:
     - mvn clean test
+  only:
+    - main                                       #  Джоба запустится, только если была изменена ветка - main

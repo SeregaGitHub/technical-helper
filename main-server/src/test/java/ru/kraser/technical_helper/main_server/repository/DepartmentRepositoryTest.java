@@ -4,23 +4,20 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 
-import java.sql.Connection;
-import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
 @SpringBootTest
@@ -35,10 +32,6 @@ class DepartmentRepositoryTest {
     private Department defaultAdminDepartment;
     private LocalDateTime now;
     private User defaultAdminUser;
-
-    /*@Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:17-alpine");*/
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -58,63 +51,13 @@ class DepartmentRepositoryTest {
     @BeforeAll
     @SneakyThrows
     static void beforeAll() {
+
         postgreSQLContainer.start();
-
-//        Connection connection = postgreSQLContainer.createConnection("");
-//        Statement statement = connection.createStatement();
-
-        // creating default admin department and default admin user
-        /*statement.executeUpdate(
-                """
-                        ALTER TABLE IF EXISTS users
-                            DROP CONSTRAINT IF EXISTS fk_user_created_by;
-                        ALTER TABLE IF EXISTS users
-                            DROP CONSTRAINT IF EXISTS fk_user_last_updated_by;
-                        ALTER TABLE IF EXISTS department
-                            DROP CONSTRAINT IF EXISTS fk_department_created_by;
-                        ALTER TABLE IF EXISTS department
-                            DROP CONSTRAINT IF EXISTS fk_department_last_updated_by;
-                        """
-        );
-        statement.executeUpdate(
-                """
-                        INSERT INTO department
-                        VALUES
-                        ('d1d11111-11d1-1d11-1111-d111111d1111', 'test_admin_department', true,
-                        'u1u11111-11u1-1u11-1111-u111111u1111', '2025-09-29 13:00:00',
-                        'u1u11111-11u1-1u11-1111-u111111u1111', '2025-09-29 13:00:00');
-                        """);
-        statement.executeUpdate(
-                """
-                        INSERT INTO users
-                        VALUES
-                        ('u1u11111-11u1-1u11-1111-u111111u1111', 'test_admin', 'some_password', true,
-                        'd1d11111-11d1-1d11-1111-d111111d1111', 'ADMIN',
-                        'u1u11111-11u1-1u11-1111-u111111u1111', '2025-09-29 13:00:00',
-                        'u1u11111-11u1-1u11-1111-u111111u1111', '2025-09-29 13:00:00');
-                        """);
-        statement.executeUpdate(
-                """
-                        ALTER TABLE department
-                            ADD CONSTRAINT fk_department_created_by FOREIGN KEY (created_by)
-                            	REFERENCES users (id);
-                        ALTER TABLE department
-                            ADD CONSTRAINT fk_department_last_updated_by FOREIGN KEY (last_updated_by)
-                            	REFERENCES users (id);
-                        ALTER TABLE users
-                            ADD CONSTRAINT fk_user_created_by FOREIGN KEY (created_by)
-                            	REFERENCES users (id);
-                        ALTER TABLE users
-                            ADD CONSTRAINT fk_user_last_updated_by FOREIGN KEY (last_updated_by)
-                            	REFERENCES users (id);
-                        """
-        );
-
-        statement.close();*/
     }
 
     @AfterAll
     static void afterAll() {
+
         postgreSQLContainer.stop();
     }
 
@@ -194,11 +137,49 @@ class DepartmentRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenDepartmentFindByName {
+
+        @Test
+        void whenDepartmentFindByNameThenReturnDepartment() {
+
+            Optional<Department> department = departmentRepository.findByName(defaultAdminDepartment.getName());
+
+            assertThat(department).isNotEmpty();
+        }
+
+        @Test
+        void whenDepartmentFindByNameThenReturnDepartmentEvenWhenEnabledIsFalse() {
+
+            Department department = Department.builder()
+                    .name("some_name")
+                    .enabled(false)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            departmentRepository.saveAndFlush(department);
+
+            Optional<Department> departmentWithEnabledIsFalse =
+                    departmentRepository.findByName(department.getName());
+
+            departmentRepository.deleteById(department.getId());
+
+            assertThat(departmentWithEnabledIsFalse).isNotEmpty();
+        }
+
+        @Test
+        void whenDepartmentFindByNameThenReturnEmptyOptionalIfNameNotExist() {
+
+            Optional<Department> department = departmentRepository.findByName("some_non-existent_name");
+
+            assertThat(department).isEmpty();
+        }
+    }
 
 
-//    @Test
-//    void findByName() {
-//    }
 //
 //    @Test
 //    void updateDepartment() {
