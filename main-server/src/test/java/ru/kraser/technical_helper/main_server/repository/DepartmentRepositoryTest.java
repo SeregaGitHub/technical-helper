@@ -291,10 +291,52 @@ class DepartmentRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenGetDepartment {
 
-//    @Test
-//    void getDepartmentById() {
-//    }
+        @Test
+        void whenGetDepartmentThenReturnDepartmentDto() {
+
+            Optional<DepartmentDto> optional =
+                    departmentRepository.getDepartmentById(defaultAdminDepartment.getId());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenGetDepartmentWhichNotExistThenReturnEmptyOptional() {
+
+            Optional<DepartmentDto> optional =
+                    departmentRepository.getDepartmentById("some_non-existent_id");
+
+            assertThat(optional).isEmpty();
+        }
+
+        @Test
+        void whenGetDepartmentWhichNotEnabledThenReturnEmptyOptional() {
+
+            Department notEnabledDepartment = Department.builder()
+                    .name("some_not_enabled_department")
+                    .enabled(false)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            Department savedDepartment = departmentRepository.saveAndFlush(notEnabledDepartment);
+
+            Optional<DepartmentDto> optional =
+                    departmentRepository.getDepartmentById(savedDepartment.getId());
+
+            departmentRepository.deleteById(savedDepartment.getId());
+
+            assertThat(optional).isEmpty();
+        }
+    }
+
+
+
 //
 //    @Test
 //    void deleteDepartment() {

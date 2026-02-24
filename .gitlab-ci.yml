@@ -30,7 +30,9 @@ build-job:
 test-job:
   stage: test
   variables:
-    DOCKER_HOST: "unix:///var/run/docker.sock"
+  #  DOCKER_HOST: "unix:///var/run/docker.sock"
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   image: maven:3.9-amazoncorretto-21-alpine
   services:
     - docker:27-dind
