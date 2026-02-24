@@ -12,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -254,19 +256,40 @@ class DepartmentRepositoryTest {
         }
     }
 
-/*    @Test
-    void whenGetAllDepartmentsThenReturnListOfDepartments() {
+    @Nested
+    class WhenGetAllDepartments {
 
-        List<DepartmentDto> departmentDtoList = departmentRepository.getAllDepartments();
+        @Test
+        void whenGetAllDepartmentsThenReturnListOfDepartments() {
 
-        assertThat(departmentDtoList.size()).isEqualTo(1);
-    }*/
+            List<DepartmentDto> departmentDtoList = departmentRepository.getAllDepartments();
+
+            assertThat(departmentDtoList.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllDepartmentsAndSomeDepartmentEnabledIsFalseThenReturnListOfDepartments() {
+
+            Department notEnabledDepartment = Department.builder()
+                    .name("some_not_enabled_department")
+                    .enabled(false)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            departmentRepository.saveAndFlush(notEnabledDepartment);
+
+            List<DepartmentDto> departmentDtoList = departmentRepository.getAllDepartments();
+
+            departmentRepository.deleteById(notEnabledDepartment.getId());
+
+            assertThat(departmentDtoList.size()).isEqualTo(1);
+        }
+    }
 
 
-//    @Test
-//    void getAllDepartments() {
-//    }
-//
 //    @Test
 //    void getDepartmentById() {
 //    }
