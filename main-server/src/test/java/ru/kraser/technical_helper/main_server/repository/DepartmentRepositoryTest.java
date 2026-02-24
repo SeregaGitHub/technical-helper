@@ -60,11 +60,11 @@ class DepartmentRepositoryTest {
     static void beforeAll() {
         postgreSQLContainer.start();
 
-        Connection connection = postgreSQLContainer.createConnection("");
-        Statement statement = connection.createStatement();
+//        Connection connection = postgreSQLContainer.createConnection("");
+//        Statement statement = connection.createStatement();
 
         // creating default admin department and default admin user
-        statement.executeUpdate(
+        /*statement.executeUpdate(
                 """
                         ALTER TABLE IF EXISTS users
                             DROP CONSTRAINT IF EXISTS fk_user_created_by;
@@ -110,7 +110,7 @@ class DepartmentRepositoryTest {
                         """
         );
 
-        statement.close();
+        statement.close();*/
     }
 
     @AfterAll
