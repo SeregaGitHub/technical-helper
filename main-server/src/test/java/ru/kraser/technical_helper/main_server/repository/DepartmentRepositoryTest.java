@@ -281,11 +281,13 @@ class DepartmentRepositoryTest {
 
             departmentRepository.saveAndFlush(notEnabledDepartment);
 
-            List<DepartmentDto> departmentDtoList = departmentRepository.getAllDepartments();
+            List<DepartmentDto> enabledDepartments = departmentRepository.getAllDepartments();
+            List<Department> allDepartments = departmentRepository.findAll();
 
             departmentRepository.deleteById(notEnabledDepartment.getId());
 
-            assertThat(departmentDtoList.size()).isEqualTo(1);
+            assertThat(enabledDepartments.size()).isEqualTo(1);
+            assertThat(allDepartments.size()).isEqualTo(2);
         }
     }
 

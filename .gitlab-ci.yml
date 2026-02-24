@@ -39,6 +39,6 @@ test-job:
   after_script:
     - echo "==================== finish test-job ===================="
   script:
-    - mvn clean test
+    - mvn test
   only:
     - add-main-server-department-tests
