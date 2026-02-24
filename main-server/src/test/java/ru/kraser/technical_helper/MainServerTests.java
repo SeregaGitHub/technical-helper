@@ -32,7 +32,6 @@ public class MainServerTests {
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     }*/
 
-
     @Test
     void contextLoads() {
     }
