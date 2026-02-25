@@ -25,12 +25,11 @@ build-job:
   script:
     - mvn clean compile
   only:
-    - add-main-server-department-tests
+    - main
 
 test-job:
   stage: test
   variables:
-  #  DOCKER_HOST: "unix:///var/run/docker.sock"
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   image: maven:3.9-amazoncorretto-21-alpine
@@ -43,4 +42,4 @@ test-job:
   script:
     - mvn test
   only:
-    - add-main-server-department-tests
+    - main
