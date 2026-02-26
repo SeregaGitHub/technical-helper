@@ -1,3 +1,6 @@
+
+
+-------------------- Create default admin department and default admin user --------------------
 ALTER TABLE IF EXISTS users
     DROP CONSTRAINT IF EXISTS fk_user_created_by;
 ALTER TABLE IF EXISTS users
