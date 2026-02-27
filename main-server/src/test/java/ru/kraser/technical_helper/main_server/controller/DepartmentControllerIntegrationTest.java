@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
@@ -36,9 +37,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
 @Testcontainers
@@ -165,6 +166,7 @@ public class DepartmentControllerIntegrationTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(201))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("CREATED"))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andExpect(status().isCreated())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -205,6 +207,7 @@ public class DepartmentControllerIntegrationTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                             .value(responseMessage))
+                    .andExpect(status().isUnprocessableEntity())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -246,6 +249,7 @@ public class DepartmentControllerIntegrationTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -280,6 +284,7 @@ public class DepartmentControllerIntegrationTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                             .value(responseMessage))
+                    .andExpect(status().isUnprocessableEntity())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -287,6 +292,32 @@ public class DepartmentControllerIntegrationTest {
             departmentRepository.deleteById(savedDepartment.getId());
 
             AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnNotFound() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Данный отдел не существует !!!";
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(DEPARTMENT_ID_HEADER, "some_not_exist_id")
+                            .content(objectMapper.writeValueAsString(createDepartmentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(responseMessage))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
             assertThat(exception.getMessage()).isEqualTo(responseMessage);
         }
     }
