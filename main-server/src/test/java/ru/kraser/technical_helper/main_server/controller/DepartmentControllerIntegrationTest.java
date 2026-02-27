@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
@@ -69,6 +70,7 @@ public class DepartmentControllerIntegrationTest {
     private CreateDepartmentDto createDepartmentDto;
     private DateTimeFormatter dtf;
     private LocalDateTime now;
+    private Department defaultAdminDepartment;
     private User defaultAdminUser;
 
     @Container
@@ -102,6 +104,7 @@ public class DepartmentControllerIntegrationTest {
     @BeforeEach
     void setUp() {
 
+        defaultAdminDepartment = departmentRepository.findById("d1d11111-11d1-1d11-1111-d111111d1111").get();
         defaultAdminUser = userRepository.findById("u1u11111-11u1-1u11-1111-u111111u1111").get();
 
         now = LocalDateTime.of(
@@ -174,6 +177,34 @@ public class DepartmentControllerIntegrationTest {
 
             ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
             assertThat(actualApiResponse).isEqualTo(apiResponse);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenCreateDepartmentThenReturnUnprocessableEntity() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            CreateDepartmentDto createDepartmentDtoWithNotUniqueName =
+                    new CreateDepartmentDto(defaultAdminDepartment.getName());
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .content(objectMapper.writeValueAsString(createDepartmentDtoWithNotUniqueName)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(responseMessage))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
         }
     }
 }
