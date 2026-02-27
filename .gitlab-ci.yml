@@ -24,8 +24,8 @@ build-job:
     - echo "==================== finish build-job ===================="
   script:
     - mvn clean compile
-  only:
-    - main
+#  only:
+#    - main
 
 test-job:
   stage: test
@@ -41,5 +41,5 @@ test-job:
     - echo "==================== finish test-job ===================="
   script:
     - mvn test
-  only:
-    - main
+#  only:
+#    - main

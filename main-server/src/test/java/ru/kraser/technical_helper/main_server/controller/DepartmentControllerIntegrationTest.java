@@ -1,6 +1,8 @@
 package ru.kraser.technical_helper.main_server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 
@@ -44,6 +46,8 @@ import static ru.kraser.technical_helper.common_module.util.Constant.*;
 @Transactional
 public class DepartmentControllerIntegrationTest {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -181,7 +185,7 @@ public class DepartmentControllerIntegrationTest {
 
         @SneakyThrows
         @Test
-        void whenCreateDepartmentThenReturnUnprocessableEntity() {
+        void whenCreateDepartmentThenReturnAlreadyExistsException() {
 
             when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
             when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
@@ -205,6 +209,50 @@ public class DepartmentControllerIntegrationTest {
 
             AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
             assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
+    }
+
+    @Nested
+    class WhenDepartmentUpdating {
+
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnOk() {
+
+            Department savedDepartment = departmentRepository.saveAndFlush(department);
+            CreateDepartmentDto updateDepartmentDto = new CreateDepartmentDto("new_department_name");
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(DEPARTMENT_ID_HEADER, savedDepartment.getId())
+                            .content(objectMapper.writeValueAsString(updateDepartmentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            entityManager.clear();
+            Department updatedDepartment = departmentRepository.findById(savedDepartment.getId()).get();
+
+            assertThat(result).isEqualTo(objectMapper.writeValueAsString(apiResponse));
+            assertThat(updatedDepartment.getName()).isEqualTo(updateDepartmentDto.name());
         }
     }
 }
