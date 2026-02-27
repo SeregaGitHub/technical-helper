@@ -36,6 +36,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
@@ -170,6 +171,7 @@ public class DepartmentControllerIntegrationTest {
 
             Example<Department> example = Example.of(department);
             Department savedDepartment = departmentRepository.findOne(example).get();
+            departmentRepository.deleteById(savedDepartment.getId());
 
             assertThat(savedDepartment.getId()).isNotNull();
             assertThat(savedDepartment.getName()).isEqualTo(department.getName());
@@ -250,9 +252,42 @@ public class DepartmentControllerIntegrationTest {
 
             entityManager.clear();
             Department updatedDepartment = departmentRepository.findById(savedDepartment.getId()).get();
+            departmentRepository.deleteById(updatedDepartment.getId());
 
             assertThat(result).isEqualTo(objectMapper.writeValueAsString(apiResponse));
             assertThat(updatedDepartment.getName()).isEqualTo(updateDepartmentDto.name());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateDepartmentThenReturnAlreadyExistsException() {
+
+            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
+            String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            Department savedDepartment = departmentRepository.saveAndFlush(department);
+            CreateDepartmentDto departmentDtoWithNotUniqueName =
+                    new CreateDepartmentDto(defaultAdminDepartment.getName());
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(DEPARTMENT_ID_HEADER, savedDepartment.getId())
+                            .content(objectMapper.writeValueAsString(departmentDtoWithNotUniqueName)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(responseMessage))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            departmentRepository.deleteById(savedDepartment.getId());
+
+            AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
         }
     }
 }
