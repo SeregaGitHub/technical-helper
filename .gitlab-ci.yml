@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - package
 #  - deploy
 
 # This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
@@ -43,3 +44,18 @@ test-job:
     - mvn test
 #  only:
 #    - main
+
+package-job:
+  stage: package
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  image: maven:3.9-amazoncorretto-21-alpine
+  services:
+    - docker:27-dind
+  before_script:
+    - echo "==================== start package-job ===================="
+  after_script:
+    - echo "==================== finish package-job ===================="
+  script:
+    - mvn package
