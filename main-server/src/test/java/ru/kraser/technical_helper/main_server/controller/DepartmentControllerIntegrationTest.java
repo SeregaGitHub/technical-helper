@@ -126,6 +126,9 @@ public class DepartmentControllerIntegrationTest {
 
         dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
         department = Department.builder()
                 .name("test_department")
                 .enabled(true)
@@ -145,9 +148,6 @@ public class DepartmentControllerIntegrationTest {
         @SneakyThrows
         @Test
         void whenCreateDepartmentThenReturnCreated() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
 
@@ -194,9 +194,6 @@ public class DepartmentControllerIntegrationTest {
         @Test
         void whenCreateDepartmentThenReturnAlreadyExistsException() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
                     "Используйте другое имя !!!";
 
@@ -229,9 +226,6 @@ public class DepartmentControllerIntegrationTest {
 
             Department savedDepartment = departmentRepository.saveAndFlush(department);
             CreateDepartmentDto updateDepartmentDto = new CreateDepartmentDto("new_department_name");
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
 
@@ -269,9 +263,6 @@ public class DepartmentControllerIntegrationTest {
         @Test
         void whenUpdateDepartmentThenReturnAlreadyExistsException() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
                     "Используйте другое имя !!!";
 
@@ -301,9 +292,6 @@ public class DepartmentControllerIntegrationTest {
         @SneakyThrows
         @Test
         void whenUpdateDepartmentThenReturnNotFound() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Данный отдел не существует !!!";
 
@@ -458,9 +446,6 @@ public class DepartmentControllerIntegrationTest {
     @SneakyThrows
     @Test
     void whenDeleteDepartmentThenReturnOk() {
-
-        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         String responseMessage = "Отдел - был успешно удалён.";
 

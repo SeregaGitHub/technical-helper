@@ -75,6 +75,9 @@ class DepartmentControllerWebMvcTest {
 
         dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
         department = Department.builder()
                 .id("d1d11111-11d1-1d11-1111-d111111d1111")
                 .name("test_department")
@@ -95,9 +98,6 @@ class DepartmentControllerWebMvcTest {
         @SneakyThrows
         @Test
         void whenCreateDepartmentThenReturnCreated() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
 
@@ -130,9 +130,6 @@ class DepartmentControllerWebMvcTest {
         @SneakyThrows
         @Test
         void whenCreateDepartmentThenReturnUnprocessableEntity() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
@@ -175,9 +172,6 @@ class DepartmentControllerWebMvcTest {
         @Test
         void whenUpdateDepartmentThenReturnOk() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
 
             ApiResponse apiResponse = ApiResponse.builder()
@@ -213,9 +207,6 @@ class DepartmentControllerWebMvcTest {
         @SneakyThrows
         @Test
         void whenUpdateDepartmentThenReturnUnprocessableEntity() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
@@ -257,9 +248,6 @@ class DepartmentControllerWebMvcTest {
         @SneakyThrows
         @Test
         void whenUpdateDepartmentThenReturnNotFound() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Данный отдел не существует !!!";
 
@@ -375,9 +363,6 @@ class DepartmentControllerWebMvcTest {
     @SneakyThrows
     @Test
     void whenDeleteDepartmentThenReturnOk() {
-
-        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         String responseMessage = "Отдел - был успешно удалён.";
 

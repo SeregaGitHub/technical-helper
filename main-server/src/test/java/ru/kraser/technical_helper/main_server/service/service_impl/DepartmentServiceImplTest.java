@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -33,6 +35,7 @@ import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_
 import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DepartmentServiceImplTest {
 
     @Mock
@@ -68,6 +71,9 @@ class DepartmentServiceImplTest {
                 0,
                 0);
 
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
         department = Department.builder()
                 .id("d1d11111-11d1-1d11-1111-d111111d1111")
                 .name("test_department")
@@ -93,9 +99,6 @@ class DepartmentServiceImplTest {
         @Test
         void whenCreateDepartmentThenReturnCreated() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + department.getName() + ", - был успешно создан.";
 
             ApiResponse apiResponse = ApiResponse.builder()
@@ -118,9 +121,6 @@ class DepartmentServiceImplTest {
 
         @Test
         void whenCreateDepartmentWithNotUniqueNameThenThrowAlreadyExistsException() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
@@ -158,9 +158,6 @@ class DepartmentServiceImplTest {
         @Test
         void whenUpdateDepartmentThenReturnOk() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
 
             ApiResponse apiResponse = ApiResponse.builder()
@@ -186,9 +183,6 @@ class DepartmentServiceImplTest {
         @Test
         void whenUpdateDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Данный отдел не существует !!!";
 
             when(departmentRepository.updateDepartment(
@@ -208,9 +202,6 @@ class DepartmentServiceImplTest {
 
         @Test
         void whenUpdateDepartmentIfNotUniqueNameThenThrowAlreadyExistsException() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + updateDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
@@ -332,9 +323,6 @@ class DepartmentServiceImplTest {
         @Test
         void whenDeleteDepartmentThenReturnOk() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел - был успешно удалён.";
 
             ApiResponse apiResponse = ApiResponse.builder()
@@ -359,9 +347,6 @@ class DepartmentServiceImplTest {
 
         @Test
         void whenDeleteDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             when(departmentRepository.deleteDepartment(
                     department.getId(), currentUserId, now)

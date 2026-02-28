@@ -66,6 +66,9 @@ class DepartmentControllerTest {
                 0,
                 0);
 
+        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+
         department = Department.builder()
                 .id("d1d11111-11d1-1d11-1111-d111111d1111")
                 .name("test_department")
@@ -85,9 +88,6 @@ class DepartmentControllerTest {
 
         @Test
         void whenCreateDepartmentThenReturnCreated() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
 
@@ -114,9 +114,6 @@ class DepartmentControllerTest {
 
         @Test
         void whenCreateDepartmentThenReturnUnprocessableEntity() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
@@ -149,9 +146,6 @@ class DepartmentControllerTest {
         @Test
         void whenUpdateDepartmentNameThenReturnOk() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
 
             when(departmentService.updateDepartment(department.getId(), createDepartmentDto, currentUserId))
@@ -178,9 +172,6 @@ class DepartmentControllerTest {
         @Test
         void whenUpdateDepartmentThenReturnUnprocessableEntity() {
 
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
 
@@ -206,9 +197,6 @@ class DepartmentControllerTest {
 
         @Test
         void whenUpdateDepartmentThenReturnNotFound() {
-
-            when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             String responseMessage = "Данный отдел не существует !!!";
 
@@ -286,9 +274,6 @@ class DepartmentControllerTest {
 
     @Test
     void whenDeleteDepartmentThenReturnOk() {
-
-        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         String responseMessage = "Отдел - был успешно удалён.";
 
