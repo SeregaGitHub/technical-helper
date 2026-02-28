@@ -1,0 +1,45 @@
+stages:
+  - build
+  - test
+#  - deploy
+
+# This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+    - main-server/target/
+    - breakage-server/target/
+    - gateway/target/
+    - common-module/target/
+
+build-job:
+  stage: build
+  image: maven:3.9-amazoncorretto-21-alpine
+  before_script:
+    - echo "==================== start build-job ===================="
+  after_script:
+    - echo "==================== finish build-job ===================="
+  script:
+    - mvn clean compile
+#  only:
+#    - main
+
+test-job:
+  stage: test
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  image: maven:3.9-amazoncorretto-21-alpine
+  services:
+    - docker:27-dind
+  before_script:
+    - echo "==================== start test-job ===================="
+  after_script:
+    - echo "==================== finish test-job ===================="
+  script:
+    - mvn test
+#  only:
+#    - main

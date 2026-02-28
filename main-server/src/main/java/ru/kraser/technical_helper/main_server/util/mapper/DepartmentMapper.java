@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 
 @UtilityClass
 public class DepartmentMapper {
-    public Department toDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+    public Department toDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId, LocalDateTime now) {
         Department department = new Department();
 
         department.setName(createDepartmentDto.name());

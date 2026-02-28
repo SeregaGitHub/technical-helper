@@ -13,6 +13,7 @@ import ru.kraser.technical_helper.main_server.service.DepartmentService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 import ru.kraser.technical_helper.main_server.util.mapper.DepartmentMapper;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,12 +23,14 @@ import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;
+    private final Clock clock;
 
     @Override
     @Transactional
     public ApiResponse createDepartment(CreateDepartmentDto createDepartmentDto, String currentUserId) {
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         try {
-            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId));
+            departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now));
         } catch (Exception e) {
             ThrowMainServerException.departmentHandler(e.getMessage(), createDepartmentDto.name());
         }
@@ -35,14 +38,14 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .message("Отдел: " + createDepartmentDto.name() + ", - был успешно создан.")
                 .status(201)
                 .httpStatus(HttpStatus.CREATED)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
     @Override
     @Transactional
     public ApiResponse updateDepartment(String departmentId, CreateDepartmentDto departmentDto, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         int response;
         try {
             response = departmentRepository.updateDepartment(
@@ -76,7 +79,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public ApiResponse deleteDepartment(String departmentId, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         int response;
         response = departmentRepository.deleteDepartment(departmentId, currentUserId, now);
 
@@ -87,7 +90,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .message("Отдел - был успешно удалён.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
