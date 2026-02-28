@@ -64,6 +64,8 @@ deploy-job:
   stage: deploy
   variables:
     DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_CLIENT_TIMEOUT: 120
+    COMPOSE_HTTP_TIMEOUT: 120
 #    DOCKER_HOST: tcp://docker:2375   # без TLS
 #    DOCKER_TLS_CERTDIR: "/certs"          # включает TLS и указывает корень для сертификатов
 #    DOCKER_HOST: tcp://docker:2376         # TLS-порт демона
