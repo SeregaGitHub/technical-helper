@@ -63,15 +63,19 @@ package-job:
 deploy-job:
   stage: deploy
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: "/certs"               # каталог для сертификатов
+    DOCKER_HOST: tcp://docker:2376              # TLS-порт
+    DOCKER_TLS_VERIFY: 1                         # включить проверку TLS
   image: docker:27-cli
   services:
     - docker:27-dind
   before_script:
     - echo "==================== start deploy-job ===================="
+    - echo "==================== start check the connection with the docker demon ===================="
+    - docker info || true
+    - echo "==================== finish check the connection with the docker demon ===================="
   after_script:
     - echo "==================== finish deploy-job ===================="
   script:
-    - docker-compose build
-    - docker-compose up -d
+    - docker compose build
+    - docker compose up -d
