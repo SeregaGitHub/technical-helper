@@ -63,16 +63,20 @@ package-job:
 deploy-job:
   stage: deploy
   variables:
-    DOCKER_TLS_CERTDIR: "/certs"               # каталог для сертификатов
-    DOCKER_HOST: tcp://docker:2376              # TLS-порт
-    DOCKER_TLS_VERIFY: 1                         # включить проверку TLS
+    DOCKER_TLS_CERTDIR: "/certs"          # включает TLS и указывает корень для сертификатов
+    DOCKER_HOST: tcp://docker:2376         # TLS-порт демона
+    DOCKER_TLS_VERIFY: 1                    # включить проверку TLS
+    DOCKER_CERT_PATH: "/certs/client"       # где клиент ищет сертификаты
   image: docker:27-cli
   services:
-    - docker:27-dind
+    - name: docker:27-dind
+      alias: docker                         # гарантирует, что имя хоста — docker
   before_script:
     - echo "==================== start deploy-job ===================="
     - echo "==================== start check the connection with the docker demon ===================="
+    - ls -la /certs/client || true
     - docker info || true
+    - docker version
     - echo "==================== finish check the connection with the docker demon ===================="
   after_script:
     - echo "==================== finish deploy-job ===================="
