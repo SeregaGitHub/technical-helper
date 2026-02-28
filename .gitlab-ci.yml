@@ -2,7 +2,7 @@ stages:
   - build
   - test
   - package
-#  - deploy
+  - deploy
 
 # This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
 variables:
@@ -42,8 +42,8 @@ test-job:
     - echo "==================== finish test-job ===================="
   script:
     - mvn test
-#  only:
-#    - main
+  only:
+    - main
 
 package-job:
   stage: package
@@ -59,3 +59,19 @@ package-job:
     - echo "==================== finish package-job ===================="
   script:
     - mvn package
+
+deploy-job:
+  stage: deploy
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  image: docker:27-cli
+  services:
+    - docker:27-dind
+  before_script:
+    - echo "==================== start deploy-job ===================="
+  after_script:
+    - echo "==================== finish deploy-job ===================="
+  script:
+    - docker-compose build
+    - docker-compose up -d
