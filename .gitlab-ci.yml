@@ -63,18 +63,20 @@ package-job:
 deploy-job:
   stage: deploy
   variables:
-    DOCKER_HOST: tcp://docker:2375   # без TLS
+    DOCKER_HOST: unix:///var/run/docker.sock
+#    DOCKER_HOST: tcp://docker:2375   # без TLS
 #    DOCKER_TLS_CERTDIR: "/certs"          # включает TLS и указывает корень для сертификатов
 #    DOCKER_HOST: tcp://docker:2376         # TLS-порт демона
 #    DOCKER_TLS_VERIFY: 1                    # включить проверку TLS
 #    DOCKER_CERT_PATH: "/certs/client"       # где клиент ищет сертификаты
   image: docker:27-cli
-  services:
-    - name: docker:27-dind
-      alias: docker                         # гарантирует, что имя хоста — docker
-      command: ["dockerd", "-H", "tcp://0.0.0.0:2375"]
+#  services:
+#    - name: docker:27-dind
+#      alias: docker                         # гарантирует, что имя хоста — docker
+#      command: ["dockerd", "-H", "tcp://0.0.0.0:2375"]
   before_script:
     - echo "==================== start deploy-job ===================="
+    - cat /proc/self/status | grep CapEff
     - echo "==================== start check the connection with the docker demon ===================="
     - ls -la /certs/client || true
     - docker info || true
