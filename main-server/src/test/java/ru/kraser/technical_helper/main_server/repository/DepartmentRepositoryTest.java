@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @Testcontainers
 @SpringBootTest
@@ -69,8 +70,8 @@ class DepartmentRepositoryTest {
     @SneakyThrows
     void setUp() {
 
-        defaultAdminDepartment = departmentRepository.findById("d1d11111-11d1-1d11-1111-d111111d1111").get();
-        defaultAdminUser = userRepository.findById("u1u11111-11u1-1u11-1111-u111111u1111").get();
+        defaultAdminDepartment = departmentRepository.findById(DEPARTMENT_ID).get();
+        defaultAdminUser = userRepository.findById(USER_ID).get();
 
         now = LocalDateTime.of(
                 2025,
@@ -88,7 +89,7 @@ class DepartmentRepositoryTest {
         void whenCreateDepartmentThenReturnDepartment() {
 
             Department toSaveDepartment = Department.builder()
-                    .name("some_name")
+                    .name(DEPARTMENT_TEST_NAME)
                     .enabled(true)
                     .createdBy(defaultAdminUser.getId())
                     .createdDate(now)
@@ -146,7 +147,7 @@ class DepartmentRepositoryTest {
 
             Department savedDepartment = departmentRepository.saveAndFlush(
                     Department.builder()
-                            .name("some_name")
+                            .name(DEPARTMENT_TEST_NAME)
                             .enabled(false)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)
@@ -182,7 +183,7 @@ class DepartmentRepositoryTest {
 
             savedDepartment = departmentRepository.saveAndFlush(
                     Department.builder()
-                            .name("some_name")
+                            .name(DEPARTMENT_TEST_NAME)
                             .enabled(true)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)
@@ -334,7 +335,7 @@ class DepartmentRepositoryTest {
 
             Department savedDepartment = departmentRepository.saveAndFlush(
                     Department.builder()
-                            .name("some_name")
+                            .name(DEPARTMENT_TEST_NAME)
                             .enabled(true)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)

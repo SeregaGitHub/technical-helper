@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
+import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @WebMvcTest(controllers = DepartmentController.class)
 class DepartmentControllerWebMvcTest {
@@ -48,7 +49,6 @@ class DepartmentControllerWebMvcTest {
     private CreateDepartmentDto createDepartmentDto;
     private DateTimeFormatter dtf;
     private LocalDateTime now;
-    private String currentUserId = "u1u11111-11u1-1u11-1111-u111111u1111";
 
     private static final ZonedDateTime NOW_ZDT = ZonedDateTime.of(
             2025,
@@ -79,12 +79,12 @@ class DepartmentControllerWebMvcTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id("d1d11111-11d1-1d11-1111-d111111d1111")
-                .name("test_department")
+                .id(DEPARTMENT_ID)
+                .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
-                .createdBy(currentUserId)
+                .createdBy(USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(currentUserId)
+                .lastUpdatedBy(USER_ID)
                 .lastUpdatedDate(now)
                 .build();
 
@@ -108,11 +108,11 @@ class DepartmentControllerWebMvcTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, currentUserId)).thenReturn(apiResponse);
+            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(CURRENT_USER_ID_HEADER, USER_ID)
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
@@ -124,7 +124,7 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, currentUserId);
+            verify(departmentService, times(1)).createDepartment(createDepartmentDto, USER_ID);
         }
 
         @SneakyThrows
@@ -141,11 +141,11 @@ class DepartmentControllerWebMvcTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, currentUserId)).thenReturn(apiResponse);
+            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(CURRENT_USER_ID_HEADER, USER_ID)
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -161,7 +161,7 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, currentUserId);
+            verify(departmentService, times(1)).createDepartment(createDepartmentDto, USER_ID);
         }
     }
 
@@ -182,12 +182,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, currentUserId)
+                    department.getId(), createDepartmentDto, USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(CURRENT_USER_ID_HEADER, USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -201,7 +201,7 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
         }
 
         @SneakyThrows
@@ -219,12 +219,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, currentUserId)
+                    department.getId(), createDepartmentDto, USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(CURRENT_USER_ID_HEADER, USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -242,7 +242,7 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
         }
 
         @SneakyThrows
@@ -259,12 +259,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, currentUserId)
+                    department.getId(), createDepartmentDto, USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, currentUserId)
+                            .header(CURRENT_USER_ID_HEADER, USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -282,7 +282,7 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, currentUserId);
+                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
         }
     }
 
@@ -374,13 +374,13 @@ class DepartmentControllerWebMvcTest {
                 .build();
 
         when(departmentService.deleteDepartment(
-                department.getId(), currentUserId)
+                department.getId(), USER_ID)
         ).thenReturn(apiResponse);
 
         String result = mockMvc.perform(MockMvcRequestBuilders.patch(
                                 BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(CURRENT_USER_ID_HEADER, currentUserId)
+                        .header(CURRENT_USER_ID_HEADER, USER_ID)
                         .header(DEPARTMENT_ID_HEADER, department.getId()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
@@ -393,7 +393,7 @@ class DepartmentControllerWebMvcTest {
 
         assertEquals(objectMapper.writeValueAsString(apiResponse), result);
         verify(departmentService, times(1))
-                .deleteDepartment(department.getId(), currentUserId);
+                .deleteDepartment(department.getId(), USER_ID);
     }
 
 }

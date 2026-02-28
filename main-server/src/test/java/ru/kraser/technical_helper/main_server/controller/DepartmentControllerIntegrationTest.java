@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
+import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @Testcontainers
 @SpringBootTest
@@ -113,8 +114,8 @@ public class DepartmentControllerIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        defaultAdminDepartment = departmentRepository.findById("d1d11111-11d1-1d11-1111-d111111d1111").get();
-        defaultAdminUser = userRepository.findById("u1u11111-11u1-1u11-1111-u111111u1111").get();
+        defaultAdminDepartment = departmentRepository.findById(DEPARTMENT_ID).get();
+        defaultAdminUser = userRepository.findById(USER_ID).get();
 
         now = LocalDateTime.of(
                 2025,
@@ -130,7 +131,7 @@ public class DepartmentControllerIntegrationTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .name("test_department")
+                .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
                 .createdBy(defaultAdminUser.getId())
                 .createdDate(now)

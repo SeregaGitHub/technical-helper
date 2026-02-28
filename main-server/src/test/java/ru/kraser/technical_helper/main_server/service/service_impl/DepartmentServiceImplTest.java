@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_ID_HEADER;
 import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
+import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -47,7 +48,6 @@ class DepartmentServiceImplTest {
 
     private Department department;
     private LocalDateTime now;
-    private final String currentUserId = "u1u11111-11u1-1u11-1111-u111111u1111";
 
     private static final ZonedDateTime NOW_ZDT = ZonedDateTime.of(
             2025,
@@ -75,12 +75,12 @@ class DepartmentServiceImplTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id("d1d11111-11d1-1d11-1111-d111111d1111")
-                .name("test_department")
+                .id(DEPARTMENT_ID)
+                .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
-                .createdBy(currentUserId)
+                .createdBy(USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(currentUserId)
+                .lastUpdatedBy(USER_ID)
                 .lastUpdatedDate(now)
                 .build();
     }
@@ -108,15 +108,15 @@ class DepartmentServiceImplTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now)))
+            when(departmentRepository.saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, USER_ID, now)))
                     .thenReturn(department);
 
-            ApiResponse returnedApiResponse = departmentService.createDepartment(createDepartmentDto, currentUserId);
+            ApiResponse returnedApiResponse = departmentService.createDepartment(createDepartmentDto, USER_ID);
 
             assertEquals(apiResponse, returnedApiResponse);
 
             verify(departmentRepository, times(1))
-                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now));
+                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, USER_ID, now));
         }
 
         @Test
@@ -126,7 +126,7 @@ class DepartmentServiceImplTest {
                     "Используйте другое имя !!!";
 
             when(departmentRepository.saveAndFlush(
-                    DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now))
+                    DepartmentMapper.toDepartment(createDepartmentDto, USER_ID, now))
             ).thenThrow(new DataIntegrityViolationException(
                             "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"uk_department_name\""
                     )
@@ -134,13 +134,13 @@ class DepartmentServiceImplTest {
 
             AlreadyExistsException exception = assertThrows(
                     AlreadyExistsException.class,
-                    () -> departmentService.createDepartment(createDepartmentDto, currentUserId)
+                    () -> departmentService.createDepartment(createDepartmentDto, USER_ID)
             );
 
             assertEquals(responseMessage, exception.getMessage());
 
             verify(departmentRepository, times(1))
-                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, currentUserId, now));
+                    .saveAndFlush(DepartmentMapper.toDepartment(createDepartmentDto, USER_ID, now));
         }
     }
 
@@ -168,16 +168,16 @@ class DepartmentServiceImplTest {
                     .build();
 
             when(departmentRepository.updateDepartment(
-                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+                    department.getId(), updateDepartmentDto.name(), USER_ID, now)
             ).thenReturn(1);
 
             ApiResponse returnedApiResponse = departmentService.updateDepartment(
-                    department.getId(), updateDepartmentDto, currentUserId);
+                    department.getId(), updateDepartmentDto, USER_ID);
 
             assertEquals(apiResponse, returnedApiResponse);
 
             verify(departmentRepository, times(1))
-                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), USER_ID, now);
         }
 
         @Test
@@ -186,18 +186,18 @@ class DepartmentServiceImplTest {
             String responseMessage = "Данный отдел не существует !!!";
 
             when(departmentRepository.updateDepartment(
-                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+                    department.getId(), updateDepartmentDto.name(), USER_ID, now)
             ).thenThrow(new NotFoundException(responseMessage));
 
             NotFoundException exception = assertThrows(
                     NotFoundException.class,
-                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, currentUserId)
+                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, USER_ID)
             );
 
             assertEquals(responseMessage, exception.getMessage());
 
             verify(departmentRepository, times(1))
-                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), USER_ID, now);
         }
 
         @Test
@@ -207,7 +207,7 @@ class DepartmentServiceImplTest {
                     "Используйте другое имя !!!";
 
             when(departmentRepository.updateDepartment(
-                    department.getId(), updateDepartmentDto.name(), currentUserId, now)
+                    department.getId(), updateDepartmentDto.name(), USER_ID, now)
             ).thenThrow(new DataIntegrityViolationException(
                             "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"uk_department_name\""
                     )
@@ -215,13 +215,13 @@ class DepartmentServiceImplTest {
 
             AlreadyExistsException exception = assertThrows(
                     AlreadyExistsException.class,
-                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, currentUserId)
+                    () -> departmentService.updateDepartment(department.getId(), updateDepartmentDto, USER_ID)
             );
 
             assertEquals(responseMessage, exception.getMessage());
 
             verify(departmentRepository, times(1))
-                    .updateDepartment(department.getId(), updateDepartmentDto.name(), currentUserId, now);
+                    .updateDepartment(department.getId(), updateDepartmentDto.name(), USER_ID, now);
         }
     }
 
@@ -333,34 +333,34 @@ class DepartmentServiceImplTest {
                     .build();
 
             when(departmentRepository.deleteDepartment(
-                    department.getId(), currentUserId, now)
+                    department.getId(), USER_ID, now)
             ).thenReturn(1);
 
             ApiResponse returnedApiResponse = departmentService.deleteDepartment(
-                    department.getId(), currentUserId);
+                    department.getId(), USER_ID);
 
             assertEquals(apiResponse, returnedApiResponse);
 
             verify(departmentRepository, times(1))
-                    .deleteDepartment(department.getId(), currentUserId, now);
+                    .deleteDepartment(department.getId(), USER_ID, now);
         }
 
         @Test
         void whenDeleteDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
 
             when(departmentRepository.deleteDepartment(
-                    department.getId(), currentUserId, now)
+                    department.getId(), USER_ID, now)
             ).thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
 
             NotFoundException exception = assertThrows(
                     NotFoundException.class,
-                    () -> departmentService.deleteDepartment(department.getId(), currentUserId)
+                    () -> departmentService.deleteDepartment(department.getId(), USER_ID)
             );
 
             assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
 
             verify(departmentRepository, times(1))
-                    .deleteDepartment(department.getId(), currentUserId, now);
+                    .deleteDepartment(department.getId(), USER_ID, now);
         }
     }
 }
