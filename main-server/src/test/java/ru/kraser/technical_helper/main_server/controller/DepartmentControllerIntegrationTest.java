@@ -1,5 +1,6 @@
 package ru.kraser.technical_helper.main_server.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,6 +24,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -35,6 +37,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -319,6 +322,136 @@ public class DepartmentControllerIntegrationTest {
 
             NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
             assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
+    }
+
+    @Nested
+    class WhenGetMethodsAreExecuting {
+
+        DepartmentDto expectedDepartmentDto;
+        Department notEnabledDepartment;
+
+        @BeforeEach
+        void initializeDepartmentDto() {
+
+            expectedDepartmentDto = DepartmentDto.builder()
+                    .id(defaultAdminDepartment.getId())
+                    .name(defaultAdminDepartment.getName())
+                    .createdBy(defaultAdminUser.getUsername())
+                    .createdDate(defaultAdminDepartment.getCreatedDate())
+                    .lastUpdatedBy(defaultAdminUser.getUsername())
+                    .lastUpdatedDate(defaultAdminDepartment.getLastUpdatedDate())
+                    .build();
+
+            Department toSaveDepartment = Department.builder()
+                    .name(department.getName())
+                    .enabled(false)
+                    .createdBy(department.getCreatedBy())
+                    .createdDate(department.getCreatedDate())
+                    .lastUpdatedBy(department.getLastUpdatedBy())
+                    .lastUpdatedDate(department.getLastUpdatedDate())
+                    .build();
+
+            notEnabledDepartment = departmentRepository.saveAndFlush(toSaveDepartment);
+        }
+
+        @AfterEach
+        void removeNotEnabledDepartment() {
+
+            departmentRepository.deleteById(notEnabledDepartment.getId());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                    BASE_URL + ADMIN_URL + DEPARTMENT_URL + ALL_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            List<DepartmentDto> departments = objectMapper.readValue(result, new TypeReference<>() {});
+            assertThat(departments).hasSize(1);
+
+            DepartmentDto departmentDto = departments.getFirst();
+
+            assertThat(departmentDto.id()).isEqualTo(expectedDepartmentDto.id());
+            assertThat(departmentDto.name()).isEqualTo(expectedDepartmentDto.name());
+            assertThat(departmentDto.createdBy()).isEqualTo(expectedDepartmentDto.createdBy());
+            assertThat(departmentDto.createdDate()).isEqualTo(expectedDepartmentDto.createdDate());
+            assertThat(departmentDto.lastUpdatedBy()).isEqualTo(expectedDepartmentDto.lastUpdatedBy());
+            assertThat(departmentDto.lastUpdatedDate()).isEqualTo(expectedDepartmentDto.lastUpdatedDate());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetDepartmentByIdThenReturnDepartmentDto() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                    BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            DepartmentDto departmentDto = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(departmentDto.id()).isEqualTo(expectedDepartmentDto.id());
+            assertThat(departmentDto.name()).isEqualTo(expectedDepartmentDto.name());
+            assertThat(departmentDto.createdBy()).isEqualTo(expectedDepartmentDto.createdBy());
+            assertThat(departmentDto.createdDate()).isEqualTo(expectedDepartmentDto.createdDate());
+            assertThat(departmentDto.lastUpdatedBy()).isEqualTo(expectedDepartmentDto.lastUpdatedBy());
+            assertThat(departmentDto.lastUpdatedDate()).isEqualTo(expectedDepartmentDto.lastUpdatedDate());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetDepartmentWhichNotEnabledThenReturnNotFoundException() {
+
+            String responseMessage = "Данного отдела не существует !!!";
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, notEnabledDepartment.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(notFoundException.getMessage()).isEqualTo(responseMessage);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetDepartmentWhichNotExistThenReturnNotFoundException() {
+
+            String responseMessage = "Данного отдела не существует !!!";
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, "some_not_exist_department_id"))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(notFoundException.getMessage()).isEqualTo(responseMessage);
         }
     }
 }
