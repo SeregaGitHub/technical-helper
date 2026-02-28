@@ -34,7 +34,7 @@ services:
       - main-server
       - breakage-server
     environment:
-      HOST_SERVER_IP: 192.168.0.101
+      HOST_SERVER_IP: 10.130.0.12
       TZ: Europe/Moscow
     networks:
       - network
