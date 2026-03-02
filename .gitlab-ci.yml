@@ -11,22 +11,24 @@ variables:
 cache:
   paths:
     - .m2/repository/
-    - main-server/target/
-    - breakage-server/target/
-    - gateway/target/
-    - common-module/target/
 
 build-job:
   stage: build
   image: maven:3.9-amazoncorretto-21-alpine
+  artifacts:
+    name: "TH_build-job_$CI_COMMIT_TITLE"
+    paths:
+      - main-server/target/
+      - breakage-server/target/
+      - gateway/target/
+      - common-module/target/
+    expire_in: 10 minutes
   before_script:
     - echo "==================== start build-job ===================="
   after_script:
     - echo "==================== finish build-job ===================="
   script:
     - mvn clean compile
-#  only:
-#    - main
 
 test-job:
   stage: test
@@ -42,8 +44,8 @@ test-job:
     - echo "==================== finish test-job ===================="
   script:
     - mvn test
-  only:
-    - main
+  dependencies:
+    - build-job
 
 package-job:
   stage: package
@@ -53,12 +55,27 @@ package-job:
   image: maven:3.9-amazoncorretto-21-alpine
   services:
     - docker:27-dind
+  artifacts:
+    name: "TH_package-job_$CI_COMMIT_TITLE"
+    paths:
+      - main-server/target/*.jar
+      - main-server/target/*.jar.original
+      - breakage-server/target/*.jar
+      - breakage-server/target/*.jar.original
+      - gateway/target/*.jar
+      - gateway/target/*.jar.original
+      - common-module/target/*.jar
+    expire_in: 10 minutes
   before_script:
     - echo "==================== start package-job ===================="
   after_script:
     - echo "==================== finish package-job ===================="
   script:
     - mvn package
+  dependencies:
+    - build-job
+#  only:
+#    - main
 
 deploy-job:
   stage: deploy
@@ -66,26 +83,16 @@ deploy-job:
     DOCKER_HOST: unix:///var/run/docker.sock
     DOCKER_CLIENT_TIMEOUT: 120
     COMPOSE_HTTP_TIMEOUT: 120
-#    DOCKER_HOST: tcp://docker:2375   # без TLS
-#    DOCKER_TLS_CERTDIR: "/certs"          # включает TLS и указывает корень для сертификатов
-#    DOCKER_HOST: tcp://docker:2376         # TLS-порт демона
-#    DOCKER_TLS_VERIFY: 1                    # включить проверку TLS
-#    DOCKER_CERT_PATH: "/certs/client"       # где клиент ищет сертификаты
   image: docker:27-cli
-#  services:
-#    - name: docker:27-dind
-#      alias: docker                         # гарантирует, что имя хоста — docker
-#      command: ["dockerd", "-H", "tcp://0.0.0.0:2375"]
   before_script:
     - echo "==================== start deploy-job ===================="
-    - cat /proc/self/status | grep CapEff
-    - echo "==================== start check the connection with the docker demon ===================="
-    - ls -la /certs/client || true
-    - docker info || true
-    - docker version || true
-    - echo "==================== finish check the connection with the docker demon ===================="
   after_script:
     - echo "==================== finish deploy-job ===================="
   script:
     - docker compose build
     - docker compose up -d
+  dependencies:
+    - build-job
+    - package-job
+#  only:
+#    - main
