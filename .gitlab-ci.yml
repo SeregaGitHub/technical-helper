@@ -43,7 +43,7 @@ test-job:
   after_script:
     - echo "==================== finish test-job ===================="
   script:
-    - mvn test
+    - mvn test -Dmaven.main.skip=true
   dependencies:
     - build-job
 
