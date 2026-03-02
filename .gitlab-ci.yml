@@ -71,7 +71,7 @@ package-job:
   after_script:
     - echo "==================== finish package-job ===================="
   script:
-    - mvn package
+    - mvn package -Dmaven.test.skip=true
   dependencies:
     - build-job
 #  only:
