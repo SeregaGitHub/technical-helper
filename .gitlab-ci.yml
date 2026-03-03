@@ -82,7 +82,6 @@ deploy-job:
     - docker compose build
     - docker compose up -d
   dependencies:
-    - build-job
     - package-job
 #  only:
 #    - main
