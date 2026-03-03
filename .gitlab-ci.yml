@@ -4,6 +4,12 @@ stages:
   - package
   - deploy
 
+default:
+  before_script:
+    - echo "==================== start $CI_JOB_NAME ===================="
+  after_script:
+    - echo "==================== finish $CI_JOB_NAME ===================="
+
 # This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
@@ -16,17 +22,13 @@ build-job:
   stage: build
   image: maven:3.9-amazoncorretto-21-alpine
   artifacts:
-    name: "TH_build-job_$CI_COMMIT_TITLE"
+    name: "TH_compile-files_$CI_COMMIT_TITLE"
     paths:
       - main-server/target/
       - breakage-server/target/
       - gateway/target/
       - common-module/target/
-    expire_in: 10 minutes
-  before_script:
-    - echo "==================== start build-job ===================="
-  after_script:
-    - echo "==================== finish build-job ===================="
+    expire_in: 20 minutes
   script:
     - mvn clean compile
 
@@ -38,10 +40,6 @@ test-job:
   image: maven:3.9-amazoncorretto-21-alpine
   services:
     - docker:27-dind
-  before_script:
-    - echo "==================== start test-job ===================="
-  after_script:
-    - echo "==================== finish test-job ===================="
   script:
     - mvn test -Dmaven.main.skip=true
   dependencies:
@@ -56,7 +54,7 @@ package-job:
   services:
     - docker:27-dind
   artifacts:
-    name: "TH_package-job_$CI_COMMIT_TITLE"
+    name: "TH_jar-files_$CI_COMMIT_TITLE"
     paths:
       - main-server/target/*.jar
       - main-server/target/*.jar.original
@@ -65,11 +63,7 @@ package-job:
       - gateway/target/*.jar
       - gateway/target/*.jar.original
       - common-module/target/*.jar
-    expire_in: 10 minutes
-  before_script:
-    - echo "==================== start package-job ===================="
-  after_script:
-    - echo "==================== finish package-job ===================="
+    expire_in: 20 minutes
   script:
     - mvn package -Dmaven.test.skip=true
   dependencies:
@@ -84,15 +78,10 @@ deploy-job:
     DOCKER_CLIENT_TIMEOUT: 120
     COMPOSE_HTTP_TIMEOUT: 120
   image: docker:27-cli
-  before_script:
-    - echo "==================== start deploy-job ===================="
-  after_script:
-    - echo "==================== finish deploy-job ===================="
   script:
     - docker compose build
     - docker compose up -d
   dependencies:
-    - build-job
     - package-job
 #  only:
 #    - main
