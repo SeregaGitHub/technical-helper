@@ -6,10 +6,9 @@ stages:
 
 default:
   before_script:
-    - env | grep CI_JOB_NAME   # посмотреть, есть ли переменная и её значение
-    - echo "start $CI_JOB_NAME"
+    - echo "==================== start $CI_JOB_NAME ===================="
   after_script:
-    - echo "finish $CI_JOB_NAME"
+    - echo "==================== finish $CI_JOB_NAME ===================="
 
 # This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
 variables:
@@ -83,6 +82,7 @@ deploy-job:
     - docker compose build
     - docker compose up -d
   dependencies:
+    - build-job
     - package-job
 #  only:
 #    - main
