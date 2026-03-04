@@ -4,13 +4,53 @@ stages:
   - package
   - deploy
 
-default:
+#.setup:                                                # скрипты установки различных приложений
+#  helm:
+#    - echo "Установка helm..."
+#  kubectl:
+#    - echo "Установка kubectl..."
+#  vault:
+#    - echo "Установка vault..."
+#  yq:
+#    - echo "Установка yq..."
+
+#pre-job:
+#  stage: .pre                    # .pre выполняется перед всеми стадиями - автоматически добавляется в каждый пайплайн.
+#  before_script:
+#    - !reference [ .setup, helm ]       # Ссылаемся на команду установки helm через !reference
+#    - !reference [ .setup, kubectl ]    # Ссылаемся на команду установки kubectl через !reference
+#  script:
+#    - echo "some_script"
+
+#.rules:
+#  default: &default                                    # Определяем якорь для default правил
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_COMMIT_BRANCH != "main"
+#  main: &main                                          # Определяем якорь для main правил
+#    - if: $CI_COMMIT_BRANCH == "main"
+#  main_manual: &main_manual                            # Определяем якорь для main_manual правил
+#    - if: $CI_COMMIT_BRANCH == "main"
+#      when: manual
+
+workflow:                       #  interruptible (прерываемая джоба) работает в связке с workflow:auto_cancel
+  auto_cancel:
+    on_new_commit: conservative
+    on_job_failure: all
+
+# conservative  - отменить пайплайн, если ещё не запущена ни одна джоба с параметром interruptible: false
+# interruptible - отменяйте только джобы с interruptible: true
+# none          - не выполнять автоматическую отмену каких-либо джоб
+
+# none          - пайплайн не будет автоматически отменен при сбое (failure) одного из его джобов
+# all           - отменить весь пайплайн, если любой из его джобов завершится неудачей
+
+default:                        # общие для всех джобов
   before_script:
     - echo "==================== start $CI_JOB_NAME ===================="
   after_script:
     - echo "==================== finish $CI_JOB_NAME ===================="
 
-.maven_docker_2375:
+.maven_docker_2375:             # можно переиспользовать этот блок кода через (extends: .maven_docker_2375) в джобах
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -18,18 +58,30 @@ default:
   services:
     - docker:27-dind
 
+.docker_variables: &docker_variables             #  задаём якорь, его можно вызвать через алиас - *docker_variables
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
 # This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
-cache:
+
+#  По умолчанию кэш общий для всех пайплайнов в проекте, что может привести к конфликтам,
+# если разные ветки используют разные версии зависимостей.
+# key: - необязательный параметр, его можно не указывать
+cache:                                           #  для переиспользования скаченных зависимостей
+  key: ${CI_COMMIT_REF_SLUG}                     #  key: ${CI_COMMIT_REF_SLUG} создает отдельный кэш для каждой ветки
   paths:
     - .m2/repository/
 
 build-job:
   stage: build
+#  rules: *main_manual                           # Ссылаемся на main_manual правило через алиас
+#  rules: !reference [.rules, main]              # Ссылаемся на main правило через !reference
   image: maven:3.9-amazoncorretto-21-alpine
-  artifacts:
+  interruptible: true                            # джоба будет остановлена, если будет запущен более новый пайплайн.
+  artifacts:                                     #  для переиспользования скомпилированных файлов
     name: "TH_compile-files_$CI_COMMIT_TITLE"
     paths:
       - main-server/target/
@@ -42,27 +94,25 @@ build-job:
 
 test-job:
   stage: test
-  extends: .maven_docker_2375
-#  variables:
-#    DOCKER_HOST: tcp://docker:2375
-#    DOCKER_TLS_CERTDIR: ""
-#  image: maven:3.9-amazoncorretto-21-alpine
-#  services:
-#    - docker:27-dind
+  extends: .maven_docker_2375                   #  переиспользовние блока кода - .maven_docker_2375
+#  extends:                                     #  extends - поддерживает множественное наследование
+#    - .test_base
+#    - .artifact_config
+  interruptible: true
   script:
-    - mvn test -Dmaven.main.skip=true
+    - mvn test -Dmaven.main.skip=true           #  команда mvn test - пропустит этап компиляции
   dependencies:
-    - build-job
+    - build-job                                 #  переиспользование артифактов из джобы - build-job
 
 package-job:
   stage: package
-  extends: .maven_docker_2375
-#  variables:
-#    DOCKER_HOST: tcp://docker:2375
-#    DOCKER_TLS_CERTDIR: ""
-#  image: maven:3.9-amazoncorretto-21-alpine
-#  services:
-#    - docker:27-dind
+  variables:
+    <<: *docker_variables                       # ссылаемся через алиас на якорь - &docker_variables
+#    DOCKER_TLS_CERTDIR: "some_path"            # можно переопределять данные из якоря
+  image: maven:3.9-amazoncorretto-21-alpine
+  interruptible: true
+  services:
+    - docker:27-dind
   artifacts:
     name: "TH_jar-files_$CI_COMMIT_TITLE"
     paths:
@@ -75,11 +125,11 @@ package-job:
       - common-module/target/*.jar
     expire_in: 20 minutes
   script:
-    - mvn package -Dmaven.test.skip=true
+    - mvn package -Dmaven.test.skip=true         #  команда mvn package - пропустит тесты
   dependencies:
-    - build-job
+    - build-job                                  #  переиспользование артифактов из джобы - build-job
 #  only:
-#    - main
+#    - main                                      #  джоба запустится только при коммите в main
 
 deploy-job:
   stage: deploy
