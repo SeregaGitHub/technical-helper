@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm install
 RUN npx ngcc --properties es2023 browser module main --first-only --create-ivy-entry-points
 COPY . .
-RUN npm run build -- --define GATEWAY_URL=\"http://158.160.226.207:12344\"
+RUN npm run build -- --define GATEWAY_URL=\"http://158.160.205.190:12344\"
 
 FROM nginx:stable-alpine
 COPY --from=build /app/dist/frontend/browser/ /usr/share/nginx/html
