@@ -1,45 +1,94 @@
 stages:
   - build
   - test
-#  - deploy
+  - package
+  - deploy
 
-# This is for cache - .m2/repository/ (maven will save files in project directory, not in home folder)
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+    on_job_failure: all
 
-cache:
-  paths:
-    - .m2/repository/
-    - main-server/target/
-    - breakage-server/target/
-    - gateway/target/
-    - common-module/target/
-
-build-job:
-  stage: build
-  image: maven:3.9-amazoncorretto-21-alpine
+default:
   before_script:
-    - echo "==================== start build-job ===================="
+    - echo "==================== start $CI_JOB_NAME ===================="
   after_script:
-    - echo "==================== finish build-job ===================="
-  script:
-    - mvn clean compile
-#  only:
-#    - main
+    - echo "==================== finish $CI_JOB_NAME ===================="
 
-test-job:
-  stage: test
+.maven_docker_2375:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   image: maven:3.9-amazoncorretto-21-alpine
   services:
     - docker:27-dind
-  before_script:
-    - echo "==================== start test-job ===================="
-  after_script:
-    - echo "==================== finish test-job ===================="
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .m2/repository/
+
+####################  Jobs:
+build-job:
+  stage: build
+  image: maven:3.9-amazoncorretto-21-alpine
+  interruptible: true
+  artifacts:
+    name: "TH_compile-files_$CI_COMMIT_TITLE"
+    paths:
+      - main-server/target/
+      - breakage-server/target/
+      - gateway/target/
+      - common-module/target/
+    expire_in: 20 minutes
   script:
-    - mvn test
-#  only:
-#    - main
+    - mvn clean compile
+
+test-job:
+  stage: test
+  extends: .maven_docker_2375
+  interruptible: true
+  script:
+    - mvn test -Dmaven.main.skip=true
+  dependencies:
+    - build-job
+
+package-job:
+  stage: package
+  extends: .maven_docker_2375
+  interruptible: true
+  artifacts:
+    name: "TH_jar-files_$CI_COMMIT_TITLE"
+    paths:
+      - main-server/target/*.jar
+      - main-server/target/*.jar.original
+      - breakage-server/target/*.jar
+      - breakage-server/target/*.jar.original
+      - gateway/target/*.jar
+      - gateway/target/*.jar.original
+      - common-module/target/*.jar
+    expire_in: 20 minutes
+  script:
+    - mvn package -Dmaven.test.skip=true
+  dependencies:
+    - build-job
+  only:
+    - main
+
+deploy-job:
+  stage: deploy
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_CLIENT_TIMEOUT: 120
+    COMPOSE_HTTP_TIMEOUT: 120
+  image: docker:27-cli
+  script:
+    - docker compose build
+    - docker compose up -d
+  dependencies:
+    - package-job
+  only:
+    - main
