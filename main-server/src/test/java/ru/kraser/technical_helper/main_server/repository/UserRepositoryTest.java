@@ -500,14 +500,45 @@ class UserRepositoryTest {
         }
     }
 
-//
-//    @Test
-//    void getUserById() {
-//    }
-//
-//    @Test
-//    void findUserByUsername() {
-//    }
+    @Nested
+    class WhenFindUserByUsername {
+
+        @Test
+        void whenFindUserByUsernameThenReturnUser() {
+
+            Optional<User> optional =
+                    userRepository.findUserByUsername(defaultAdminUser.getUsername());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenFindUserByUsernameWhichNotEnabledThenReturnUser() {
+
+            User notEnabledUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(false)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            Optional<User> optional =
+                    userRepository.findUserByUsername(notEnabledUser.getUsername());
+
+            userRepository.deleteById(notEnabledUser.getId());
+
+            assertThat(optional).isNotEmpty();
+        }
+    }
+
+
 //
 //    @Test
 //    void getUserByUsernameAndEnabledTrue() {
