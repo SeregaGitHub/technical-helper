@@ -12,11 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -344,10 +347,44 @@ class UserRepositoryTest {
         }
     }
 
-//    @Test
-//    void getAllUsers() {
-//    }
-//
+    @Nested
+    class WhenGetAllUsers {
+
+        @Test
+        void whenGetAllUsersThenReturnListOfUsers() {
+
+            List<UserDto> userDtoList = userRepository.getAllUsers();
+
+            assertThat(userDtoList.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllUsersAndSomeUserEnabledIsFalseThenReturnListOfUsers() {
+
+            User notEnabledUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(false)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            List<UserDto> enabledUsers = userRepository.getAllUsers();
+            List<User> allUsers = userRepository.findAll();
+
+            userRepository.deleteById(notEnabledUser.getId());
+
+            assertThat(enabledUsers.size()).isEqualTo(1);
+            assertThat(allUsers.size()).isEqualTo(2);
+        }
+    }
+
 //    @Test
 //    void getAdminAndTechnicianList() {
 //    }
