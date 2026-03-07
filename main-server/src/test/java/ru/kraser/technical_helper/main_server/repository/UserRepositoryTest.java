@@ -284,10 +284,66 @@ class UserRepositoryTest {
         }
     }
 
-//    @Test
-//    void changeUserPassword() {
-//    }
-//
+    @Nested
+    class WhenUserChangingPassword {
+
+        private User savedUser;
+
+        @BeforeEach
+        void setUp() {
+
+            savedUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(true)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+        }
+
+        @AfterEach
+        @SneakyThrows
+        void tearDown() {
+            userRepository.deleteById(savedUser.getId());
+        }
+
+        @Test
+        @Transactional()
+        @Modifying(clearAutomatically = true)
+        void whenChangeUserPasswordThenReturnOne() {
+
+            int response = userRepository.changeUserPassword(
+                    savedUser.getId(),
+                    "new_user_password",
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            assertThat(response).isEqualTo(1);
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenChangeUserPasswordWhichNotExistThenReturnZero() {
+
+            int response = userRepository.changeUserPassword(
+                    SOME_NOT_EXIST_ID,
+                    "new_user_password",
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            assertThat(response).isEqualTo(0);
+        }
+    }
+
 //    @Test
 //    void getAllUsers() {
 //    }
@@ -314,13 +370,5 @@ class UserRepositoryTest {
 //
 //    @Test
 //    void deleteUser() {
-//    }
-//
-//    @Test
-//    void dropConstraints() {
-//    }
-//
-//    @Test
-//    void setCurrentId() {
 //    }
 }
