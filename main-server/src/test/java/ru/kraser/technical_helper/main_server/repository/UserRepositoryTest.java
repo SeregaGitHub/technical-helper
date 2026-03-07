@@ -577,12 +577,38 @@ class UserRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenFindTop1ByRoleAndEnabledTrue {
 
-//
-//    @Test
-//    void findTop1ByRoleAndEnabledTrue() {
-//    }
-//
+        @Test
+        void whenFindTop1ByRoleAndEnabledTrueThenReturnUser() {
+
+            Optional<User> optional =
+                    userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenFindTop1ByRoleAndEnabledTrueIfNoOneAdminThenReturnEmptyOptional() {
+
+            User notEnabledAdmin = userRepository.findById(defaultAdminUser.getId()).get();
+            notEnabledAdmin.setEnabled(false);
+            userRepository.saveAndFlush(notEnabledAdmin);
+
+            Optional<User> optional =
+                    userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+
+            User enabledAdmin = userRepository.findById(defaultAdminUser.getId()).get();
+            enabledAdmin.setEnabled(true);
+            userRepository.saveAndFlush(enabledAdmin);
+
+            assertThat(optional).isEmpty();
+        }
+    }
+
+
+
 //    @Test
 //    void deleteUser() {
 //    }
