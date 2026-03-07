@@ -21,6 +21,7 @@ import ru.kraser.technical_helper.common_module.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -449,6 +450,53 @@ class UserRepositoryTest {
             List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
 
             assertThat(userDtoList.size()).isEqualTo(1);
+        }
+    }
+
+    @Nested
+    class WhenGetUser {
+
+        @Test
+        void whenGetUserThenReturnUserDto() {
+
+            Optional<UserDto> optional =
+                    userRepository.getUserById(defaultAdminUser.getId());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenGetUserWhichNotExistThenReturnEmptyOptional() {
+
+            Optional<UserDto> optional =
+                    userRepository.getUserById(SOME_NOT_EXIST_ID);
+
+            assertThat(optional).isEmpty();
+        }
+
+        @Test
+        void whenGetUserWhichNotEnabledThenReturnEmptyOptional() {
+
+            User notEnabledUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(false)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            Optional<UserDto> optional =
+                    userRepository.getUserById(notEnabledUser.getId());
+
+            userRepository.deleteById(notEnabledUser.getId());
+
+            assertThat(optional).isEmpty();
         }
     }
 
