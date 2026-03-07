@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
@@ -385,9 +386,72 @@ class UserRepositoryTest {
         }
     }
 
-//    @Test
-//    void getAdminAndTechnicianList() {
-//    }
+    @Nested
+    class WhenGetAllAdminAndTechnician {
+
+        private User technicianUser;
+        private User employeeUser;
+
+        @BeforeEach
+        void setUp() {
+
+            technicianUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username("technician_user")
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(true)
+                            .role(Role.TECHNICIAN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            employeeUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username("employee_user")
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(true)
+                            .role(Role.EMPLOYEE)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+        }
+
+        @AfterEach
+        @SneakyThrows
+        void tearDown() {
+            userRepository.deleteById(technicianUser.getId());
+            userRepository.deleteById(employeeUser.getId());
+        }
+
+        @Test
+        void whenGetAllAdminAndTechnicianThenReturnList() {
+
+            List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
+
+            assertThat(userDtoList.size()).isEqualTo(2);
+        }
+
+        @Test
+        void whenGetAllAdminAndTechnicianThenReturnOnlyEnabledList() {
+
+            User notEnabledUser = userRepository.findById(technicianUser.getId()).get();
+            notEnabledUser.setEnabled(false);
+            userRepository.saveAndFlush(notEnabledUser);
+
+            List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
+
+            assertThat(userDtoList.size()).isEqualTo(1);
+        }
+    }
+
 //
 //    @Test
 //    void getUserById() {
