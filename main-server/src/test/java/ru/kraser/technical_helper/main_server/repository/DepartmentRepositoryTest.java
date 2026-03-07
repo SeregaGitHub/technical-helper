@@ -167,7 +167,7 @@ class DepartmentRepositoryTest {
         @Test
         void whenDepartmentFindByNameThenReturnEmptyOptionalIfNameNotExist() {
 
-            Optional<Department> department = departmentRepository.findByName("some_non-existent_name");
+            Optional<Department> department = departmentRepository.findByName(DEPARTMENT_TEST_NAME);
 
             assertThat(department).isEmpty();
         }
@@ -219,7 +219,7 @@ class DepartmentRepositoryTest {
         void whenUpdateDepartmentWhichNotExistThenReturnZero() {
 
             int response = departmentRepository.updateDepartment(
-                    "some_non-existent_id",
+                    SOME_NOT_EXIST_ID,
                     "updated_department_name",
                     defaultAdminUser.getId(),
                     now);
@@ -262,7 +262,7 @@ class DepartmentRepositoryTest {
 
             Department notEnabledDepartment = departmentRepository.saveAndFlush(
                     Department.builder()
-                            .name("some_not_enabled_department")
+                            .name(DEPARTMENT_TEST_NAME)
                             .enabled(false)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)
@@ -297,7 +297,7 @@ class DepartmentRepositoryTest {
         void whenGetDepartmentWhichNotExistThenReturnEmptyOptional() {
 
             Optional<DepartmentDto> optional =
-                    departmentRepository.getDepartmentById("some_non-existent_id");
+                    departmentRepository.getDepartmentById(SOME_NOT_EXIST_ID);
 
             assertThat(optional).isEmpty();
         }
@@ -307,7 +307,7 @@ class DepartmentRepositoryTest {
 
             Department savedDepartment = departmentRepository.saveAndFlush(
                     Department.builder()
-                            .name("some_not_enabled_department")
+                            .name(DEPARTMENT_TEST_NAME)
                             .enabled(false)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)
@@ -359,7 +359,7 @@ class DepartmentRepositoryTest {
         void whenDeleteDepartmentThenReturnZero() {
 
             int response = departmentRepository.deleteDepartment(
-                    "some_non-existent_id", defaultAdminUser.getId(), now
+                    SOME_NOT_EXIST_ID, defaultAdminUser.getId(), now
             );
 
             assertThat(response).isEqualTo(0);

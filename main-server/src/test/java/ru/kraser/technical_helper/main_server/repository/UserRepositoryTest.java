@@ -141,7 +141,7 @@ class UserRepositoryTest {
         void whenCreateUserWithNotExistDepartmentThenThrowException() {
 
             Department notExistDepartment = Department.builder()
-                    .id("some_not_exist_department_id")
+                    .id(SOME_NOT_EXIST_ID)
                     .name(DEPARTMENT_TEST_NAME)
                     .enabled(true)
                     .createdBy(defaultAdminUser.getId())
@@ -234,7 +234,7 @@ class UserRepositoryTest {
         void whenUpdateUserWhichNotExistThenReturnZero() {
 
             int response = userRepository.updateUser(
-                    "some_not_exist_id",
+                    SOME_NOT_EXIST_ID,
                     "new_username",
                     savedDepartment.getId(),
                     Role.EMPLOYEE,
@@ -275,7 +275,7 @@ class UserRepositoryTest {
                     () -> userRepository.updateUser(
                             savedUser.getId(),
                             "new_username",
-                            "some_not_exist_id",
+                            SOME_NOT_EXIST_ID,
                             Role.EMPLOYEE,
                             defaultAdminUser.getId(),
                             now
