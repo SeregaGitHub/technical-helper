@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -538,11 +539,45 @@ class UserRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenGetUserByUsernameAndEnabledTrue {
 
-//
-//    @Test
-//    void getUserByUsernameAndEnabledTrue() {
-//    }
+        @Test
+        void whenGetUserByUsernameAndEnabledTrueThenReturnUser() {
+
+            Optional<UserFullDto> optional =
+                    userRepository.getUserByUsernameAndEnabledTrue(defaultAdminUser.getUsername());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenGetUserByUsernameAndEnabledTrueWhichNotEnabledThenReturnEmptyOption() {
+
+            User notEnabledUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(false)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            Optional<UserFullDto> optional =
+                    userRepository.getUserByUsernameAndEnabledTrue(notEnabledUser.getUsername());
+
+            userRepository.deleteById(notEnabledUser.getId());
+
+            assertThat(optional).isEmpty();
+        }
+    }
+
+
 //
 //    @Test
 //    void findTop1ByRoleAndEnabledTrue() {
