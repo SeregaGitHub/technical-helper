@@ -5,8 +5,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -85,8 +87,8 @@ class UserRepositoryTest {
         void whenCreateUserThenReturnUser() {
 
             User toSaveUser = User.builder()
-                    .username("some_username")
-                    .password("some_password")
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.ADMIN)
                     .department(defaultAdminDepartment)
@@ -119,7 +121,7 @@ class UserRepositoryTest {
 
             User toSaveUserWithNotUniqueName = User.builder()
                     .username(existUserName)
-                    .password("some_password")
+                    .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.ADMIN)
                     .department(defaultAdminDepartment)
@@ -149,8 +151,8 @@ class UserRepositoryTest {
                     .build();
 
             User toSaveUserWithNotExistDepartment = User.builder()
-                    .username("some_username")
-                    .password("some_password")
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.ADMIN)
                     .department(notExistDepartment)
@@ -167,10 +169,121 @@ class UserRepositoryTest {
         }
     }
 
-//    @Test
-//    void updateUser() {
-//    }
-//
+    @Nested
+    class WhenUserUpdating {
+
+        private Department savedDepartment;
+        private User savedUser;
+
+        @BeforeEach
+        void setUp() {
+
+            savedDepartment = departmentRepository.saveAndFlush(
+                    Department.builder()
+                            .name(DEPARTMENT_TEST_NAME)
+                            .enabled(true)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            savedUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(true)
+                            .role(Role.ADMIN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+        }
+
+        @AfterEach
+        @SneakyThrows
+        void tearDown() {
+            userRepository.deleteById(savedUser.getId());
+            departmentRepository.deleteById(savedDepartment.getId());
+        }
+
+        @Test
+        @Transactional()
+        @Modifying(clearAutomatically = true)
+        void whenUpdateUserThenReturnOne() {
+
+            int response = userRepository.updateUser(
+                    savedUser.getId(),
+                    "new_username",
+                    savedDepartment.getId(),
+                    Role.EMPLOYEE,
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            assertThat(response).isEqualTo(1);
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenUpdateUserWhichNotExistThenReturnZero() {
+
+            int response = userRepository.updateUser(
+                    "some_not_exist_id",
+                    "new_username",
+                    savedDepartment.getId(),
+                    Role.EMPLOYEE,
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            assertThat(response).isEqualTo(0);
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenUpdateUserWithNotUniqueNameThenThrowException() {
+
+            String existUsername = defaultAdminUser.getUsername();
+
+            assertThrows(
+                    DataIntegrityViolationException.class,
+                    () -> userRepository.updateUser(
+                            savedUser.getId(),
+                            existUsername,
+                            savedDepartment.getId(),
+                            Role.EMPLOYEE,
+                            defaultAdminUser.getId(),
+                            now
+                    )
+            );
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenUpdateUserWithNotExistDepartmentThenThrowException() {
+
+            assertThrows(
+                    DataIntegrityViolationException.class,
+                    () -> userRepository.updateUser(
+                            savedUser.getId(),
+                            "new_username",
+                            "some_not_exist_id",
+                            Role.EMPLOYEE,
+                            defaultAdminUser.getId(),
+                            now
+                    )
+            );
+        }
+    }
+
 //    @Test
 //    void changeUserPassword() {
 //    }
