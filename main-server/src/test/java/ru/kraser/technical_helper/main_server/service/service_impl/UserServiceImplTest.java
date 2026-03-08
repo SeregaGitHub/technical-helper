@@ -12,9 +12,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -28,6 +26,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -348,13 +347,6 @@ class UserServiceImplTest {
         @Test
         void whenChangeUserPasswordIfThisUserNotExistThenThrowNotFoundException() {
 
-            ApiResponse apiResponse = ApiResponse.builder()
-                    .message(USER_NOT_EXIST)
-                    .status(200)
-                    .httpStatus(HttpStatus.OK)
-                    .timestamp(now)
-                    .build();
-
             when(userRepository.changeUserPassword(
                     user.getId(),
                     userPasswordDto.newPassword(),
@@ -378,14 +370,62 @@ class UserServiceImplTest {
         }
     }
 
-//
-//    @Test
-//    void getAllUsers() {
-//    }
-//
-//    @Test
-//    void getAdminAndTechnicianList() {
-//    }
+    @Nested
+    class WhenGetAllUsersMethods {
+
+        @Test
+        void whenGetAllUsersThenReturnListOfUsers() {
+
+            UserDto userDto = UserDto.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .departmentId(department.getId())
+                    .department(department.getName())
+                    .role(user.getRole())
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userRepository.getAllUsers()).thenReturn(List.of(userDto));
+
+            List<UserDto> returnedList = userRepository.getAllUsers();
+
+            assertEquals(1, returnedList.size());
+            assertEquals(userDto.id(), returnedList.getFirst().id());
+            assertEquals(userDto.username(), returnedList.getFirst().username());
+            assertEquals(userDto.departmentId(), returnedList.getFirst().departmentId());
+            assertEquals(userDto.department(), returnedList.getFirst().department());
+            assertEquals(userDto.role(), returnedList.getFirst().role());
+            assertEquals(userDto.createdBy(), returnedList.getFirst().createdBy());
+            assertEquals(userDto.createdDate(), returnedList.getFirst().createdDate());
+            assertEquals(userDto.lastUpdatedBy(), returnedList.getFirst().lastUpdatedBy());
+            assertEquals(userDto.lastUpdatedDate(), returnedList.getFirst().lastUpdatedDate());
+
+            verify(userRepository, times(1)).getAllUsers();
+        }
+
+        @Test
+        void whenAdminAndTechnicianListThenReturnListOfAdminAndTechnicians() {
+
+            UserShortDto userShortAdminDto = new UserShortDto(DEFAULT_ADMIN_USER_ID, "test_admin");
+            UserShortDto userShortTechnicianDto = new UserShortDto(USER_TEST_ID, USER_TEST_NAME);
+
+            when(userRepository.getAdminAndTechnicianList())
+                    .thenReturn(List.of(userShortAdminDto, userShortTechnicianDto));
+
+            List<UserShortDto> returnedList = userRepository.getAdminAndTechnicianList();
+
+            assertEquals(2, returnedList.size());
+            assertEquals(userShortAdminDto.id(), returnedList.getFirst().id());
+            assertEquals(userShortAdminDto.username(), returnedList.getFirst().username());
+            assertEquals(userShortTechnicianDto.id(), returnedList.getLast().id());
+            assertEquals(userShortTechnicianDto.username(), returnedList.getLast().username());
+        }
+    }
+
+
 //
 //    @Test
 //    void getUser() {
