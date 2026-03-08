@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -75,24 +76,25 @@ class UserServiceImplTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id(DEPARTMENT_ID)
+                .id(DEPARTMENT_TEST_ID)
                 .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
-                .createdBy(USER_ID)
+                .createdBy(DEFAULT_ADMIN_USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(USER_ID)
+                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
                 .lastUpdatedDate(now)
                 .build();
 
         user = User.builder()
+                .id(USER_TEST_ID)
                 .username(USER_TEST_NAME)
                 .password(USER_TEST_PASSWORD)
                 .enabled(true)
                 .role(Role.ADMIN)
                 .department(department)
-                .createdBy(USER_ID)
+                .createdBy(DEFAULT_ADMIN_USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(USER_ID)
+                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
                 .lastUpdatedDate(now)
                 .build();
     }
@@ -124,15 +126,15 @@ class UserServiceImplTest {
 
             when(departmentRepository.getReferenceById(user.getDepartment().getId()))
                     .thenReturn(department);
-            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now)))
+            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now)))
                     .thenReturn(user);
 
-            ApiResponse returnedApiResponse = userService.createUser(createUserDto, USER_ID);
+            ApiResponse returnedApiResponse = userService.createUser(createUserDto, DEFAULT_ADMIN_USER_ID);
 
             assertEquals(apiResponse, returnedApiResponse);
 
             verify(userRepository, times(1))
-                    .saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now));
+                    .saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now));
         }
 
         @Test
@@ -143,7 +145,7 @@ class UserServiceImplTest {
 
             when(departmentRepository.getReferenceById(user.getDepartment().getId()))
                     .thenReturn(department);
-            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now)))
+            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now)))
                     .thenThrow(new DataIntegrityViolationException(
                                     "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности " +
                                             "\"uk_users_username\""
@@ -152,13 +154,13 @@ class UserServiceImplTest {
 
             AlreadyExistsException exception = assertThrows(
                     AlreadyExistsException.class,
-                    () -> userService.createUser(createUserDto, USER_ID)
+                    () -> userService.createUser(createUserDto, DEFAULT_ADMIN_USER_ID)
             );
 
             assertEquals(responseMessage, exception.getMessage());
 
             verify(userRepository, times(1))
-                    .saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now));
+                    .saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now));
         }
 
         @Test
@@ -168,7 +170,7 @@ class UserServiceImplTest {
 
             when(departmentRepository.getReferenceById(user.getDepartment().getId()))
                     .thenReturn(department);
-            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now)))
+            when(userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now)))
                     .thenThrow(new NotFoundException(
                                     "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности " +
                                             "\"fk_users_department\""
@@ -177,20 +179,63 @@ class UserServiceImplTest {
 
             NotFoundException exception = assertThrows(
                     NotFoundException.class,
-                    () -> userService.createUser(createUserDto, USER_ID)
+                    () -> userService.createUser(createUserDto, DEFAULT_ADMIN_USER_ID)
             );
 
             assertEquals(responseMessage, exception.getMessage());
 
             verify(userRepository, times(1))
-                    .saveAndFlush(UserMapper.toUser(createUserDto, department, USER_ID, now));
+                    .saveAndFlush(UserMapper.toUser(createUserDto, department, DEFAULT_ADMIN_USER_ID, now));
         }
     }
 
-//    @Test
-//    void updateUser() {
-//    }
-//
+    @Nested
+    class WhenUserUpdating {
+
+        UpdateUserDto updateUserDto;
+
+        @BeforeEach
+        void setUp() {
+
+            updateUserDto = new UpdateUserDto("new_username", department.getId(), Role.TECHNICIAN);
+        }
+
+        @Test
+        void whenUpdateDepartmentThenReturnOk() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userRepository.updateUser(
+                    user.getId(),
+                    updateUserDto.username(),
+                    updateUserDto.departmentId(),
+                    updateUserDto.role(),
+                    DEFAULT_ADMIN_USER_ID,
+                    now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = userService.updateUser(
+                    user.getId(), updateUserDto, DEFAULT_ADMIN_USER_ID);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(userRepository, times(1))
+                    .updateUser(user.getId(),
+                            updateUserDto.username(),
+                            updateUserDto.departmentId(),
+                            updateUserDto.role(),
+                            DEFAULT_ADMIN_USER_ID,
+                            now);
+        }
+    }
+
 //    @Test
 //    void changeUserPassword() {
 //    }

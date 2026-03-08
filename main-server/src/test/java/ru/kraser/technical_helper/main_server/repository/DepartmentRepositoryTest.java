@@ -70,8 +70,8 @@ class DepartmentRepositoryTest {
     @SneakyThrows
     void setUp() {
 
-        defaultAdminDepartment = departmentRepository.findById(DEPARTMENT_ID).get();
-        defaultAdminUser = userRepository.findById(USER_ID).get();
+        defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+        defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
 
         now = LocalDateTime.of(
                 2025,

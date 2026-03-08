@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserFullDto;
 import ru.kraser.technical_helper.common_module.dto.user.UserShortDto;
@@ -74,8 +73,8 @@ class UserRepositoryTest {
     @SneakyThrows
     void setUp() {
 
-        defaultAdminDepartment = departmentRepository.findById(DEPARTMENT_ID).get();
-        defaultAdminUser = userRepository.findById(USER_ID).get();
+        defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+        defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
 
         now = LocalDateTime.of(
                 2025,
