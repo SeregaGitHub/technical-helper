@@ -607,9 +607,51 @@ class UserRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenUserDeleting {
 
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenDeleteUserThenReturnOne() {
 
-//    @Test
-//    void deleteUser() {
-//    }
+            User toSaveUser = User.builder()
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.ADMIN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User savedUser = userRepository.saveAndFlush(toSaveUser);
+
+            int response = userRepository.deleteUser(
+                    savedUser.getId(),
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            userRepository.deleteById(savedUser.getId());
+
+            assertThat(response).isEqualTo(1);
+        }
+
+        @Test
+        @Transactional
+        @Modifying(clearAutomatically = true)
+        void whenDeleteUserThenReturnZero() {
+
+            int response = userRepository.deleteUser(
+                    SOME_NOT_EXIST_ID,
+                    defaultAdminUser.getId(),
+                    now
+            );
+
+            assertThat(response).isEqualTo(0);
+        }
+    }
 }
