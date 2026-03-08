@@ -70,7 +70,7 @@ class DepartmentControllerTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id(DEFAULT_ADMIN_DEPARTMENT_ID)
+                .id(DEPARTMENT_TEST_ID)
                 .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
                 .createdBy(DEFAULT_ADMIN_USER_ID)

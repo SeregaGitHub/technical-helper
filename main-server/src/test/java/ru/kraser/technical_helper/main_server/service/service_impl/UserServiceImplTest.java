@@ -201,7 +201,7 @@ class UserServiceImplTest {
         }
 
         @Test
-        void whenUpdateDepartmentThenReturnOk() {
+        void whenUpdateUserThenReturnOk() {
 
             String responseMessage = "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
 
@@ -225,6 +225,70 @@ class UserServiceImplTest {
                     user.getId(), updateUserDto, DEFAULT_ADMIN_USER_ID);
 
             assertEquals(apiResponse, returnedApiResponse);
+
+            verify(userRepository, times(1))
+                    .updateUser(user.getId(),
+                            updateUserDto.username(),
+                            updateUserDto.departmentId(),
+                            updateUserDto.role(),
+                            DEFAULT_ADMIN_USER_ID,
+                            now);
+        }
+
+        @Test
+        void whenUpdateUserIfNotUniqueNameThenThrowAlreadyExistsException() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            when(userRepository.updateUser(
+                    user.getId(),
+                    updateUserDto.username(),
+                    updateUserDto.departmentId(),
+                    updateUserDto.role(),
+                    DEFAULT_ADMIN_USER_ID,
+                    now)
+            ).thenThrow(new DataIntegrityViolationException(
+                            "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"uk_users_username\""
+                    )
+            );
+
+            AlreadyExistsException exception = assertThrows(
+                    AlreadyExistsException.class,
+                    () -> userService.updateUser(user.getId(), updateUserDto, DEFAULT_ADMIN_USER_ID)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(userRepository, times(1))
+                    .updateUser(user.getId(),
+                            updateUserDto.username(),
+                            updateUserDto.departmentId(),
+                            updateUserDto.role(),
+                            DEFAULT_ADMIN_USER_ID,
+                            now);
+        }
+
+        @Test
+        void whenUpdateUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            String responseMessage = "Отдел в котором находится сотрудник не существует !!!";
+
+            when(userRepository.updateUser(
+                    user.getId(),
+                    updateUserDto.username(),
+                    updateUserDto.departmentId(),
+                    updateUserDto.role(),
+                    DEFAULT_ADMIN_USER_ID,
+                    now)
+            ).thenThrow(new NotFoundException(responseMessage));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.updateUser(user.getId(), updateUserDto, DEFAULT_ADMIN_USER_ID)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
 
             verify(userRepository, times(1))
                     .updateUser(user.getId(),
