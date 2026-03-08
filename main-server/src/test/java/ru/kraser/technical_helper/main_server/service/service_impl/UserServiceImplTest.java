@@ -427,7 +427,7 @@ class UserServiceImplTest {
     }
 
     @Nested
-    class WhenGetUser {
+    class WhenGetUserById {
 
         @Test
         void whenGetUserThenReturnUserDto() {
@@ -470,10 +470,60 @@ class UserServiceImplTest {
                     .getUserById(user.getId());
         }
     }
-//
-//    @Test
-//    void getUserByName() {
-//    }
+
+    @Nested
+    class WhenGetUserByName {
+
+        @Test
+        void whenGetUserByNameThenReturnUser() {
+
+            UserFullDto userFullDto = UserFullDto.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .enabled(user.isEnabled())
+                    .role(user.getRole())
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .departmentId(department.getId())
+                    .departmentName(department.getName())
+                    .departmentEnabled(department.isEnabled())
+                    .departmentCreatedBy(DEFAULT_ADMIN_USER_ID)
+                    .departmentCreatedDate(now)
+                    .departmentLastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .departmentLastUpdatedDate(now)
+                    .build();
+
+            when(userRepository.getUserByUsernameAndEnabledTrue(user.getUsername()))
+                    .thenReturn(Optional.of(userFullDto));
+
+            User returnedUser = userService.getUserByName(user.getUsername());
+
+            assertEquals(userFullDto.id(), returnedUser.getId());
+
+            verify(userRepository, times(1))
+                    .getUserByUsernameAndEnabledTrue(userFullDto.username());
+        }
+
+        @Test
+        void whenGetUserByNameIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userRepository.getUserByUsernameAndEnabledTrue(user.getUsername()))
+                    .thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.getUserByName(user.getUsername())
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userRepository, times(1))
+                    .getUserByUsernameAndEnabledTrue(user.getUsername());
+        }
+    }
 //
 //    @Test
 //    void deleteUser() {
