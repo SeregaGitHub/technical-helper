@@ -11,13 +11,12 @@ import java.time.LocalDateTime;
 
 @UtilityClass
 public class UserMapper {
-    public User toUser(CreateUserDto createUserDto, Department department, String currentUserId) {
+    public User toUser(CreateUserDto createUserDto, Department department, String currentUserId, LocalDateTime now) {
         if (!department.isEnabled()) {
             throw new NotFoundException("fk_users_department");
         }
 
         User user = new User();
-        LocalDateTime now = LocalDateTime.now().withNano(0);
 
         user.setUsername(createUserDto.username());
         user.setPassword(createUserDto.password());
