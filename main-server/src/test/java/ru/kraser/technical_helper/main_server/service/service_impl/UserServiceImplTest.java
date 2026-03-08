@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -31,6 +32,7 @@ import java.time.ZonedDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -300,9 +302,82 @@ class UserServiceImplTest {
         }
     }
 
-//    @Test
-//    void changeUserPassword() {
-//    }
+    @Nested
+    class WhenUserChangingPassword {
+
+        private UserPasswordDto userPasswordDto;
+
+        @BeforeEach
+        void setUp() {
+
+            userPasswordDto = new UserPasswordDto("new_user_password");
+        }
+
+        @Test
+        void whenChangeUserPasswordThenReturnOk() {
+
+            String responseMessage = "Пароль - был успешно изменён.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userRepository.changeUserPassword(
+                    user.getId(),
+                    userPasswordDto.newPassword(),
+                    DEFAULT_ADMIN_USER_ID,
+                    now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = userService.changeUserPassword(
+                    user.getId(), userPasswordDto, DEFAULT_ADMIN_USER_ID);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(userRepository, times(1))
+                    .changeUserPassword(
+                            user.getId(),
+                            userPasswordDto.newPassword(),
+                            DEFAULT_ADMIN_USER_ID,
+                            now);
+        }
+
+        @Test
+        void whenChangeUserPasswordIfThisUserNotExistThenThrowNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(USER_NOT_EXIST)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userRepository.changeUserPassword(
+                    user.getId(),
+                    userPasswordDto.newPassword(),
+                    DEFAULT_ADMIN_USER_ID,
+                    now)
+            ).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.changeUserPassword(user.getId(), userPasswordDto, DEFAULT_ADMIN_USER_ID)
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userRepository, times(1))
+                    .changeUserPassword(
+                            user.getId(),
+                            userPasswordDto.newPassword(),
+                            DEFAULT_ADMIN_USER_ID,
+                            now);
+        }
+    }
+
 //
 //    @Test
 //    void getAllUsers() {
