@@ -307,13 +307,18 @@ class DepartmentServiceImplTest {
         @Test
         void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
 
-            when(departmentRepository.getDepartmentById(department.getId())).thenReturn(Optional.of(departmentDto));
+            when(departmentRepository.getDepartmentById(department.getId()))
+                    .thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
 
-            DepartmentDto returnedDepartment = departmentService.getDepartment(DEPARTMENT_ID_HEADER, department.getId());
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> departmentService.getDepartment(DEPARTMENT_ID_HEADER, department.getId())
+            );
 
-            assertEquals(departmentDto, returnedDepartment);
+            assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
 
-            verify(departmentRepository, times(1)).getDepartmentById(department.getId());
+            verify(departmentRepository, times(1))
+                    .getDepartmentById(department.getId());
         }
     }
 

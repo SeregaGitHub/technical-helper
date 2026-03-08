@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -425,11 +426,50 @@ class UserServiceImplTest {
         }
     }
 
+    @Nested
+    class WhenGetUser {
 
-//
-//    @Test
-//    void getUser() {
-//    }
+        @Test
+        void whenGetUserThenReturnUserDto() {
+
+            UserDto userDto = UserDto.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .departmentId(department.getId())
+                    .department(department.getName())
+                    .role(user.getRole())
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userRepository.getUserById(user.getId())).thenReturn(Optional.of(userDto));
+
+            UserDto returnedUser = userService.getUser(user.getId());
+
+            assertEquals(userDto, returnedUser);
+
+            verify(userRepository, times(1)).getUserById(userDto.id());
+        }
+
+        @Test
+        void whenGetUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userRepository.getUserById(user.getId()))
+                    .thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.getUser(user.getId())
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userRepository, times(1))
+                    .getUserById(user.getId());
+        }
+    }
 //
 //    @Test
 //    void getUserByName() {
