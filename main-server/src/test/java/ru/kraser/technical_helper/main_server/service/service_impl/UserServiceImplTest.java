@@ -524,8 +524,51 @@ class UserServiceImplTest {
                     .getUserByUsernameAndEnabledTrue(user.getUsername());
         }
     }
-//
-//    @Test
-//    void deleteUser() {
-//    }
+
+    @Nested
+    class WhenUserDeleting {
+
+        @Test
+        void whenDeleteDepartmentThenReturnOk() {
+
+            String responseMessage = "Пользователь - был успешно удалён.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userRepository.deleteUser(
+                    user.getId(), DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = userService.deleteUser(
+                    user.getId(), DEFAULT_ADMIN_USER_ID);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(userRepository, times(1))
+                    .deleteUser(user.getId(), DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenDeleteUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userRepository.deleteUser(
+                    user.getId(), DEFAULT_ADMIN_USER_ID, now)
+            ).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.deleteUser(user.getId(), DEFAULT_ADMIN_USER_ID)
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userRepository, times(1))
+                    .deleteUser(user.getId(), DEFAULT_ADMIN_USER_ID, now);
+        }
+    }
 }
