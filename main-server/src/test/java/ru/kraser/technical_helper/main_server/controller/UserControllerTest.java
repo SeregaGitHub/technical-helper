@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -23,6 +24,7 @@ import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -184,11 +186,11 @@ class UserControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(response);
 
             ApiResponse apiResponse =
-                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+                    userController.updateUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, updateUserDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(200, apiResponse.status());
@@ -196,7 +198,7 @@ class UserControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(userService, times(1))
-                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
         }
 
         @Test
@@ -212,11 +214,11 @@ class UserControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(response);
 
             ApiResponse apiResponse =
-                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+                    userController.updateUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, updateUserDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(422, apiResponse.status());
@@ -224,7 +226,7 @@ class UserControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(userService, times(1))
-                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
         }
 
         @Test
@@ -239,11 +241,11 @@ class UserControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(response);
 
             ApiResponse apiResponse =
-                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+                    userController.updateUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, updateUserDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(404, apiResponse.status());
@@ -251,7 +253,7 @@ class UserControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(userService, times(1))
-                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
         }
 
         @Test
@@ -266,11 +268,11 @@ class UserControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(response);
 
             ApiResponse apiResponse =
-                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+                    userController.updateUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, updateUserDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(404, apiResponse.status());
@@ -278,15 +280,77 @@ class UserControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(userService, times(1))
-                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
+        }
+    }
+
+    @Nested
+    class WhenUserChangingPassword {
+
+        private UserPasswordDto userPasswordDto;
+
+        @BeforeEach
+        void setUp() {
+
+            userPasswordDto = new UserPasswordDto("new_user_password");
+        }
+
+        @Test
+        void whenChangeUserPasswordThenReturnOk() {
+
+            String responseMessage = "Пароль - был успешно изменён.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.changeUserPassword(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, userPasswordDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenChangeUserPasswordIfThisUserNotExistThenThrowNotFoundException() {
+
+            String responseMessage = USER_NOT_EXIST;
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.changeUserPassword(USER_TEST_ID, DEFAULT_ADMIN_USER_ID, userPasswordDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
 
-//
-//    @Test
-//    void changeUserPassword() {
-//    }
 //
 //    @Test
 //    void getAllUsers() {
