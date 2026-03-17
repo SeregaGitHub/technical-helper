@@ -14,6 +14,8 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.model.Department;
+import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.time.Clock;
@@ -441,11 +443,60 @@ class UserControllerTest {
         }
     }
 
+    @Nested
+    class WhenGetUserByName {
 
-//
-//    @Test
-//    void getUserByName() {
-//    }
+        @Test
+        void whenGetUserByNameThenReturnUser() {
+
+            Department department = Department.builder()
+                    .id(DEPARTMENT_TEST_ID)
+                    .name(DEPARTMENT_TEST_NAME)
+                    .enabled(true)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User expectedUser = User.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .department(department)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userService.getUserByName(USER_TEST_NAME)).thenReturn(expectedUser);
+
+            User returnedUser = userController.getUserByName(USER_TEST_NAME);
+
+            assertEquals(expectedUser, returnedUser);
+
+            verify(userService, times(1)).getUserByName(USER_TEST_NAME);
+        }
+
+        @Test
+        void whenGetUserByNameIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userService.getUserByName(USER_TEST_NAME)).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.getUserByName(USER_TEST_NAME)
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userService, times(1)).getUserByName(USER_TEST_NAME);
+        }
+    }
+
 //
 //    @Test
 //    void deleteUser() {
