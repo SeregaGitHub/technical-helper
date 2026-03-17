@@ -12,6 +12,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -35,7 +36,6 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private CreateUserDto createUserDto;
     private LocalDateTime now;
 
     private static final ZonedDateTime NOW_ZDT = ZonedDateTime.of(
@@ -62,17 +62,23 @@ class UserControllerTest {
 
         when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
-        createUserDto = CreateUserDto.builder()
-                .username(USER_TEST_NAME)
-                .password(USER_TEST_PASSWORD)
-                .departmentId(DEPARTMENT_TEST_ID)
-                .role(Role.ADMIN)
-                .build();
     }
 
     @Nested
     class WhenUserCreating {
+
+        private CreateUserDto createUserDto;
+
+        @BeforeEach
+        void setUp() {
+
+            createUserDto = CreateUserDto.builder()
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .role(Role.ADMIN)
+                    .build();
+        }
 
         @Test
         void whenCreateUserThenReturnCreated() {
@@ -151,9 +157,132 @@ class UserControllerTest {
         }
     }
 
-//    @Test
-//    void updateUser() {
-//    }
+    @Nested
+    class WhenUserUpdating {
+
+        private UpdateUserDto updateUserDto;
+
+        @BeforeEach
+        void setUp() {
+
+            updateUserDto = UpdateUserDto.builder()
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .role(Role.TECHNICIAN)
+                    .build();
+        }
+
+        @Test
+        void whenUpdateUserThenReturnOk() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+        }
+
+        @Test
+        void whenUpdateUserThenReturnUnprocessableEntity() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(422)
+                    .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(422, apiResponse.status());
+            assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+        }
+
+        @Test
+        void whenUpdateUserIfUserNotExistThenReturnNotFound() {
+
+            String responseMessage = "Данный пользователь не существует !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+        }
+
+        @Test
+        void whenUpdateUserIfUserDepartmentNotExistThenReturnNotFound() {
+
+            String responseMessage = "Отдел в котором находится сотрудник не существует !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.updateUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID, updateUserDto);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .updateUser(DEFAULT_ADMIN_USER_ID, updateUserDto, USER_TEST_ID);
+        }
+    }
+
+
 //
 //    @Test
 //    void changeUserPassword() {
