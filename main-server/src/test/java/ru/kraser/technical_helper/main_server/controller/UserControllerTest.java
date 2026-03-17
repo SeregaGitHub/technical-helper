@@ -11,9 +11,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -21,6 +19,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -350,15 +349,54 @@ class UserControllerTest {
         }
     }
 
+    @Nested
+    class WhenGetAllUsersMethodsInvoked {
 
-//
-//    @Test
-//    void getAllUsers() {
-//    }
-//
-//    @Test
-//    void getAdminAndTechnicianList() {
-//    }
+        @Test
+        void whenGetAllUsersThenReturnListOfUsers() {
+
+            UserDto userDto = UserDto.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .department(DEPARTMENT_TEST_NAME)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            List<UserDto> users = List.of(userDto);
+
+            when(userService.getAllUsers()).thenReturn(users);
+
+            List<UserDto> returnedUsers = userController.getAllUsers();
+
+            assertEquals(users, returnedUsers);
+
+            verify(userService, times(1)).getAllUsers();
+        }
+
+        @Test
+        void whenAdminAndTechnicianListThenReturnListOfAdminAndTechnicians() {
+
+            UserShortDto userShortAdminDto = new UserShortDto(DEFAULT_ADMIN_USER_ID, "test_admin");
+            UserShortDto userShortTechnicianDto = new UserShortDto(USER_TEST_ID, USER_TEST_NAME);
+
+            List<UserShortDto> adminAndTechnicianList = List.of(userShortAdminDto, userShortTechnicianDto);
+
+            when(userService.getAdminAndTechnicianList()).thenReturn(adminAndTechnicianList);
+
+            List<UserShortDto> returnedList = userService.getAdminAndTechnicianList();
+
+            assertEquals(adminAndTechnicianList, returnedList);
+
+            verify(userService, times(1)).getAdminAndTechnicianList();
+        }
+    }
+
+
 //
 //    @Test
 //    void getUser() {

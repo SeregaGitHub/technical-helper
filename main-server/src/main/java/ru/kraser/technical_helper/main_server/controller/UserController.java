@@ -56,7 +56,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         log.info("Getting all Users");
-        List<UserDto> users =  userService.getAllUsers();
+        List<UserDto> users = userService.getAllUsers();
         log.info("All Users received successfully");
         return users;
     }

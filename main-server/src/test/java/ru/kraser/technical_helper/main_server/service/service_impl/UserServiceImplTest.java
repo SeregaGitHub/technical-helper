@@ -372,7 +372,7 @@ class UserServiceImplTest {
     }
 
     @Nested
-    class WhenGetAllUsersMethods {
+    class WhenGetAllUsersMethodsInvoked {
 
         @Test
         void whenGetAllUsersThenReturnListOfUsers() {
