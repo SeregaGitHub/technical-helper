@@ -497,8 +497,57 @@ class UserControllerTest {
         }
     }
 
-//
-//    @Test
-//    void deleteUser() {
-//    }
+    @Nested
+    class WhenUserDeleting {
+
+        @Test
+        void whenDeleteUserThenReturnOk() {
+
+            String responseMessage = "Пользователь - был успешно удалён.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID)).thenReturn(response);
+
+            ApiResponse apiResponse = userController.deleteUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID);
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenDeleteUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(USER_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    userController.deleteUser(DEFAULT_ADMIN_USER_ID, USER_TEST_ID);
+
+            assertEquals(USER_NOT_EXIST, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(userService, times(1))
+                    .deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+    }
 }

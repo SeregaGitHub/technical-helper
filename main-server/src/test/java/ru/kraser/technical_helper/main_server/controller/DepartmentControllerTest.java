@@ -295,28 +295,57 @@ class DepartmentControllerTest {
         }
     }
 
-    @Test
-    void whenDeleteDepartmentThenReturnOk() {
+    @Nested
+    class WhenDepartmentDeleting {
 
-        String responseMessage = "Отдел - был успешно удалён.";
+        @Test
+        void whenDeleteDepartmentThenReturnOk() {
 
-        when(departmentService.deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID))
-                .thenReturn(ApiResponse.builder()
-                        .message(responseMessage)
-                        .status(200)
-                        .httpStatus(HttpStatus.OK)
-                        .timestamp(now)
-                        .build());
+            String responseMessage = "Отдел - был успешно удалён.";
 
-        ApiResponse apiResponse = departmentController.deleteDepartment(
-                DEFAULT_ADMIN_USER_ID, department.getId());
+            when(departmentService.deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(ApiResponse.builder()
+                            .message(responseMessage)
+                            .status(200)
+                            .httpStatus(HttpStatus.OK)
+                            .timestamp(now)
+                            .build());
 
-        assertEquals(responseMessage, apiResponse.message());
-        assertEquals(200, apiResponse.status());
-        assertEquals(HttpStatus.OK, apiResponse.httpStatus());
-        assertEquals(now, apiResponse.timestamp());
+            ApiResponse apiResponse = departmentController.deleteDepartment(
+                    DEFAULT_ADMIN_USER_ID, department.getId());
 
-        verify(departmentService, times(1))
-                .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenDeleteDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(DEPARTMENT_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentService.deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    departmentController.deleteDepartment(DEFAULT_ADMIN_USER_ID, department.getId());
+
+            assertEquals(DEPARTMENT_NOT_EXIST, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
+        }
     }
 }
