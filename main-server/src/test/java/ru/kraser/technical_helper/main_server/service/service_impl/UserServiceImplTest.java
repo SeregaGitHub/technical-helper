@@ -430,7 +430,7 @@ class UserServiceImplTest {
     class WhenGetUserById {
 
         @Test
-        void whenGetUserThenReturnUserDto() {
+        void whenGetUserByIdThenReturnUserDto() {
 
             UserDto userDto = UserDto.builder()
                     .id(user.getId())

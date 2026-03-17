@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.time.Clock;
@@ -22,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
@@ -396,11 +398,50 @@ class UserControllerTest {
         }
     }
 
+    @Nested
+    class WhenGetUserById {
 
-//
-//    @Test
-//    void getUser() {
-//    }
+        @Test
+        void whenGetUserByIdThenReturnUserDto() {
+
+            UserDto expectedUserDto = UserDto.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .department(DEPARTMENT_TEST_NAME)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userService.getUser(USER_TEST_ID)).thenReturn(expectedUserDto);
+
+            UserDto returnedUser = userController.getUser(USER_TEST_ID);
+
+            assertEquals(expectedUserDto, returnedUser);
+
+            verify(userService, times(1)).getUser(USER_TEST_ID);
+        }
+
+        @Test
+        void whenGetUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userService.getUser(USER_TEST_ID)).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> userService.getUser(USER_TEST_ID)
+            );
+
+            assertEquals(USER_NOT_EXIST, exception.getMessage());
+
+            verify(userService, times(1)).getUser(USER_TEST_ID);
+        }
+    }
+
+
 //
 //    @Test
 //    void getUserByName() {

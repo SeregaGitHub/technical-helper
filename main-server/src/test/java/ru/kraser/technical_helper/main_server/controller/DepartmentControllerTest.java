@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import static org.mockito.Mockito.when;
-import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_ID_HEADER;
+import static ru.kraser.technical_helper.common_module.util.Constant.*;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -265,6 +266,28 @@ class DepartmentControllerTest {
             );
 
             assertEquals(expectedDepartmentDto, departmentDto);
+
+            verify(departmentService, times(1)).getDepartment(
+                    DEPARTMENT_ID_HEADER, department.getId()
+            );
+        }
+
+        @Test
+        void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(departmentService.getDepartment(
+                    DEPARTMENT_ID_HEADER,
+                    department.getId())
+            ).thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> departmentService.getDepartment(
+                            DEPARTMENT_ID_HEADER,
+                            department.getId())
+            );
+
+            assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
 
             verify(departmentService, times(1)).getDepartment(
                     DEPARTMENT_ID_HEADER, department.getId()
