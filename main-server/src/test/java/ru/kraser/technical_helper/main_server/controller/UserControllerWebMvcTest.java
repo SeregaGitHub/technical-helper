@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.time.Clock;
@@ -513,10 +514,76 @@ class UserControllerWebMvcTest {
         }
     }
 
-//
-//    @Test
-//    void getUser() {
-//    }
+    @Nested
+    class WhenGetUserById {
+
+        private DateTimeFormatter userDtoDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        @Test
+        @SneakyThrows
+        void whenGetUserByIdThenReturnUserDto() {
+
+            UserDto expectedUserDto = UserDto.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .department(DEPARTMENT_TEST_NAME)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userService.getUser(USER_TEST_ID)).thenReturn(expectedUserDto);
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, USER_TEST_ID))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                            .value(expectedUserDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.username")
+                            .value(expectedUserDto.username()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.departmentId")
+                            .value(expectedUserDto.departmentId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.department")
+                            .value(expectedUserDto.department()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.role")
+                            .value(expectedUserDto.role().toString()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdBy")
+                            .value(expectedUserDto.createdBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdDate")
+                            .value(userDtoDtf.format(expectedUserDto.createdDate())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedBy")
+                            .value(expectedUserDto.lastUpdatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedDate")
+                            .value(userDtoDtf.format(expectedUserDto.lastUpdatedDate())));
+
+            verify(userService ,times(1)).getUser(USER_TEST_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userService.getUser(USER_TEST_ID)).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, USER_TEST_ID))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(USER_NOT_EXIST))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            verify(userService ,times(1)).getUser(USER_TEST_ID);
+        }
+    }
+
 //
 //    @Test
 //    void getUserByName() {

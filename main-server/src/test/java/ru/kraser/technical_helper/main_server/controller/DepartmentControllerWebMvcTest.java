@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 
@@ -355,6 +356,25 @@ class DepartmentControllerWebMvcTest {
                             .value(expectedDepartmentDto.lastUpdatedBy()))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedDate")
                             .value(dtf.format(expectedDepartmentDto.lastUpdatedDate())));
+
+            verify(departmentService ,times(1))
+                    .getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id());
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(departmentService.getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(DEPARTMENT_NOT_EXIST));
 
             verify(departmentService ,times(1))
                     .getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id());
