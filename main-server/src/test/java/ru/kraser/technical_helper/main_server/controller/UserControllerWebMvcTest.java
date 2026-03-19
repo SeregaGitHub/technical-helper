@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -192,9 +193,164 @@ class UserControllerWebMvcTest {
         }
     }
 
-//    @Test
-//    void updateUser() {
-//    }
+    @Nested
+    class WhenUserUpdating {
+
+        private UpdateUserDto updateUserDto;
+
+        @BeforeEach
+        void setUp() {
+
+            updateUserDto = UpdateUserDto.builder()
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .role(Role.TECHNICIAN)
+                    .build();
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateUserThenReturnOk() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(updateUserDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateUserThenReturnUnprocessableEntity() {
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + ", - уже существует. " +
+                    "Используйте другое имя !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(422)
+                    .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(updateUserDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(422))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("UNPROCESSABLE_ENTITY"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateUserIfUserNotExistThenReturnNotFound() {
+
+            String responseMessage = "Данный пользователь не существует !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(updateUserDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateUserIfUserDepartmentNotExistThenReturnNotFound() {
+
+            String responseMessage = "Отдел в котором находится сотрудник не существует !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(updateUserDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .updateUser(USER_TEST_ID, updateUserDto, DEFAULT_ADMIN_USER_ID);
+        }
+    }
+
+
 //
 //    @Test
 //    void changeUserPassword() {
