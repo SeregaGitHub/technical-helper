@@ -1,8 +1,8 @@
 package ru.kraser.technical_helper.main_server.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,9 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -26,12 +24,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
-import static ru.kraser.technical_helper.common_module.util.Constant.CURRENT_USER_ID_HEADER;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @WebMvcTest(controllers = UserController.class)
@@ -72,6 +70,7 @@ class UserControllerWebMvcTest {
                 0);
 
         dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+        //dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
@@ -432,14 +431,88 @@ class UserControllerWebMvcTest {
                     .changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID);
         }
     }
-//
-//    @Test
-//    void getAllUsers() {
-//    }
-//
-//    @Test
-//    void getAdminAndTechnicianList() {
-//    }
+
+    @Nested
+    class WhenGetAllUsersMethodsInvoked {
+
+        private DateTimeFormatter userDtoDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        @Test
+        @SneakyThrows
+        void whenGetAllUsersThenReturnListOfUsers() {
+
+            UserDto expectedUserDto = UserDto.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .departmentId(DEPARTMENT_TEST_ID)
+                    .department(DEPARTMENT_TEST_NAME)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            List<UserDto> users = List.of(expectedUserDto);
+
+            when(userService.getAllUsers()).thenReturn(users);
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + USER_URL + ALL_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(1)))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
+                            .value(expectedUserDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].username")
+                            .value(expectedUserDto.username()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].departmentId")
+                            .value(expectedUserDto.departmentId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].department")
+                            .value(expectedUserDto.department()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].role")
+                            .value(expectedUserDto.role().toString()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].createdBy")
+                            .value(expectedUserDto.createdBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].createdDate")
+                            .value(userDtoDtf.format(expectedUserDto.createdDate())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].lastUpdatedBy")
+                            .value(expectedUserDto.lastUpdatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].lastUpdatedDate")
+                            .value(userDtoDtf.format(expectedUserDto.lastUpdatedDate())));
+
+            verify(userService ,times(1)).getAllUsers();
+        }
+
+        @Test
+        @SneakyThrows
+        void whenAdminAndTechnicianListThenReturnListOfAdminAndTechnicians() {
+
+            UserShortDto userShortAdminDto = new UserShortDto(DEFAULT_ADMIN_USER_ID, "test_admin");
+            UserShortDto userShortTechnicianDto = new UserShortDto(USER_TEST_ID, USER_TEST_NAME);
+
+            List<UserShortDto> adminAndTechnicianList = List.of(userShortAdminDto, userShortTechnicianDto);
+
+            when(userService.getAdminAndTechnicianList()).thenReturn(adminAndTechnicianList);
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].id")
+                            .value(userShortAdminDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[0].username")
+                            .value(userShortAdminDto.username()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[1].id")
+                            .value(userShortTechnicianDto.id()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$[1].username")
+                            .value(userShortTechnicianDto.username()));
+
+            verify(userService ,times(1)).getAdminAndTechnicianList();
+        }
+    }
+
 //
 //    @Test
 //    void getUser() {
