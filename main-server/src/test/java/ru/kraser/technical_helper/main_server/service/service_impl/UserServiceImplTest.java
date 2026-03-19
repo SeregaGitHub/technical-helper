@@ -310,7 +310,7 @@ class UserServiceImplTest {
         @BeforeEach
         void setUp() {
 
-            userPasswordDto = new UserPasswordDto("new_user_password");
+            userPasswordDto = new UserPasswordDto(USER_NEW_TEST_PASSWORD);
         }
 
         @Test

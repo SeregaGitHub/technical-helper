@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
@@ -350,11 +351,87 @@ class UserControllerWebMvcTest {
         }
     }
 
+    @Nested
+    class WhenUserChangingPassword {
 
-//
-//    @Test
-//    void changeUserPassword() {
-//    }
+        private UserPasswordDto userPasswordDto;
+
+        @BeforeEach
+        void setUp() {
+
+            userPasswordDto = new UserPasswordDto(USER_NEW_TEST_PASSWORD);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenChangeUserPasswordThenReturnOk() {
+
+            String responseMessage = "Пароль - был успешно изменён.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(userPasswordDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenChangeUserPasswordIfThisUserNotExistThenThrowNotFoundException() {
+
+            String responseMessage = USER_NOT_EXIST;
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID)
+                            .content(objectMapper.writeValueAsString(userPasswordDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .changeUserPassword(USER_TEST_ID, userPasswordDto, DEFAULT_ADMIN_USER_ID);
+        }
+    }
 //
 //    @Test
 //    void getAllUsers() {

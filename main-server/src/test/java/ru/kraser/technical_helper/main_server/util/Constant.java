@@ -15,4 +15,5 @@ public class Constant {
     public static final String USER_TEST_NAME = "test_username";
 
     public static final String USER_TEST_PASSWORD = "some_password";
+    public static final String USER_NEW_TEST_PASSWORD = "new_user_password";
 }

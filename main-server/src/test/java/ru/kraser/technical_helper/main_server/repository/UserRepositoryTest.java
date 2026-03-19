@@ -325,7 +325,7 @@ class UserRepositoryTest {
 
             int response = userRepository.changeUserPassword(
                     savedUser.getId(),
-                    "new_user_password",
+                    USER_NEW_TEST_PASSWORD,
                     defaultAdminUser.getId(),
                     now
             );
@@ -340,7 +340,7 @@ class UserRepositoryTest {
 
             int response = userRepository.changeUserPassword(
                     SOME_NOT_EXIST_ID,
-                    "new_user_password",
+                    USER_NEW_TEST_PASSWORD,
                     defaultAdminUser.getId(),
                     now
             );
