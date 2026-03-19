@@ -95,8 +95,8 @@ class DepartmentControllerWebMvcTest {
     @Nested
     class WhenDepartmentCreating {
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenCreateDepartmentThenReturnCreated() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
@@ -124,11 +124,12 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
+            verify(departmentService, times(1))
+                    .createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenCreateDepartmentThenReturnUnprocessableEntity() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
@@ -168,8 +169,8 @@ class DepartmentControllerWebMvcTest {
     @Nested
     class WhenDepartmentUpdating {
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnOk() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
@@ -204,8 +205,8 @@ class DepartmentControllerWebMvcTest {
                     .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnUnprocessableEntity() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
@@ -245,8 +246,8 @@ class DepartmentControllerWebMvcTest {
                     .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnNotFound() {
 
             String responseMessage = "Данный отдел не существует !!!";
@@ -303,8 +304,8 @@ class DepartmentControllerWebMvcTest {
                     .build();
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
 
             when(departmentService.getAllDepartments()).thenReturn(List.of(expectedDepartmentDto));
@@ -330,8 +331,8 @@ class DepartmentControllerWebMvcTest {
             verify(departmentService ,times(1)).getAllDepartments();
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenGetDepartmentByIdThenReturnDepartmentDto() {
 
             when(departmentService.getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
@@ -360,8 +361,8 @@ class DepartmentControllerWebMvcTest {
         }
     }
 
-    @SneakyThrows
     @Test
+    @SneakyThrows
     void whenDeleteDepartmentThenReturnOk() {
 
         String responseMessage = "Отдел - был успешно удалён.";
