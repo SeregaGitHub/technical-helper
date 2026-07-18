@@ -18,6 +18,8 @@ import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.model.Department;
+import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.service.UserService;
 
 import java.time.Clock;
@@ -71,7 +73,6 @@ class UserControllerWebMvcTest {
                 0);
 
         dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
-        //dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
@@ -584,10 +585,94 @@ class UserControllerWebMvcTest {
         }
     }
 
-//
-//    @Test
-//    void getUserByName() {
-//    }
+    @Nested
+    class WhenGetUserByName {
+
+        private DateTimeFormatter userDtoDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        @Test
+        @SneakyThrows
+        void whenGetUserByNameThenReturnUser() {
+
+            Department department = Department.builder()
+                    .id(DEPARTMENT_TEST_ID)
+                    .name(DEPARTMENT_TEST_NAME)
+                    .enabled(true)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User expectedUser = User.builder()
+                    .id(USER_TEST_ID)
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .department(department)
+                    .role(Role.ADMIN)
+                    .createdBy(DEFAULT_ADMIN_USER_ID)
+                    .createdDate(now)
+                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            when(userService.getUserByName(USER_TEST_NAME)).thenReturn(expectedUser);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                    BASE_URL + ADMIN_URL + USER_URL + "/{username}", USER_TEST_NAME)
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                            .value(expectedUser.getId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.username")
+                            .value(expectedUser.getUsername()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.isEnabled")
+                            .value(expectedUser.isEnabled()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.department.id")
+                            .value(expectedUser.getDepartment().getId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.department.name")
+                            .value(expectedUser.getDepartment().getName()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.role")
+                            .value(expectedUser.getRole().toString()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdBy")
+                            .value(expectedUser.getCreatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdDate")
+                            .value(userDtoDtf.format(expectedUser.getCreatedDate())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedBy")
+                            .value(expectedUser.getLastUpdatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.lastUpdatedDate")
+                            .value(userDtoDtf.format(expectedUser.getLastUpdatedDate())))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(expectedUser), result);
+            verify(userService, times(1))
+                    .getUserByName(USER_TEST_NAME);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetUserByNameIfThisUserNotExistThenThrowNotFoundException() {
+
+            when(userService.getUserByName(USER_TEST_NAME)).thenThrow(new NotFoundException(USER_NOT_EXIST));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(
+                    BASE_URL + ADMIN_URL + USER_URL + "/{username}", USER_TEST_NAME)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(USER_NOT_EXIST))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            verify(userService ,times(1)).getUserByName(USER_TEST_NAME);
+        }
+    }
 //
 //    @Test
 //    void deleteUser() {
