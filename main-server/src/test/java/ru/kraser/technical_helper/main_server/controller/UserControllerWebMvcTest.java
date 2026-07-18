@@ -673,8 +673,76 @@ class UserControllerWebMvcTest {
             verify(userService ,times(1)).getUserByName(USER_TEST_NAME);
         }
     }
-//
-//    @Test
-//    void deleteUser() {
-//    }
+
+    @Nested
+    class WhenUserDeleting {
+
+        @Test
+        @SneakyThrows
+        void whenDeleteUserThenReturnOk() {
+
+            String responseMessage = "Пользователь - был успешно удалён.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                    BASE_URL + ADMIN_URL + USER_URL + DELETE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenDeleteUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(USER_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(userService.deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + ADMIN_URL + USER_URL + DELETE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, USER_TEST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(USER_NOT_EXIST))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(response), result);
+            verify(userService, times(1))
+                    .deleteUser(USER_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+    }
 }
