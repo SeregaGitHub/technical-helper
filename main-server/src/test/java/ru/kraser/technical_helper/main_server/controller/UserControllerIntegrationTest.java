@@ -22,10 +22,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
@@ -76,9 +77,7 @@ class UserControllerIntegrationTest {
             ZoneId.of("UTC")
     );
 
-    private Department department;
     private User user;
-    private CreateDepartmentDto createDepartmentDto;
     private DateTimeFormatter dtf;
     private LocalDateTime now;
     private Department defaultAdminDepartment;
@@ -131,15 +130,6 @@ class UserControllerIntegrationTest {
         when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
-        /*department = Department.builder()
-                .name(DEPARTMENT_TEST_NAME)
-                .enabled(true)
-                .createdBy(defaultAdminUser.getId())
-                .createdDate(now)
-                .lastUpdatedBy(defaultAdminUser.getId())
-                .lastUpdatedDate(now)
-                .build();*/
-
         user = User.builder()
                 .username(USER_TEST_NAME)
                 .enabled(true)
@@ -162,7 +152,7 @@ class UserControllerIntegrationTest {
         void setUp() {
 
             createUserDto = CreateUserDto.builder()
-                    .username(USER_TEST_NAME)
+                    .username(user.getUsername())
                     .password(USER_TEST_PASSWORD)
                     .departmentId(DEFAULT_ADMIN_DEPARTMENT_ID)
                     .role(Role.ADMIN)
@@ -250,7 +240,7 @@ class UserControllerIntegrationTest {
             String responseMessage = "Отдел в котором находится сотрудник не существует !!!";
 
             CreateUserDto createUserDtoWithNotExistDepartmentId = CreateUserDto.builder()
-                    .username(USER_TEST_NAME)
+                    .username(user.getUsername())
                     .password(USER_TEST_PASSWORD)
                     .departmentId(SOME_NOT_EXIST_ID)
                     .role(Role.ADMIN)
@@ -275,7 +265,159 @@ class UserControllerIntegrationTest {
     @Nested
     class WhenUserUpdating {
 
+        private UpdateUserDto updateUserDto;
+        private Department department;
+        private final String newUserName = "new_user_name";
 
+        @SneakyThrows
+        @Test
+        void whenUpdateUserThenReturnOk() {
+
+            department = Department.builder()
+                    .name(DEPARTMENT_TEST_NAME)
+                    .enabled(true)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User savedUser = userRepository.saveAndFlush(user);
+            Department savedDepartment = departmentRepository.saveAndFlush(department);
+
+            updateUserDto = UpdateUserDto.builder()
+                    .username(newUserName)
+                    .departmentId(savedDepartment.getId())
+                    .role(Role.TECHNICIAN)
+                    .build();
+
+            String responseMessage = "Сотрудник: " + updateUserDto.username() + " - был успешно изменен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, savedUser.getId())
+                            .content(objectMapper.writeValueAsString(updateUserDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            entityManager.clear();
+            User updatedUser = userRepository.findById(savedUser.getId()).get();
+            userRepository.deleteById(savedUser.getId());
+            departmentRepository.deleteById(savedDepartment.getId());
+
+            assertThat(result).isEqualTo(objectMapper.writeValueAsString(apiResponse));
+            assertThat(updatedUser.getUsername()).isEqualTo(updateUserDto.username());
+            assertThat(updatedUser.getDepartment().getId()).isEqualTo(updateUserDto.departmentId());
+            assertThat(updatedUser.getRole()).isEqualTo(updateUserDto.role());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateUserThenReturnAlreadyExistsException() {
+
+            User savedUser = userRepository.saveAndFlush(user);
+
+            String responseMessage = "Сотрудник: " + defaultAdminUser.getUsername() + ", - уже существует." +
+                    " Используйте другое имя !!!";
+
+            UpdateUserDto updateUserDtoWithNotUniqueName = UpdateUserDto.builder()
+                    .username(defaultAdminUser.getUsername())
+                    .departmentId(defaultAdminDepartment.getId())
+                    .role(Role.ADMIN)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, savedUser.getId())
+                            .content(objectMapper.writeValueAsString(updateUserDtoWithNotUniqueName)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            userRepository.deleteById(savedUser.getId());
+
+            AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateUserIfSuchDepartmentNotExistThenReturnNotFoundException() {
+
+            User savedUser = userRepository.saveAndFlush(user);
+
+            String responseMessage = "Отдел в котором находится сотрудник не существует !!!";
+
+            UpdateUserDto updateUserDtoWithNotExistDepartmentId = UpdateUserDto.builder()
+                    .username(newUserName)
+                    .departmentId(SOME_NOT_EXIST_ID)
+                    .role(Role.ADMIN)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, savedUser.getId())
+                            .content(objectMapper.writeValueAsString(updateUserDtoWithNotExistDepartmentId)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            userRepository.deleteById(savedUser.getId());
+
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenUpdateUserIfSuchUserNotExistThenReturnNotFoundException() {
+
+            String responseMessage = "Данный пользователь не существует !!!";
+
+            UpdateUserDto updateUserDtoWithNotExistUserId = UpdateUserDto.builder()
+                    .username(newUserName)
+                    .departmentId(defaultAdminDepartment.getId())
+                    .role(Role.ADMIN)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + USER_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .content(objectMapper.writeValueAsString(updateUserDtoWithNotExistUserId)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
+            assertThat(exception.getMessage()).isEqualTo(responseMessage);
+        }
     }
 
 //
