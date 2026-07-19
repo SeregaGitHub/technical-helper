@@ -1,5 +1,6 @@
 package ru.kraser.technical_helper.main_server.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,9 +23,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
+import ru.kraser.technical_helper.common_module.dto.user.*;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -38,6 +37,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -493,14 +493,105 @@ class UserControllerIntegrationTest {
             assertThat(exception.getMessage()).isEqualTo(USER_NOT_EXIST);
         }
     }
-//
-//    @Test
-//    void getAllUsers() {
-//    }
-//
-//    @Test
-//    void getAdminAndTechnicianList() {
-//    }
+
+    @Nested
+    class WhenGetAllUsersMethodsInvoked {
+
+        private User enabledTechnicianUser;
+        private User enabledEmployeeUser;
+        private User notEnabledTechnicianUser;
+
+        @BeforeEach
+        void setUp() {
+
+            enabledTechnicianUser = User.builder()
+                    .username("enabled_technician_user")
+                    .enabled(true)
+                    .password(USER_TEST_PASSWORD)
+                    .role(Role.TECHNICIAN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            enabledEmployeeUser = User.builder()
+                    .username("enabled_employee_user")
+                    .enabled(true)
+                    .password(USER_TEST_PASSWORD)
+                    .role(Role.EMPLOYEE)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            notEnabledTechnicianUser = User.builder()
+                    .username("not_enabled_technician_user")
+                    .enabled(false)
+                    .password(USER_TEST_PASSWORD)
+                    .role(Role.TECHNICIAN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            enabledTechnicianUser = userRepository.saveAndFlush(enabledTechnicianUser);
+            enabledEmployeeUser = userRepository.saveAndFlush(enabledEmployeeUser);
+            notEnabledTechnicianUser = userRepository.saveAndFlush(notEnabledTechnicianUser);
+        }
+
+        @AfterEach
+        void tearDown() {
+
+            entityManager.clear();
+
+            userRepository.deleteById(enabledTechnicianUser.getId());
+            userRepository.deleteById(enabledEmployeeUser.getId());
+            userRepository.deleteById(notEnabledTechnicianUser.getId());
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetAllUsersThenReturnListOfUsers() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + ALL_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            List<UserDto> enabledUsers = objectMapper.readValue(result, new TypeReference<>() {});
+            List<User> allUsers = userRepository.findAll();
+
+            assertThat(enabledUsers).hasSize(3);
+            assertThat(allUsers).hasSize(4);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenAdminAndTechnicianListThenReturnListOfAdminAndTechnicians() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + BREAKAGE_URL)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            List<UserShortDto> users = objectMapper.readValue(result, new TypeReference<>() {});
+            assertThat(users).hasSize(2);
+        }
+    }
 //
 //    @Test
 //    void getUser() {
