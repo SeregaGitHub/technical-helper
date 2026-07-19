@@ -592,10 +592,91 @@ class UserControllerIntegrationTest {
             assertThat(users).hasSize(2);
         }
     }
-//
-//    @Test
-//    void getUser() {
-//    }
+
+    @Nested
+    class WhenGetUserById {
+
+        @SneakyThrows
+        @Test
+        void whenGetUserByIdThenReturnUserDto() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, defaultAdminUser.getId()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            UserDto userDto = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(userDto.id()).isEqualTo(defaultAdminUser.getId());
+            assertThat(userDto.username()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(userDto.role()).isEqualTo(defaultAdminUser.getRole());
+            assertThat(userDto.departmentId()).isEqualTo(defaultAdminUser.getDepartment().id);
+            assertThat(userDto.createdBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(userDto.createdDate()).isEqualTo(defaultAdminUser.getCreatedDate());
+            assertThat(userDto.lastUpdatedBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(userDto.lastUpdatedDate()).isEqualTo(defaultAdminUser.getLastUpdatedDate());
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetUserWhichNotEnabledThenReturnNotFoundException() {
+
+            User notEnabledUser = User.builder()
+                    .username("not_enabled_user")
+                    .enabled(false)
+                    .password(USER_TEST_PASSWORD)
+                    .role(Role.TECHNICIAN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User savedUser = userRepository.saveAndFlush(notEnabledUser);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, savedUser.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            userRepository.deleteById(savedUser.getId());
+
+            assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+
+        @SneakyThrows
+        @Test
+        void whenGetUserWhichNotExistThenReturnNotFoundException() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+    }
 //
 //    @Test
 //    void getUserByName() {
