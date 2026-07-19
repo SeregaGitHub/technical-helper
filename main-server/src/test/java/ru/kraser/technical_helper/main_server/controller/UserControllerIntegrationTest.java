@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.dto.user.UpdateUserDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserPasswordDto;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
@@ -420,10 +421,78 @@ class UserControllerIntegrationTest {
         }
     }
 
-//
-//    @Test
-//    void changeUserPassword() {
-//    }
+    @Nested
+    class WhenUserChangingPassword {
+
+        private UserPasswordDto userPasswordDto;
+
+        @BeforeEach
+        void setUp() {
+
+            userPasswordDto = new UserPasswordDto(USER_NEW_TEST_PASSWORD);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenChangeUserPasswordThenReturnOk() {
+
+            User savedUser = userRepository.saveAndFlush(user);
+            String oldPassword = userRepository.findById(savedUser.getId()).get().getPassword();
+
+            String responseMessage = "Пароль - был успешно изменён.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                    BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, savedUser.getId())
+                            .content(objectMapper.writeValueAsString(userPasswordDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            entityManager.clear();
+            String newPassword = userRepository.findById(savedUser.getId()).get().getPassword();
+            userRepository.deleteById(savedUser.getId());
+
+            assertThat(result).isEqualTo(objectMapper.writeValueAsString(apiResponse));
+            assertThat(newPassword).isNotEqualTo(oldPassword);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenChangeUserPasswordIfUserNotExistThenReturnNotFoundException() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + ADMIN_URL + USER_URL + PASSWORD_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .content(objectMapper.writeValueAsString(userPasswordDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(USER_NOT_EXIST))
+                    .andExpect(status().isNotFound())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
+            assertThat(exception.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+    }
 //
 //    @Test
 //    void getAllUsers() {
