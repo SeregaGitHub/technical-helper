@@ -1,7 +1,7 @@
 package ru.kraser.technical_helper.main_server.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;   
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -56,7 +56,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         log.info("Getting all Users");
-        List<UserDto> users =  userService.getAllUsers();
+        List<UserDto> users = userService.getAllUsers();
         log.info("All Users received successfully");
         return users;
     }

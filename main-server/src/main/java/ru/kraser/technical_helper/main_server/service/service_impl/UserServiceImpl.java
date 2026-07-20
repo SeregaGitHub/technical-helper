@@ -18,6 +18,7 @@ import ru.kraser.technical_helper.main_server.service.UserService;
 import ru.kraser.technical_helper.main_server.util.error_handler.ThrowMainServerException;
 import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EX
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final Clock clock;
 
     @Value("${default.admin.name}")
     private String defaultAdminName;
@@ -42,9 +44,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse createUser(CreateUserDto createUserDto, String currentUserId) {
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         try {
             Department department = departmentRepository.getReferenceById(createUserDto.departmentId());
-            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, currentUserId));
+            userRepository.saveAndFlush(UserMapper.toUser(createUserDto, department, currentUserId, now));
         } catch (Exception e) {
             ThrowMainServerException.userHandler(e.getMessage(), createUserDto.username());
         }
@@ -52,14 +55,14 @@ public class UserServiceImpl implements UserService {
                 .message("Сотрудник: " + createUserDto.username() + ", - был успешно создан.")
                 .status(201)
                 .httpStatus(HttpStatus.CREATED)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
     @Override
     @Transactional
     public ApiResponse updateUser(String userId, UpdateUserDto updateUserDto, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         int response;
         try {
             response = userRepository.updateUser(
@@ -77,14 +80,14 @@ public class UserServiceImpl implements UserService {
                 .message("Сотрудник: " + updateUserDto.username() + " - был успешно изменен.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
     @Override
     @Transactional
     public ApiResponse changeUserPassword(String userId, UserPasswordDto passwordDto, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         int response;
         response = userRepository.changeUserPassword(
                 userId,
@@ -100,7 +103,7 @@ public class UserServiceImpl implements UserService {
                 .message("Пароль - был успешно изменён.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
@@ -136,7 +139,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse deleteUser(String userId, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now().withNano(0);
+        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
         int response;
         response = userRepository.deleteUser(userId, currentUserId, now);
 
@@ -147,7 +150,7 @@ public class UserServiceImpl implements UserService {
                 .message("Пользователь - был успешно удалён.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now().withNano(0))
+                .timestamp(now)
                 .build();
     }
 
@@ -156,7 +159,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
 
         if (optionalUser.isEmpty()) {
-            LocalDateTime now = LocalDateTime.now().withNano(0);
+            LocalDateTime now = LocalDateTime.now(clock).withNano(0);
             String temporaryAdminId = defaultAdminId;
 
             userRepository.dropConstraints();
@@ -214,7 +217,7 @@ public class UserServiceImpl implements UserService {
                     .message("Сотрудник: " + defaultAdminName + ", - был успешно создан.")
                     .status(201)
                     .httpStatus(HttpStatus.CREATED)
-                    .timestamp(LocalDateTime.now().withNano(0))
+                    .timestamp(now)
                     .build();
         } else {
             throw new AlreadyExistsException("Пользователь с правами администратора - уже существует !!!");

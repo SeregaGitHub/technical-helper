@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import static org.mockito.Mockito.when;
-import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_ID_HEADER;
+import static ru.kraser.technical_helper.common_module.util.Constant.*;
 import static ru.kraser.technical_helper.main_server.util.Constant.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,12 +71,12 @@ class DepartmentControllerTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id(DEPARTMENT_ID)
+                .id(DEPARTMENT_TEST_ID)
                 .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
-                .createdBy(USER_ID)
+                .createdBy(DEFAULT_ADMIN_USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(USER_ID)
+                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
                 .lastUpdatedDate(now)
                 .build();
 
@@ -98,10 +99,10 @@ class DepartmentControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(response);
+            when(departmentService.createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID)).thenReturn(response);
 
             ApiResponse apiResponse = departmentController.createDepartment(
-                    USER_ID, createDepartmentDto);
+                    DEFAULT_ADMIN_USER_ID, createDepartmentDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(201, apiResponse.status());
@@ -109,7 +110,7 @@ class DepartmentControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(departmentService, times(1))
-                    .createDepartment(createDepartmentDto, USER_ID);
+                    .createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
         @Test
@@ -125,10 +126,10 @@ class DepartmentControllerTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(response);
+            when(departmentService.createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID)).thenReturn(response);
 
             ApiResponse apiResponse = departmentController.createDepartment(
-                    USER_ID, createDepartmentDto);
+                    DEFAULT_ADMIN_USER_ID, createDepartmentDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(422, apiResponse.status());
@@ -136,7 +137,7 @@ class DepartmentControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(departmentService, times(1))
-                    .createDepartment(createDepartmentDto, USER_ID);
+                    .createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
@@ -148,7 +149,7 @@ class DepartmentControllerTest {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
 
-            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, USER_ID))
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(ApiResponse.builder()
                             .message(responseMessage)
                             .status(200)
@@ -157,7 +158,7 @@ class DepartmentControllerTest {
                             .build());
 
             ApiResponse apiResponse = departmentController.updateDepartment(
-                    department.getId(), USER_ID, createDepartmentDto);
+                    department.getId(), DEFAULT_ADMIN_USER_ID, createDepartmentDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(200, apiResponse.status());
@@ -165,7 +166,7 @@ class DepartmentControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
 
         }
 
@@ -175,7 +176,7 @@ class DepartmentControllerTest {
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
                     "Используйте другое имя !!!";
 
-            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, USER_ID))
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(ApiResponse.builder()
                             .message(responseMessage)
                             .status(422)
@@ -184,7 +185,7 @@ class DepartmentControllerTest {
                             .build());
 
             ApiResponse apiResponse = departmentController.updateDepartment(
-                    department.getId(), USER_ID, createDepartmentDto);
+                    department.getId(), DEFAULT_ADMIN_USER_ID, createDepartmentDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(422, apiResponse.status());
@@ -192,7 +193,7 @@ class DepartmentControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
         @Test
@@ -200,7 +201,7 @@ class DepartmentControllerTest {
 
             String responseMessage = "Данный отдел не существует !!!";
 
-            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, USER_ID))
+            when(departmentService.updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID))
                     .thenReturn(ApiResponse.builder()
                             .message(responseMessage)
                             .status(404)
@@ -209,7 +210,7 @@ class DepartmentControllerTest {
                             .build());
 
             ApiResponse apiResponse = departmentController.updateDepartment(
-                    department.getId(), USER_ID, createDepartmentDto);
+                    department.getId(), DEFAULT_ADMIN_USER_ID, createDepartmentDto);
 
             assertEquals(responseMessage, apiResponse.message());
             assertEquals(404, apiResponse.status());
@@ -217,7 +218,7 @@ class DepartmentControllerTest {
             assertEquals(now, apiResponse.timestamp());
 
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
@@ -270,30 +271,81 @@ class DepartmentControllerTest {
                     DEPARTMENT_ID_HEADER, department.getId()
             );
         }
+
+        @Test
+        void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(departmentService.getDepartment(
+                    DEPARTMENT_ID_HEADER,
+                    department.getId())
+            ).thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> departmentService.getDepartment(
+                            DEPARTMENT_ID_HEADER,
+                            department.getId())
+            );
+
+            assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
+
+            verify(departmentService, times(1)).getDepartment(
+                    DEPARTMENT_ID_HEADER, department.getId()
+            );
+        }
     }
 
-    @Test
-    void whenDeleteDepartmentThenReturnOk() {
+    @Nested
+    class WhenDepartmentDeleting {
 
-        String responseMessage = "Отдел - был успешно удалён.";
+        @Test
+        void whenDeleteDepartmentThenReturnOk() {
 
-        when(departmentService.deleteDepartment(department.getId(), USER_ID))
-                .thenReturn(ApiResponse.builder()
-                        .message(responseMessage)
-                        .status(200)
-                        .httpStatus(HttpStatus.OK)
-                        .timestamp(now)
-                        .build());
+            String responseMessage = "Отдел - был успешно удалён.";
 
-        ApiResponse apiResponse = departmentController.deleteDepartment(
-                USER_ID, department.getId());
+            when(departmentService.deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(ApiResponse.builder()
+                            .message(responseMessage)
+                            .status(200)
+                            .httpStatus(HttpStatus.OK)
+                            .timestamp(now)
+                            .build());
 
-        assertEquals(responseMessage, apiResponse.message());
-        assertEquals(200, apiResponse.status());
-        assertEquals(HttpStatus.OK, apiResponse.httpStatus());
-        assertEquals(now, apiResponse.timestamp());
+            ApiResponse apiResponse = departmentController.deleteDepartment(
+                    DEFAULT_ADMIN_USER_ID, department.getId());
 
-        verify(departmentService, times(1))
-                .deleteDepartment(department.getId(), USER_ID);
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenDeleteDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(DEPARTMENT_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(departmentService.deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(response);
+
+            ApiResponse apiResponse =
+                    departmentController.deleteDepartment(DEFAULT_ADMIN_USER_ID, department.getId());
+
+            assertEquals(DEPARTMENT_NOT_EXIST, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(departmentService, times(1))
+                    .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
+        }
     }
 }

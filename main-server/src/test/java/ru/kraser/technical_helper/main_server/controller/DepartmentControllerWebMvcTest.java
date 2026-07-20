@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.department.CreateDepartmentDto;
 import ru.kraser.technical_helper.common_module.dto.department.DepartmentDto;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.main_server.service.DepartmentService;
 
@@ -79,12 +80,12 @@ class DepartmentControllerWebMvcTest {
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         department = Department.builder()
-                .id(DEPARTMENT_ID)
+                .id(DEPARTMENT_TEST_ID)
                 .name(DEPARTMENT_TEST_NAME)
                 .enabled(true)
-                .createdBy(USER_ID)
+                .createdBy(DEFAULT_ADMIN_USER_ID)
                 .createdDate(now)
-                .lastUpdatedBy(USER_ID)
+                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
                 .lastUpdatedDate(now)
                 .build();
 
@@ -95,8 +96,8 @@ class DepartmentControllerWebMvcTest {
     @Nested
     class WhenDepartmentCreating {
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenCreateDepartmentThenReturnCreated() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
@@ -108,11 +109,11 @@ class DepartmentControllerWebMvcTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(apiResponse);
+            when(departmentService.createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID)).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, USER_ID)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
@@ -124,11 +125,12 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, USER_ID);
+            verify(departmentService, times(1))
+                    .createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenCreateDepartmentThenReturnUnprocessableEntity() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
@@ -141,11 +143,11 @@ class DepartmentControllerWebMvcTest {
                     .timestamp(now)
                     .build();
 
-            when(departmentService.createDepartment(createDepartmentDto, USER_ID)).thenReturn(apiResponse);
+            when(departmentService.createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID)).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, USER_ID)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -161,15 +163,15 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, USER_ID);
+            verify(departmentService, times(1)).createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
     @Nested
     class WhenDepartmentUpdating {
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnOk() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно изменен.";
@@ -182,12 +184,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, USER_ID)
+                    department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, USER_ID)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -201,11 +203,11 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnUnprocessableEntity() {
 
             String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - уже существует. " +
@@ -219,12 +221,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, USER_ID)
+                    department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, USER_ID)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -242,11 +244,11 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenUpdateDepartmentThenReturnNotFound() {
 
             String responseMessage = "Данный отдел не существует !!!";
@@ -259,12 +261,12 @@ class DepartmentControllerWebMvcTest {
                     .build();
 
             when(departmentService.updateDepartment(
-                    department.getId(), createDepartmentDto, USER_ID)
+                    department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID)
             ).thenReturn(apiResponse);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .header(CURRENT_USER_ID_HEADER, USER_ID)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                             .header(DEPARTMENT_ID_HEADER, department.getId())
                             .content(objectMapper.writeValueAsString(createDepartmentDto)))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -282,7 +284,7 @@ class DepartmentControllerWebMvcTest {
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
             verify(departmentService, times(1))
-                    .updateDepartment(department.getId(), createDepartmentDto, USER_ID);
+                    .updateDepartment(department.getId(), createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
@@ -303,8 +305,8 @@ class DepartmentControllerWebMvcTest {
                     .build();
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
 
             when(departmentService.getAllDepartments()).thenReturn(List.of(expectedDepartmentDto));
@@ -330,8 +332,8 @@ class DepartmentControllerWebMvcTest {
             verify(departmentService ,times(1)).getAllDepartments();
         }
 
-        @SneakyThrows
         @Test
+        @SneakyThrows
         void whenGetDepartmentByIdThenReturnDepartmentDto() {
 
             when(departmentService.getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
@@ -358,10 +360,29 @@ class DepartmentControllerWebMvcTest {
             verify(departmentService ,times(1))
                     .getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id());
         }
+
+        @Test
+        @SneakyThrows
+        void whenGetDepartmentIfThisDepartmentNotExistThenThrowNotFoundException() {
+
+            when(departmentService.getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id()))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(DEPARTMENT_NOT_EXIST));
+
+            verify(departmentService ,times(1))
+                    .getDepartment(DEPARTMENT_ID_HEADER, expectedDepartmentDto.id());
+        }
     }
 
-    @SneakyThrows
     @Test
+    @SneakyThrows
     void whenDeleteDepartmentThenReturnOk() {
 
         String responseMessage = "Отдел - был успешно удалён.";
@@ -374,13 +395,13 @@ class DepartmentControllerWebMvcTest {
                 .build();
 
         when(departmentService.deleteDepartment(
-                department.getId(), USER_ID)
+                department.getId(), DEFAULT_ADMIN_USER_ID)
         ).thenReturn(apiResponse);
 
         String result = mockMvc.perform(MockMvcRequestBuilders.patch(
                                 BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(CURRENT_USER_ID_HEADER, USER_ID)
+                        .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
                         .header(DEPARTMENT_ID_HEADER, department.getId()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
@@ -393,7 +414,7 @@ class DepartmentControllerWebMvcTest {
 
         assertEquals(objectMapper.writeValueAsString(apiResponse), result);
         verify(departmentService, times(1))
-                .deleteDepartment(department.getId(), USER_ID);
+                .deleteDepartment(department.getId(), DEFAULT_ADMIN_USER_ID);
     }
 
 }
