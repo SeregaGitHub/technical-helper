@@ -604,7 +604,6 @@ class UserControllerIntegrationTest {
                                     BASE_URL + ADMIN_URL + USER_URL + CURRENT_URL)
                             .accept(MediaType.APPLICATION_JSON)
                             .header(USER_ID_HEADER, defaultAdminUser.getId()))
-                    .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andReturn()
@@ -677,10 +676,93 @@ class UserControllerIntegrationTest {
             assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
         }
     }
-//
-//    @Test
-//    void getUserByName() {
-//    }
+
+    @Nested
+    class WhenGetUserByName {
+
+        @SneakyThrows
+        @Test
+        void whenGetUserByNameThenReturnUser() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}",
+                                    defaultAdminUser.getUsername())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, defaultAdminUser.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            User user = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(user.getId()).isEqualTo(defaultAdminUser.getId());
+            assertThat(user.getUsername()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(user.getRole()).isEqualTo(defaultAdminUser.getRole());
+            assertThat(user.getDepartment().getId()).isEqualTo(defaultAdminUser.getDepartment().id);
+            assertThat(user.getCreatedBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(user.getCreatedDate()).isEqualTo(defaultAdminUser.getCreatedDate());
+            assertThat(user.getLastUpdatedBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(user.getLastUpdatedDate()).isEqualTo(defaultAdminUser.getLastUpdatedDate());
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetUserByNameIfThisUserNotExistThenThrowNotFoundException() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}",
+                                    defaultAdminUser.getUsername())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetUserByNameIfThisUserNotEnabledThenThrowNotFoundException() {
+
+            User notEnabledUser = User.builder()
+                    .username("not_enabled_user")
+                    .enabled(false)
+                    .password(USER_TEST_PASSWORD)
+                    .role(Role.TECHNICIAN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User savedUser = userRepository.saveAndFlush(notEnabledUser);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}",
+                                    defaultAdminUser.getUsername())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(USER_ID_HEADER, savedUser.getUsername()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException notFoundException = objectMapper.readValue(result, new TypeReference<>() {});
+
+            userRepository.deleteById(savedUser.getId());
+
+            assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+    }
 //
 //    @Test
 //    void deleteUser() {
