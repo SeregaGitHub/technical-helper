@@ -40,7 +40,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -701,9 +700,9 @@ class UserControllerIntegrationTest {
             assertThat(user.getUsername()).isEqualTo(defaultAdminUser.getUsername());
             assertThat(user.getRole()).isEqualTo(defaultAdminUser.getRole());
             assertThat(user.getDepartment().getId()).isEqualTo(defaultAdminUser.getDepartment().id);
-            assertThat(user.getCreatedBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(user.getCreatedBy()).isEqualTo(defaultAdminUser.getId());
             assertThat(user.getCreatedDate()).isEqualTo(defaultAdminUser.getCreatedDate());
-            assertThat(user.getLastUpdatedBy()).isEqualTo(defaultAdminUser.getUsername());
+            assertThat(user.getLastUpdatedBy()).isEqualTo(defaultAdminUser.getId());
             assertThat(user.getLastUpdatedDate()).isEqualTo(defaultAdminUser.getLastUpdatedDate());
         }
 
@@ -712,12 +711,10 @@ class UserControllerIntegrationTest {
         void whenGetUserByNameIfThisUserNotExistThenThrowNotFoundException() {
 
             String result = mockMvc.perform(MockMvcRequestBuilders.get(
-                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}",
-                                    defaultAdminUser.getUsername())
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID))
+                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}", USER_TEST_NAME)
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isNotFound())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -746,12 +743,10 @@ class UserControllerIntegrationTest {
             User savedUser = userRepository.saveAndFlush(notEnabledUser);
 
             String result = mockMvc.perform(MockMvcRequestBuilders.get(
-                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}",
-                                    defaultAdminUser.getUsername())
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header(USER_ID_HEADER, savedUser.getUsername()))
+                                    BASE_URL + ADMIN_URL + USER_URL + "/{username}", savedUser)
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isNotFound())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -763,8 +758,66 @@ class UserControllerIntegrationTest {
             assertThat(notFoundException.getMessage()).isEqualTo(USER_NOT_EXIST);
         }
     }
-//
-//    @Test
-//    void deleteUser() {
-//    }
+
+    @Nested
+    class WhenUserDeleting {
+
+        @Test
+        @SneakyThrows
+        void whenDeleteUserThenReturnOk() {
+
+            User savedUser = userRepository.saveAndFlush(user);
+
+            String responseMessage = "Пользователь - был успешно удалён.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + ADMIN_URL + USER_URL + DELETE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, savedUser.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value("OK"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+            assertThat(actualApiResponse).isEqualTo(apiResponse);
+
+            entityManager.clear();
+            User deletedUser = userRepository.findById(savedUser.getId()).get();
+            userRepository.deleteById(savedUser.getId());
+
+            assertThat(deletedUser.isEnabled()).isFalse();
+        }
+
+        @Test
+        @SneakyThrows
+        void whenDeleteUserIfThisUserNotExistThenThrowNotFoundException() {
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + ADMIN_URL + USER_URL + DELETE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(USER_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(USER_NOT_EXIST))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
+            assertThat(exception.getMessage()).isEqualTo(USER_NOT_EXIST);
+        }
+    }
 }
