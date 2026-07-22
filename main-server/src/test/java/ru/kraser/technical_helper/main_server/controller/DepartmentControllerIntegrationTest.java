@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
-import static ru.kraser.technical_helper.main_server.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @Testcontainers
 @SpringBootTest

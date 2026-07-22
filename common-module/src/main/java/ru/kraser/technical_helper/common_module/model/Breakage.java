@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import ru.kraser.technical_helper.common_module.enums.Priority;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @Table(name = "breakage")
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Breakage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department", nullable = false)

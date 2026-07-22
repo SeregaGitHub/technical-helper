@@ -1,9 +1,9 @@
-package ru.kraser.technical_helper.main_server.util;
+package ru.kraser.technical_helper.common_module.util;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Constant {
+public class ConstantForTests {
 
     public static final String DEFAULT_ADMIN_USER_ID = "u1u11111-11u1-1u11-1111-u111111u1111";
     public static final String USER_TEST_ID = "u1t11111-11u1-1t11-1111-u111111t1111";

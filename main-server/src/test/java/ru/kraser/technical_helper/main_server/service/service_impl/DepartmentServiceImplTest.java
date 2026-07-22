@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_ID_HEADER;
 import static ru.kraser.technical_helper.common_module.util.Constant.DEPARTMENT_NOT_EXIST;
-import static ru.kraser.technical_helper.main_server.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

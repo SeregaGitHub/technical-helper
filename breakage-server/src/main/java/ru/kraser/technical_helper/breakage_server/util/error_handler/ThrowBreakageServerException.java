@@ -11,7 +11,7 @@ public class ThrowBreakageServerException {
 
     public void breakageHandler(String message) {
         if (message.contains("fk_breakage_department") || message.contains("Unable to find")) {
-            throw new NotFoundException("Отдел в котором находится сотрудник не существует !!!");
+            throw new NotFoundException("Отдел, за которым числится неисправность не существует !!!");
         } else if (message.contains("не существует")) {
             throw new NotFoundException(message);
         } else {
