@@ -1,5 +1,7 @@
 package ru.kraser.technical_helper.breakage_server.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,18 +36,19 @@ import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 @ContextConfiguration(classes = BreakageServer.class)
 class BreakageRepositoryTest {
 
+//    @PersistenceContext
+//    private EntityManager entityManager;
     @Autowired
     BreakageRepository breakageRepository;
-
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     DepartmentRepository departmentRepository;
 
     private LocalDateTime now;
     private User defaultAdminUser;
     private Department defaultAdminDepartment;
+    private Breakage testBreakage;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -72,6 +78,12 @@ class BreakageRepositoryTest {
         postgreSQLContainer.stop();
     }
 
+    /*@Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void truncateTables() {
+        entityManager.createNativeQuery(
+                "TRUNCATE TABLE breakage_comment_audit, breakage_comment CASCADE").executeUpdate();
+    }*/
+
     @BeforeEach
     @SneakyThrows
     void setUp() {
@@ -86,12 +98,41 @@ class BreakageRepositoryTest {
                 13,
                 0,
                 0);
+
+        testBreakage = Breakage.builder()
+                .department(defaultAdminDepartment)
+                .room("some_room")
+                .breakageTopic("test_breakage_topic")
+                .breakageText("test_breakage_text")
+                .status(Status.NEW)
+                .priority(Priority.MEDIUM)
+                .executor(null)
+                .executorAppointedBy(null)
+                .deadline(null)
+                .createdBy(defaultAdminUser.getId())
+                .createdDate(now)
+                .lastUpdatedBy(defaultAdminUser.getId())
+                .lastUpdatedDate(now)
+                .build();
+    }
+
+    @AfterEach
+    //@Transactional
+    //@Sql(statements = "TRUNCATE TABLE breakage_comment_audit, breakage_comment CASCADE")
+    @Sql(statements = "TRUNCATE TABLE breakage CASCADE")
+    void tearDown() {
+
+        //truncateTables();
+
+//        entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment CASCADE").executeUpdate();
+//        entityManager.createNativeQuery("TRUNCATE TABLE breakage CASCADE").executeUpdate();
     }
 
     @Nested
     class WhenBreakageCreating {
 
         @Test
+        @SneakyThrows
         void whenCreateBreakageWithNoExecutorThenReturnBreakage() {
 
             Breakage toSaveBreakage = Breakage.builder()
@@ -111,6 +152,10 @@ class BreakageRepositoryTest {
                     .build();
 
             Breakage savedBreakage = breakageRepository.saveAndFlush(toSaveBreakage);
+
+/*            postgreSQLContainer.createConnection("DELETE FROM breakage_audit");
+
+            breakageRepository.deleteById(savedBreakage.getId());*/
 
             assertThat(savedBreakage.getId()).isNotNull();
             assertThat(savedBreakage.getDepartment().getId()).isEqualTo(toSaveBreakage.getDepartment().getId());
@@ -200,9 +245,12 @@ class BreakageRepositoryTest {
         }
     }
 
-//    @Test
-//    void updateBreakageStatus() {
-//    }
+    /*@Nested
+    class WhenBreakageStatusUpdating {
+
+
+    }*/
+
 //
 //    @Test
 //    void updateBreakageStatusAndResetExecutor() {
