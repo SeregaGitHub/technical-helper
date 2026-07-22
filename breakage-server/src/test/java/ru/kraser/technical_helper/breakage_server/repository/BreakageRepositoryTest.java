@@ -120,7 +120,6 @@ class BreakageRepositoryTest {
     class WhenBreakageCreating {
 
         @Test
-        //@SneakyThrows
         void whenCreateBreakageWithNoExecutorThenReturnBreakage() {
 
             Breakage savedBreakage = breakageRepository.saveAndFlush(testBreakage);
@@ -269,15 +268,70 @@ class BreakageRepositoryTest {
         }
     }
 
+    @Nested
+    class WhenBreakageExecutorAddingOrDropping {
 
-//
-//    @Test
-//    void addBreakageExecutor() {
-//    }
-//
-//    @Test
-//    void dropBreakageExecutor() {
-//    }
+        private Breakage savedBreakage;
+        private LocalDateTime afterNow;
+
+        @BeforeEach
+        void setUp() {
+
+            afterNow = now.plusHours(1);
+        }
+
+        @Test
+        @Transactional()
+        @Modifying(clearAutomatically = true)
+        void addBreakageExecutor() {
+
+            savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+
+            int response = breakageRepository.addBreakageExecutor(
+                    savedBreakage.getId(),
+                    defaultAdminUser.getId(),
+                    afterNow,
+                    defaultAdminUser.getId(),
+                    afterNow
+            );
+
+            entityManager.clear();
+            Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+
+            assertThat(response).isEqualTo(1);
+            assertThat(updatedBreakage.getExecutor().getId()).isEqualTo(defaultAdminUser.getId());
+            assertThat(updatedBreakage.getExecutorAppointedBy().getId()).isEqualTo(defaultAdminUser.getId());
+            assertThat(updatedBreakage.getDeadline()).isEqualTo(afterNow);
+        }
+
+        @Test
+        @Transactional()
+        @Modifying(clearAutomatically = true)
+        void dropBreakageExecutor() {
+
+            testBreakage.setExecutor(defaultAdminUser);
+            testBreakage.setExecutorAppointedBy(defaultAdminUser);
+            testBreakage.setDeadline(afterNow);
+
+            savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+
+            int response = breakageRepository.dropBreakageExecutor(
+                    savedBreakage.getId(),
+                    defaultAdminUser.getId(),
+                    afterNow
+            );
+
+            entityManager.clear();
+            Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+
+            assertThat(response).isEqualTo(1);
+            assertThat(updatedBreakage.getExecutor()).isNull();
+            assertThat(updatedBreakage.getExecutorAppointedBy()).isNull();
+            assertThat(updatedBreakage.getDeadline()).isNull();
+        }
+    }
+
+
 //
 //    @Test
 //    void getAllEmployeeBreakages() {
