@@ -135,7 +135,7 @@ class BreakageRepositoryTest {
         @SneakyThrows
         void whenCreateBreakageWithNoExecutorThenReturnBreakage() {
 
-            Breakage toSaveBreakage = Breakage.builder()
+            /*Breakage toSaveBreakage = Breakage.builder()
                     .department(defaultAdminDepartment)
                     .room("some_room")
                     .breakageTopic("test_breakage_topic")
@@ -149,34 +149,34 @@ class BreakageRepositoryTest {
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
                     .lastUpdatedDate(now)
-                    .build();
+                    .build();*/
 
-            Breakage savedBreakage = breakageRepository.saveAndFlush(toSaveBreakage);
+            Breakage savedBreakage = breakageRepository.saveAndFlush(testBreakage);
 
 /*            postgreSQLContainer.createConnection("DELETE FROM breakage_audit");
 
             breakageRepository.deleteById(savedBreakage.getId());*/
 
             assertThat(savedBreakage.getId()).isNotNull();
-            assertThat(savedBreakage.getDepartment().getId()).isEqualTo(toSaveBreakage.getDepartment().getId());
-            assertThat(savedBreakage.getRoom()).isEqualTo(toSaveBreakage.getRoom());
-            assertThat(savedBreakage.getBreakageTopic()).isEqualTo(toSaveBreakage.getBreakageTopic());
-            assertThat(savedBreakage.getBreakageText()).isEqualTo(toSaveBreakage.getBreakageText());
-            assertThat(savedBreakage.getStatus()).isEqualTo(toSaveBreakage.getStatus());
-            assertThat(savedBreakage.getPriority()).isEqualTo(toSaveBreakage.getPriority());
+            assertThat(savedBreakage.getDepartment().getId()).isEqualTo(testBreakage.getDepartment().getId());
+            assertThat(savedBreakage.getRoom()).isEqualTo(testBreakage.getRoom());
+            assertThat(savedBreakage.getBreakageTopic()).isEqualTo(testBreakage.getBreakageTopic());
+            assertThat(savedBreakage.getBreakageText()).isEqualTo(testBreakage.getBreakageText());
+            assertThat(savedBreakage.getStatus()).isEqualTo(testBreakage.getStatus());
+            assertThat(savedBreakage.getPriority()).isEqualTo(testBreakage.getPriority());
             assertThat(savedBreakage.getExecutor()).isNull();
             assertThat(savedBreakage.getExecutorAppointedBy()).isNull();
             assertThat(savedBreakage.getDeadline()).isNull();
-            assertThat(savedBreakage.getCreatedBy()).isEqualTo(toSaveBreakage.getCreatedBy());
-            assertThat(savedBreakage.getCreatedDate()).isEqualTo(toSaveBreakage.getCreatedDate());
-            assertThat(savedBreakage.getLastUpdatedBy()).isEqualTo(toSaveBreakage.getLastUpdatedBy());
-            assertThat(savedBreakage.getLastUpdatedDate()).isEqualTo(toSaveBreakage.getLastUpdatedDate());
+            assertThat(savedBreakage.getCreatedBy()).isEqualTo(testBreakage.getCreatedBy());
+            assertThat(savedBreakage.getCreatedDate()).isEqualTo(testBreakage.getCreatedDate());
+            assertThat(savedBreakage.getLastUpdatedBy()).isEqualTo(testBreakage.getLastUpdatedBy());
+            assertThat(savedBreakage.getLastUpdatedDate()).isEqualTo(testBreakage.getLastUpdatedDate());
         }
 
         @Test
         void whenCreateBreakageWithExecutorThenReturnBreakage() {
 
-            Breakage toSaveBreakage = Breakage.builder()
+            /*Breakage toSaveBreakage = Breakage.builder()
                     .department(defaultAdminDepartment)
                     .room("some_room")
                     .breakageTopic("test_breakage_topic")
@@ -190,24 +190,28 @@ class BreakageRepositoryTest {
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
                     .lastUpdatedDate(now)
-                    .build();
+                    .build();*/
 
-            Breakage savedBreakage = breakageRepository.saveAndFlush(toSaveBreakage);
+            testBreakage.setExecutor(defaultAdminUser);
+            testBreakage.setExecutorAppointedBy(defaultAdminUser);
+            testBreakage.setDeadline(now);
+
+            Breakage savedBreakage = breakageRepository.saveAndFlush(testBreakage);
 
             assertThat(savedBreakage.getId()).isNotNull();
-            assertThat(savedBreakage.getDepartment().getId()).isEqualTo(toSaveBreakage.getDepartment().getId());
-            assertThat(savedBreakage.getRoom()).isEqualTo(toSaveBreakage.getRoom());
-            assertThat(savedBreakage.getBreakageTopic()).isEqualTo(toSaveBreakage.getBreakageTopic());
-            assertThat(savedBreakage.getBreakageText()).isEqualTo(toSaveBreakage.getBreakageText());
-            assertThat(savedBreakage.getStatus()).isEqualTo(toSaveBreakage.getStatus());
-            assertThat(savedBreakage.getPriority()).isEqualTo(toSaveBreakage.getPriority());
-            assertThat(savedBreakage.getExecutor()).isEqualTo(toSaveBreakage.getExecutor());
-            assertThat(savedBreakage.getExecutorAppointedBy()).isEqualTo(toSaveBreakage.getExecutorAppointedBy());
-            assertThat(savedBreakage.getDeadline()).isEqualTo(toSaveBreakage.getDeadline());
-            assertThat(savedBreakage.getCreatedBy()).isEqualTo(toSaveBreakage.getCreatedBy());
-            assertThat(savedBreakage.getCreatedDate()).isEqualTo(toSaveBreakage.getCreatedDate());
-            assertThat(savedBreakage.getLastUpdatedBy()).isEqualTo(toSaveBreakage.getLastUpdatedBy());
-            assertThat(savedBreakage.getLastUpdatedDate()).isEqualTo(toSaveBreakage.getLastUpdatedDate());
+            assertThat(savedBreakage.getDepartment().getId()).isEqualTo(testBreakage.getDepartment().getId());
+            assertThat(savedBreakage.getRoom()).isEqualTo(testBreakage.getRoom());
+            assertThat(savedBreakage.getBreakageTopic()).isEqualTo(testBreakage.getBreakageTopic());
+            assertThat(savedBreakage.getBreakageText()).isEqualTo(testBreakage.getBreakageText());
+            assertThat(savedBreakage.getStatus()).isEqualTo(testBreakage.getStatus());
+            assertThat(savedBreakage.getPriority()).isEqualTo(testBreakage.getPriority());
+            assertThat(savedBreakage.getExecutor()).isEqualTo(testBreakage.getExecutor());
+            assertThat(savedBreakage.getExecutorAppointedBy()).isEqualTo(testBreakage.getExecutorAppointedBy());
+            assertThat(savedBreakage.getDeadline()).isEqualTo(testBreakage.getDeadline());
+            assertThat(savedBreakage.getCreatedBy()).isEqualTo(testBreakage.getCreatedBy());
+            assertThat(savedBreakage.getCreatedDate()).isEqualTo(testBreakage.getCreatedDate());
+            assertThat(savedBreakage.getLastUpdatedBy()).isEqualTo(testBreakage.getLastUpdatedBy());
+            assertThat(savedBreakage.getLastUpdatedDate()).isEqualTo(testBreakage.getLastUpdatedDate());
         }
 
         @Test
@@ -222,7 +226,7 @@ class BreakageRepositoryTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            Breakage toSaveBreakage = Breakage.builder()
+            /*Breakage toSaveBreakage = Breakage.builder()
                     .department(notExistDepartment)
                     .room("some_room")
                     .breakageTopic("test_breakage_topic")
@@ -236,11 +240,13 @@ class BreakageRepositoryTest {
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
                     .lastUpdatedDate(now)
-                    .build();
+                    .build();*/
+
+            testBreakage.setDepartment(notExistDepartment);
 
             assertThrows(
                     DataIntegrityViolationException.class,
-                    () -> breakageRepository.saveAndFlush(toSaveBreakage)
+                    () -> breakageRepository.saveAndFlush(testBreakage)
             );
         }
     }
