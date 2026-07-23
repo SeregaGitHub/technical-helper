@@ -10,6 +10,7 @@ public class ConstantForTests {
     public static final String DEFAULT_ADMIN_DEPARTMENT_ID = "d1d11111-11d1-1d11-1111-d111111d1111";
     public static final String DEPARTMENT_TEST_ID = "d1t11111-11d1-1t11-1111-d111111t1111";
     public static final String SOME_NOT_EXIST_ID = "some_not_exist_id";
+    public static final String SOME_NOT_EXIST_TEXT = "some_not_exist_text";
 
     public static final String DEPARTMENT_TEST_NAME = "test_department";
     public static final String USER_TEST_NAME = "test_username";

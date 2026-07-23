@@ -462,13 +462,111 @@ class BreakageRepositoryTest {
 
             assertThat(list.size()).isEqualTo(1);
         }
+
+        @Test
+        void whenGetAllEmployeeBreakagesByTextThenReturnListOfBreakageEmployeeDto() {
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakagesByText(
+                    defaultEmployeeStatusList,
+                    defaultPriorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest,
+                    "by_employee"
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesByTextIfNotExistThenReturnEmptyList() {
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakagesByText(
+                    defaultEmployeeStatusList,
+                    defaultPriorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest,
+                    SOME_NOT_EXIST_TEXT
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesIfStatusNotSelectedThenReturnEmptyList() {
+
+            List<Status> employeeStatusList = List.of(Status.IN_PROGRESS);
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakages(
+                    employeeStatusList,
+                    defaultPriorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesByTextIfStatusNotSelectedThenReturnEmptyList() {
+
+            List<Status> employeeStatusList = List.of(Status.IN_PROGRESS);
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakagesByText(
+                    employeeStatusList,
+                    defaultPriorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest,
+                    "by_employee"
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesIfPriorityNotSelectedThenReturnEmptyList() {
+
+            List<Priority> priorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.LOW);
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakages(
+                    defaultEmployeeStatusList,
+                    priorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesByTextIfPriorityNotSelectedThenReturnEmptyList() {
+
+            List<Priority> priorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.LOW);
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakagesByText(
+                    defaultEmployeeStatusList,
+                    priorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest,
+                    "by_employee"
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
     }
 
 
-//    @Test
-//    void getAllEmployeeBreakagesByText() {
-//    }
-//
 //    @Test
 //    void getAllBreakagesAppointedToMe() {
 //    }
