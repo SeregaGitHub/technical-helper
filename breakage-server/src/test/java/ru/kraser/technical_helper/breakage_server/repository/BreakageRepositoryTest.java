@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageEmployeeDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageTechDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -349,12 +350,15 @@ class BreakageRepositoryTest {
         private Department adminDepartment;
         private User employeeUser;
         private User adminUser;
+        private User technicianUser;
         private LocalDateTime ldt;
         private Breakage savedByEmployeeBreakage;
         private Breakage savedByAdminBreakage;
         private PageRequest defaultPageRequest;
+        List<Status> defaultStatusList;
         List<Status> defaultEmployeeStatusList;
         List<Priority> defaultPriorityList;
+        List<Priority> priorityListWithNoMedium;
 
         @BeforeAll
         void insertData() {
@@ -394,6 +398,20 @@ class BreakageRepositoryTest {
 
             employeeUser = userRepository.saveAndFlush(emplUser);
 
+            User techUser = User.builder()
+                    .username("technician_user")
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.TECHNICIAN)
+                    .department(adminDepartment)
+                    .createdBy(adminUser.getId())
+                    .createdDate(ldt)
+                    .lastUpdatedBy(adminUser.getId())
+                    .lastUpdatedDate(ldt)
+                    .build();
+
+            technicianUser = userRepository.saveAndFlush(techUser);
+
             Breakage savedByEmplBreakage = Breakage.builder()
                     .department(employeeDepartment)
                     .room("some_room")
@@ -432,6 +450,8 @@ class BreakageRepositoryTest {
             defaultPageRequest = PageRequest.of(
                     0, 10, Sort.by(Sort.Direction.DESC, "lastUpdatedDate"));
             defaultEmployeeStatusList = List.of(Status.NEW, Status.IN_PROGRESS);
+            defaultStatusList = List.of(
+                    Status.NEW, Status.IN_PROGRESS, Status.CANCELLED, Status.PAUSED, Status.REDIRECTED, Status.SOLVED);
             defaultPriorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.MEDIUM, Priority.LOW);
         }
 
@@ -533,11 +553,9 @@ class BreakageRepositoryTest {
         @Test
         void whenGetAllEmployeeBreakagesIfPriorityNotSelectedThenReturnEmptyList() {
 
-            List<Priority> priorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.LOW);
-
             Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakages(
                     defaultEmployeeStatusList,
-                    priorityList,
+                    priorityListWithNoMedium,
                     employeeDepartment.getId(),
                     defaultPageRequest
             );
@@ -550,11 +568,9 @@ class BreakageRepositoryTest {
         @Test
         void whenGetAllEmployeeBreakagesByTextIfPriorityNotSelectedThenReturnEmptyList() {
 
-            List<Priority> priorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.LOW);
-
             Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakagesByText(
                     defaultEmployeeStatusList,
-                    priorityList,
+                    priorityListWithNoMedium,
                     employeeDepartment.getId(),
                     defaultPageRequest,
                     "by_employee"
@@ -564,6 +580,22 @@ class BreakageRepositoryTest {
 
             assertThat(list).isEmpty();
         }
+
+        /*@Test
+        void whenGetAllBreakagesAppointedToMeThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesAppointedToMe(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    adminUser.getId()
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }*/
+
     }
 
 
