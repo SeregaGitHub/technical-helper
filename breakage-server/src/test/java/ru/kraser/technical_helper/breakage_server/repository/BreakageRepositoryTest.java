@@ -7,17 +7,23 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.BreakageServer;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageEmployeeDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
+import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -26,6 +32,7 @@ import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
 import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -331,12 +338,133 @@ class BreakageRepositoryTest {
         }
     }
 
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class WhenGetBreakageMethodsAreInvoked {
 
-//
-//    @Test
-//    void getAllEmployeeBreakages() {
-//    }
-//
+        @Autowired
+        private TransactionTemplate transactionTemplate;
+
+        private Department employeeDepartment;
+        private Department adminDepartment;
+        private User employeeUser;
+        private User adminUser;
+        private LocalDateTime ldt;
+        private Breakage savedByEmployeeBreakage;
+        private Breakage savedByAdminBreakage;
+        private PageRequest defaultPageRequest;
+        List<Status> defaultEmployeeStatusList;
+        List<Priority> defaultPriorityList;
+
+        @BeforeAll
+        void insertData() {
+
+            adminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
+            adminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+            ldt = LocalDateTime.of(
+                    2025,
+                    9,
+                    29,
+                    13,
+                    0,
+                    0);
+
+            Department emplDepartment = Department.builder()
+                    .name("employee_department")
+                    .enabled(true)
+                    .createdBy(adminUser.getId())
+                    .createdDate(ldt)
+                    .lastUpdatedBy(adminUser.getId())
+                    .lastUpdatedDate(ldt)
+                    .build();
+
+            employeeDepartment = departmentRepository.saveAndFlush(emplDepartment);
+
+            User emplUser = User.builder()
+                    .username("employee_user")
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.EMPLOYEE)
+                    .department(employeeDepartment)
+                    .createdBy(adminUser.getId())
+                    .createdDate(ldt)
+                    .lastUpdatedBy(adminUser.getId())
+                    .lastUpdatedDate(ldt)
+                    .build();
+
+            employeeUser = userRepository.saveAndFlush(emplUser);
+
+            Breakage savedByEmplBreakage = Breakage.builder()
+                    .department(employeeDepartment)
+                    .room("some_room")
+                    .breakageTopic("saved_by_employee_breakage_topic")
+                    .breakageText("saved_by_employee_breakage_text")
+                    .status(Status.NEW)
+                    .priority(Priority.MEDIUM)
+                    .executor(null)
+                    .executorAppointedBy(null)
+                    .deadline(null)
+                    .createdBy(employeeUser.getId())
+                    .createdDate(ldt)
+                    .lastUpdatedBy(employeeUser.getId())
+                    .lastUpdatedDate(ldt)
+                    .build();
+
+            Breakage savedByAdmBreakage = Breakage.builder()
+                    .department(adminDepartment)
+                    .room("some_room")
+                    .breakageTopic("test_breakage_topic")
+                    .breakageText("test_breakage_text")
+                    .status(Status.NEW)
+                    .priority(Priority.MEDIUM)
+                    .executor(null)
+                    .executorAppointedBy(null)
+                    .deadline(null)
+                    .createdBy(adminUser.getId())
+                    .createdDate(ldt)
+                    .lastUpdatedBy(adminUser.getId())
+                    .lastUpdatedDate(ldt)
+                    .build();
+
+            savedByAdminBreakage = breakageRepository.saveAndFlush(savedByAdmBreakage);
+            savedByEmployeeBreakage = breakageRepository.saveAndFlush(savedByEmplBreakage);
+
+            defaultPageRequest = PageRequest.of(
+                    0, 10, Sort.by(Sort.Direction.DESC, "lastUpdatedDate"));
+            defaultEmployeeStatusList = List.of(Status.NEW, Status.IN_PROGRESS);
+            defaultPriorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.MEDIUM, Priority.LOW);
+        }
+
+        @AfterAll
+        void cleanupData() {
+
+            transactionTemplate.execute(status -> {
+                entityManager.createNativeQuery("TRUNCATE TABLE breakage CASCADE")
+                        .executeUpdate();
+                return null;
+            });
+
+            userRepository.deleteById(employeeUser.getId());
+            departmentRepository.deleteById(employeeDepartment.getId());
+        }
+
+        @Test
+        void whenGetAllEmployeeBreakagesThenReturnListOfBreakageEmployeeDto() {
+
+            Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakages(
+                    defaultEmployeeStatusList,
+                    defaultPriorityList,
+                    employeeDepartment.getId(),
+                    defaultPageRequest
+            );
+
+            List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+    }
+
+
 //    @Test
 //    void getAllEmployeeBreakagesByText() {
 //    }
