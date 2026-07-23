@@ -352,11 +352,13 @@ class BreakageRepositoryTest {
         private User adminUser;
         private User technicianUser;
         private LocalDateTime ldt;
+        private LocalDateTime beforeLdt;
         private Breakage savedByEmployeeBreakage;
         private Breakage savedByAdminBreakage;
         private PageRequest defaultPageRequest;
         List<Status> defaultStatusList;
         List<Status> defaultEmployeeStatusList;
+        List<Status> statusListWithOnlyInProgress;
         List<Priority> defaultPriorityList;
         List<Priority> priorityListWithNoMedium;
 
@@ -372,6 +374,7 @@ class BreakageRepositoryTest {
                     13,
                     0,
                     0);
+            beforeLdt = ldt.minusDays(1);
 
             Department emplDepartment = Department.builder()
                     .name("employee_department")
@@ -419,9 +422,9 @@ class BreakageRepositoryTest {
                     .breakageText("saved_by_employee_breakage_text")
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
-                    .executor(null)
-                    .executorAppointedBy(null)
-                    .deadline(null)
+                    .executor(technicianUser)
+                    .executorAppointedBy(adminUser)
+                    .deadline(beforeLdt)
                     .createdBy(employeeUser.getId())
                     .createdDate(ldt)
                     .lastUpdatedBy(employeeUser.getId())
@@ -452,7 +455,9 @@ class BreakageRepositoryTest {
             defaultEmployeeStatusList = List.of(Status.NEW, Status.IN_PROGRESS);
             defaultStatusList = List.of(
                     Status.NEW, Status.IN_PROGRESS, Status.CANCELLED, Status.PAUSED, Status.REDIRECTED, Status.SOLVED);
+            statusListWithOnlyInProgress = List.of(Status.IN_PROGRESS);
             defaultPriorityList = List.of(Priority.URGENTLY, Priority.HIGH, Priority.MEDIUM, Priority.LOW);
+            priorityListWithNoMedium = List.of(Priority.URGENTLY, Priority.HIGH, Priority.LOW);
         }
 
         @AfterAll
@@ -518,10 +523,8 @@ class BreakageRepositoryTest {
         @Test
         void whenGetAllEmployeeBreakagesIfStatusNotSelectedThenReturnEmptyList() {
 
-            List<Status> employeeStatusList = List.of(Status.IN_PROGRESS);
-
             Page<BreakageEmployeeDto> breakageEmployeeDtoPage = breakageRepository.getAllEmployeeBreakages(
-                    employeeStatusList,
+                    statusListWithOnlyInProgress,
                     defaultPriorityList,
                     employeeDepartment.getId(),
                     defaultPageRequest
@@ -581,8 +584,53 @@ class BreakageRepositoryTest {
             assertThat(list).isEmpty();
         }
 
-        /*@Test
+        @Test
         void whenGetAllBreakagesAppointedToMeThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesAppointedToMe(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    technicianUser.getId()
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllBreakagesAppointedToMeIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesAppointedToMe(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    technicianUser.getId()
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesAppointedToMeIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesAppointedToMe(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    technicianUser.getId()
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesAppointedToMeThenReturnEmptyList() {
 
             Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesAppointedToMe(
                     defaultStatusList,
@@ -593,19 +641,76 @@ class BreakageRepositoryTest {
 
             List<BreakageTechDto> list = breakagesPage.getContent();
 
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextAppointedToMeThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    technicianUser.getId(),
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
             assertThat(list.size()).isEqualTo(1);
-        }*/
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextAppointedToMeIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    technicianUser.getId(),
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextAppointedToMeIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    technicianUser.getId(),
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextAppointedToMeThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextAppointedToMe(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    adminUser.getId(),
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
 
     }
 
 
-//    @Test
-//    void getAllBreakagesAppointedToMe() {
-//    }
-//
-//    @Test
-//    void getAllBreakagesByTextAppointedToMe() {
-//    }
 //
 //    @Test
 //    void getAllDeadlineExpiredBreakagesAppointedToMe() {
