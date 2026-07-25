@@ -1198,23 +1198,118 @@ class BreakageRepositoryTest {
 
             assertThat(list).isEmpty();
         }
-        // =============================================================================================================
+
+        @Test
+        void whenGetAllBreakagesThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakages(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(2);
+        }
+
+        @Test
+        void whenGetAllBreakagesIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakages(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakages(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByText(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(2);
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByText(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByText(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByText(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
 
         // =============================================================================================================
 
+        // =============================================================================================================
 
         // =============================================================================================================
 
     }
 
-//    @Test
-//    void getAllBreakages() {
-//    }
-//
-//    @Test
-//    void getAllBreakagesByText() {
-//    }
-//
+
 //    @Test
 //    void getAllDeadlineExpiredBreakages() {
 //    }
