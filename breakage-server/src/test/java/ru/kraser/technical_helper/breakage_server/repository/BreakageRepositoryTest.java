@@ -1301,23 +1301,138 @@ class BreakageRepositoryTest {
             assertThat(list.size()).isEqualTo(1);
         }
 
-        // =============================================================================================================
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesThenReturnListOfBreakages() {
 
-        // =============================================================================================================
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakages(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    ldt
+            );
 
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakages(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    ldt
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakages(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    ldt
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesThenReturnEmptyList() {
+
+            LocalDateTime localDateTime = beforeLdt.minusDays(2);
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakages(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    localDateTime
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesByTextThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage =
+                    breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                            defaultStatusList,
+                            defaultPriorityList,
+                            defaultPageRequest,
+                            ldt,
+                            "breakage"
+                    );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesByTextIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    ldt,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesByTextIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    ldt,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllDeadlineExpiredBreakagesByTextThenReturnEmptyList() {
+
+            LocalDateTime localDateTime = beforeLdt.minusDays(2);
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    localDateTime,
+                    "breakage"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
         // =============================================================================================================
 
     }
 
-
-//    @Test
-//    void getAllDeadlineExpiredBreakages() {
-//    }
-//
-//    @Test
-//    void getAllDeadlineExpiredBreakagesByText() {
-//    }
-//
 //    @Test
 //    void getBreakageEmployee() {
 //    }
