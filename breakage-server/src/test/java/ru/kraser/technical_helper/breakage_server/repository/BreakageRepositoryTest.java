@@ -434,8 +434,8 @@ class BreakageRepositoryTest {
             Breakage savedByAdmBreakage = Breakage.builder()
                     .department(adminDepartment)
                     .room("some_room")
-                    .breakageTopic("test_breakage_topic")
-                    .breakageText("test_breakage_text")
+                    .breakageTopic("saved_by_admin_breakage_topic")
+                    .breakageText("saved_by_admin_breakage_text")
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
                     .executor(null)
@@ -1096,22 +1096,117 @@ class BreakageRepositoryTest {
 
             assertThat(list).isEmpty();
         }
+
+        @Test
+        void whenGetAllBreakagesNoAppointedThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesNoAppointed(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllBreakagesNoAppointedIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesNoAppointed(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesNoAppointedIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesNoAppointed(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextNoAppointedThenReturnListOfBreakages() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextNoAppointed(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "by_admin"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list.size()).isEqualTo(1);
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextNoAppointedIfStatusNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextNoAppointed(
+                    statusListWithOnlyInProgress,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "by_admin"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextNoAppointedIfPriorityNotSelectedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextNoAppointed(
+                    defaultStatusList,
+                    priorityListWithNoMedium,
+                    defaultPageRequest,
+                    "by_admin"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
+
+        @Test
+        void whenGetAllBreakagesByTextNoAppointedThenReturnEmptyList() {
+
+            Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByTextNoAppointed(
+                    defaultStatusList,
+                    defaultPriorityList,
+                    defaultPageRequest,
+                    "by_employee"
+            );
+
+            List<BreakageTechDto> list = breakagesPage.getContent();
+
+            assertThat(list).isEmpty();
+        }
         // =============================================================================================================
 
         // =============================================================================================================
 
+
         // =============================================================================================================
+
     }
 
-
-//    @Test
-//    void getAllBreakagesNoAppointed() {
-//    }
-//
-//    @Test
-//    void getAllBreakagesByTextNoAppointed() {
-//    }
-//
 //    @Test
 //    void getAllBreakages() {
 //    }
