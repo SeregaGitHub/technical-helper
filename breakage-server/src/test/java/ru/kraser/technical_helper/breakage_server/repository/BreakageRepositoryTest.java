@@ -21,6 +21,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.BreakageServer;
+import ru.kraser.technical_helper.common_module.dto.breakage.BreakageDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageEmployeeDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.BreakageTechDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
@@ -34,6 +35,7 @@ import ru.kraser.technical_helper.main_server.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1429,15 +1431,41 @@ class BreakageRepositoryTest {
 
             assertThat(list).isEmpty();
         }
-        // =============================================================================================================
 
+        @Test
+        void whenGetBreakageByEmployeeThenReturnBreakageEmployeeDto() {
+
+            Optional<BreakageEmployeeDto> optional =
+                    breakageRepository.getBreakageEmployee(savedByEmployeeBreakage.getId());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenGetBreakageByEmployeeWhichNotExistThenReturnEmptyOptional() {
+
+            Optional<BreakageEmployeeDto> optional =
+                    breakageRepository.getBreakageEmployee(SOME_NOT_EXIST_ID);
+
+            assertThat(optional).isEmpty();
+        }
+
+        @Test
+        void whenGetBreakageThenReturnBreakageDto() {
+
+            Optional<BreakageDto> optional =
+                    breakageRepository.getBreakage(savedByAdminBreakage.getId());
+
+            assertThat(optional).isNotEmpty();
+        }
+
+        @Test
+        void whenGetBreakageWhichNotExistThenReturnEmptyOptional() {
+
+            Optional<BreakageDto> optional =
+                    breakageRepository.getBreakage(SOME_NOT_EXIST_ID);
+
+            assertThat(optional).isEmpty();
+        }
     }
-
-//    @Test
-//    void getBreakageEmployee() {
-//    }
-//
-//    @Test
-//    void getBreakage() {
-//    }
 }
