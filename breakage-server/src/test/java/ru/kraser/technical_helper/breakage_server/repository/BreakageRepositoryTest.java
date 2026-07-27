@@ -176,7 +176,7 @@ class BreakageRepositoryTest {
         }
 
         @Test
-        void whenCreateBreakageWithNotNotExistDepartmentThenThrowException() {
+        void whenCreateBreakageWithNotExistDepartmentThenThrowException() {
 
             Department notExistDepartment = Department.builder()
                     .id(SOME_NOT_EXIST_ID)
