@@ -1,6 +1,5 @@
 package ru.kraser.technical_helper.breakage_server.service.service_impl;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,23 +13,23 @@ import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
+import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
-import ru.kraser.technical_helper.common_module.exception.AlreadyExistsException;
+import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
-import ru.kraser.technical_helper.common_module.model.User;
-import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
-import static ru.kraser.technical_helper.common_module.util.ConstantForTests.DEFAULT_ADMIN_USER_ID;
 
 @ExtendWith(MockitoExtension.class)
 // @MockitoSettings(strictness = Strictness.LENIENT)  // If "NOW_ZDT" will get problem !!!
@@ -168,7 +167,6 @@ class BreakageServiceImplTest {
                             "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности " +
                                     "\"fk_breakage_department\""
                             )
-
                     );
 
             NotFoundException exception = assertThrows(
@@ -182,10 +180,105 @@ class BreakageServiceImplTest {
                     .saveAndFlush(BreakageMapper.toBreakage(createBreakageFullDto, DEFAULT_ADMIN_USER_ID, now));
         }
     }
-//
-//    @Test
-//    void cancelBreakage() {
-//    }
+
+    @Nested
+    class WhenBreakageCancelling {
+
+        @Test
+        void whenCancelBreakageByTechnicianThenReturnOk() {
+
+            String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.updateBreakageStatus(
+                    testBreakage.getId(), Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.cancelBreakage(
+                    testBreakage.getId(), testBreakage.getDepartment().getId(), DEFAULT_ADMIN_USER_ID,
+                    Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_NAME
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatus(testBreakage.getId(), Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenCancelBreakageByEmployeeFromSameDepartmentThenReturnOk() {
+
+            String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.updateBreakageStatus(
+                    testBreakage.getId(), Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.cancelBreakage(
+                    testBreakage.getId(), testDepartment.getId(), DEFAULT_ADMIN_USER_ID,
+                    Role.EMPLOYEE, testDepartment.getId(), USER_TEST_NAME
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatus(testBreakage.getId(), Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenCancelBreakageWhichNotExistThenReturnNotFoundException() {
+
+            when(breakageRepository.updateBreakageStatus(
+                    SOME_NOT_EXIST_ID, Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now)
+            ).thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.cancelBreakage(SOME_NOT_EXIST_ID, testDepartment.getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID,USER_TEST_NAME)
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatus(SOME_NOT_EXIST_ID, Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenCancelBreakageByEmployeeFromOtherDepartmentThenReturnForbiddenException() {
+
+            String responseMessage = "Только технический специалист или сотрудник отдела, " +
+                    "в котором произошла неисправность, могут отменить заявку !!!";
+
+            ForbiddenException exception = assertThrows(
+                    ForbiddenException.class,
+                    () -> breakageService.cancelBreakage(testBreakage.getId(), testDepartment.getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME)
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(breakageRepository, times(0))
+                    .updateBreakageStatus(testBreakage.getId(), Status.CANCELLED, DEFAULT_ADMIN_USER_ID, now);
+        }
+    }
+
+
 //
 //    @Test
 //    void updateBreakageStatus() {
