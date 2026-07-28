@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class AppPageMapper {
 
-    public AppPage toAppPage(Page<?> page, Role currentUserRole) {
+    public AppPage toAppPage(Page<?> page, Role currentUserRole, LocalDateTime now) {
 
         boolean isForEmployee = currentUserRole == Role.EMPLOYEE;
 
@@ -25,7 +25,7 @@ public class AppPageMapper {
                 .first(page.isFirst())
                 .last(page.isLast())
                 .isForEmployee(isForEmployee)
-                .now(isForEmployee ? null : LocalDateTime.now().withNano(0))
+                .now(isForEmployee ? null : now)
                 .build();
     }
 }

@@ -16,9 +16,8 @@ import java.util.List;
 @UtilityClass
 public class BreakageMapper {
 
-    public Breakage toBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId) {
+    public Breakage toBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId, LocalDateTime now) {
         Breakage breakage = new Breakage();
-        LocalDateTime now = LocalDateTime.now().withNano(0);
 
         breakage.setDepartment(createBreakageFullDto.department());
         breakage.setRoom(createBreakageFullDto.room());
