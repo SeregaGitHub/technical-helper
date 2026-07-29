@@ -12,10 +12,12 @@ import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
+import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -278,11 +280,112 @@ class BreakageServiceImplTest {
         }
     }
 
+    @Nested
+    class WhenBreakageStatusUpdating {
 
-//
-//    @Test
-//    void updateBreakageStatus() {
-//    }
+        @Test
+        void whenUpdateBreakageStatusThenReturnOk() {
+
+            UpdateBreakageStatusDto updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.updateBreakageStatus(
+                    testBreakage.getId(), Status.IN_PROGRESS, DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.updateBreakageStatus(
+                    testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatus(testBreakage.getId(), Status.IN_PROGRESS, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenUpdateBreakageStatusThenResetExecutorAndReturnOk() {
+
+            UpdateBreakageStatusDto updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.PAUSED);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.updateBreakageStatusAndResetExecutor(
+                    testBreakage.getId(), Status.PAUSED, DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.updateBreakageStatus(
+                    testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatusAndResetExecutor(
+                            testBreakage.getId(), Status.PAUSED, DEFAULT_ADMIN_USER_ID, now
+                    );
+        }
+
+        @Test
+        void whenUpdateBreakageWhichNotExistThenReturnNotFoundException() {
+
+            UpdateBreakageStatusDto updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            when(breakageRepository.updateBreakageStatus(
+                    SOME_NOT_EXIST_ID, Status.IN_PROGRESS, DEFAULT_ADMIN_USER_ID, now)
+            ).thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.updateBreakageStatus(
+                            SOME_NOT_EXIST_ID, updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME)
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .updateBreakageStatus(SOME_NOT_EXIST_ID, Status.IN_PROGRESS, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenUpdateBreakageStatusIfStatusIsNewThenReturnNotCorrectParameter() {
+
+            UpdateBreakageStatusDto updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.NEW);
+
+            String responseMessage = "Заявка на неисправность не может изменить статус на - \"Новая\" !!!";
+
+            NotCorrectParameter exception = assertThrows(
+                    NotCorrectParameter.class,
+                    () -> breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+                    )
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(breakageRepository, times(0))
+                    .updateBreakageStatus(testBreakage.getId(), Status.NEW, DEFAULT_ADMIN_USER_ID, now);
+        }
+    }
+
+
 //
 //    @Test
 //    void updateBreakagePriority() {
