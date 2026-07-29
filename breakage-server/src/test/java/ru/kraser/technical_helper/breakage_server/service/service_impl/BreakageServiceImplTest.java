@@ -12,6 +12,7 @@ import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -385,12 +386,85 @@ class BreakageServiceImplTest {
         }
     }
 
+    @Nested
+    class WhenBreakagePriorityUpdating {
 
-//
-//    @Test
-//    void updateBreakagePriority() {
-//    }
-//
+        @Test
+        void whenUpdateBreakagePriorityThenReturnOk() {
+
+            UpdateBreakagePriorityDto updateBreakagePriorityDto =
+                    new UpdateBreakagePriorityDto(Priority.HIGH, Status.IN_PROGRESS);
+
+            String responseMessage = "Приоритет заявки на неисправность был успешно изменен";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.updateBreakagePriority(
+                    testBreakage.getId(), Priority.HIGH, DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.updateBreakagePriority(
+                    testBreakage.getId(), updateBreakagePriorityDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .updateBreakagePriority(testBreakage.getId(), Priority.HIGH, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenUpdateBreakageWhichNotExistThenReturnNotFoundException() {
+
+            UpdateBreakagePriorityDto updateBreakagePriorityDto =
+                    new UpdateBreakagePriorityDto(Priority.HIGH, Status.IN_PROGRESS);
+
+            when(breakageRepository.updateBreakagePriority(
+                    SOME_NOT_EXIST_ID, Priority.HIGH, DEFAULT_ADMIN_USER_ID, now)
+            ).thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.updateBreakagePriority(
+                            SOME_NOT_EXIST_ID, updateBreakagePriorityDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME)
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .updateBreakagePriority(SOME_NOT_EXIST_ID, Priority.HIGH, DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenUpdateBreakagePriorityIfStatusIsSolvedOrCancelledThenReturnNotCorrectParameter() {
+
+            UpdateBreakagePriorityDto updateBreakagePriorityDto =
+                    new UpdateBreakagePriorityDto(Priority.HIGH, Status.SOLVED);
+
+            String responseMessage = "Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
+                    " - не может быть изменена !!!";
+
+            NotCorrectParameter exception = assertThrows(
+                    NotCorrectParameter.class,
+                    () -> breakageService.updateBreakagePriority(
+                            testBreakage.getId(), updateBreakagePriorityDto, DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+                    )
+            );
+
+            assertEquals(responseMessage, exception.getMessage());
+
+            verify(breakageRepository, times(0))
+                    .updateBreakagePriority(testBreakage.getId(), Priority.HIGH, DEFAULT_ADMIN_USER_ID, now);
+        }
+    }
+
+
 //    @Test
 //    void addBreakageExecutor() {
 //    }
