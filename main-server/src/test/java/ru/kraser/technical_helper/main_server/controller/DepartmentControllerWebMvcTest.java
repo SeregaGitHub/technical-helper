@@ -163,7 +163,8 @@ class DepartmentControllerWebMvcTest {
                     .getContentAsString();
 
             assertEquals(objectMapper.writeValueAsString(apiResponse), result);
-            verify(departmentService, times(1)).createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
+            verify(departmentService, times(1))
+                    .createDepartment(createDepartmentDto, DEFAULT_ADMIN_USER_ID);
         }
     }
 
