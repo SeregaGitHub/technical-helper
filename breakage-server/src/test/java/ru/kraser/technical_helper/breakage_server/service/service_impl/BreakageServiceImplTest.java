@@ -558,7 +558,9 @@ class BreakageServiceImplTest {
             assertEquals(responseMessage, exception.getMessage());
 
             verify(breakageRepository, times(1))
-                    .addBreakageExecutor(testBreakage.getId(), SOME_NOT_EXIST_ID, expectedDeadline, DEFAULT_ADMIN_USER_ID, now);
+                    .addBreakageExecutor(
+                            testBreakage.getId(), SOME_NOT_EXIST_ID, expectedDeadline, DEFAULT_ADMIN_USER_ID, now
+                    );
         }
 
         @Test
@@ -608,10 +610,59 @@ class BreakageServiceImplTest {
         }
     }
 
-//
-//    @Test
-//    void dropBreakageExecutor() {
-//    }
+    @Nested
+    class WhenBreakageExecutorDropping {
+
+        @Test
+        void whenDropBreakageThenReturnOk() {
+
+            String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageRepository.dropBreakageExecutor(
+                    testBreakage.getId(), DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.dropBreakageExecutor(
+                    testBreakage.getId(), DEFAULT_ADMIN_USER_ID, USER_TEST_NAME);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .dropBreakageExecutor(testBreakage.getId(), DEFAULT_ADMIN_USER_ID, now);
+        }
+
+        @Test
+        void whenDropBreakageThenReturnNotFoundException() {
+
+            when(breakageRepository.dropBreakageExecutor(
+                    testBreakage.getId(), DEFAULT_ADMIN_USER_ID, now)
+            ).thenReturn(0);
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, USER_TEST_NAME
+                    )
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, now
+                    );
+        }
+    }
+
+
 //
 //    @Test
 //    void getAllBreakages() {
