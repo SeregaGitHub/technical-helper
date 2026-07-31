@@ -36,6 +36,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_COMMENT_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
@@ -972,17 +973,59 @@ class BreakageServiceImplTest {
                             )
                     );
         }
+
+        @Test
+        void whenUpdateBreakageCommentThenReturnOk() {
+
+            String responseMessage = "Комментарий к заявке на неисправность был успешно обновлен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageCommentRepository.updateBreakageComment(
+                    breakageComment.getId(), createBreakageCommentDto.comment(), USER_TEST_ID, now)
+            ).thenReturn(1);
+
+            ApiResponse returnedApiResponse = breakageService.updateBreakageComment(
+                    createBreakageCommentDto, breakageComment.getId(), USER_TEST_ID
+            );
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageCommentRepository, times(1))
+                    .updateBreakageComment(
+                            breakageComment.getId(), createBreakageCommentDto.comment(), USER_TEST_ID, now
+                    );
+        }
+
+        @Test
+        void whenUpdateBreakageCommentThenReturnNotFoundException() {
+
+            when(breakageCommentRepository.updateBreakageComment(
+                    SOME_NOT_EXIST_ID, createBreakageCommentDto.comment(), USER_TEST_ID, now)
+            ).thenReturn(0);
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.updateBreakageComment(
+                            createBreakageCommentDto, SOME_NOT_EXIST_ID, USER_TEST_ID
+                    )
+            );
+
+            assertEquals(BREAKAGE_COMMENT_NOT_EXIST, exception.getMessage());
+
+            verify(breakageCommentRepository, times(1))
+                    .updateBreakageComment(
+                            SOME_NOT_EXIST_ID, createBreakageCommentDto.comment(), USER_TEST_ID, now
+                    );
+        }
     }
 
 
-//
-//    @Test
-//    void createBreakageComment() {
-//    }
-//
-//    @Test
-//    void updateBreakageComment() {
-//    }
 //
 //    @Test
 //    void deleteBreakageComment() {
