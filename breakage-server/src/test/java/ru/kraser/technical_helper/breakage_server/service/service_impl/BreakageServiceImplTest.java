@@ -9,16 +9,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageCommentMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
+import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -30,6 +36,8 @@ import ru.kraser.technical_helper.common_module.model.BreakageComment;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -175,8 +183,8 @@ class BreakageServiceImplTest {
 
             when(breakageRepository.saveAndFlush(BreakageMapper.toBreakage(createBreakageFullDto, DEFAULT_ADMIN_USER_ID, now)))
                     .thenThrow(new NotFoundException(
-                            "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности " +
-                                    "\"fk_breakage_department\""
+                                    "ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности " +
+                                            "\"fk_breakage_department\""
                             )
                     );
 
@@ -261,7 +269,7 @@ class BreakageServiceImplTest {
             NotFoundException exception = assertThrows(
                     NotFoundException.class,
                     () -> breakageService.cancelBreakage(SOME_NOT_EXIST_ID, testDepartment.getId(), DEFAULT_ADMIN_USER_ID,
-                            Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID,USER_TEST_NAME)
+                            Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_NAME)
             );
 
             assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
@@ -553,8 +561,8 @@ class BreakageServiceImplTest {
                     "Пользователь, который назначается исполнителем заявки на неисправность, не существует.";
 
             when(breakageRepository.addBreakageExecutor(
-                            testBreakage.getId(), SOME_NOT_EXIST_ID, expectedDeadline, DEFAULT_ADMIN_USER_ID, now)
-                    ).thenThrow(new NotFoundException(responseMessage));
+                    testBreakage.getId(), SOME_NOT_EXIST_ID, expectedDeadline, DEFAULT_ADMIN_USER_ID, now)
+            ).thenThrow(new NotFoundException(responseMessage));
 
             NotFoundException exception = assertThrows(
                     NotFoundException.class,
@@ -670,12 +678,146 @@ class BreakageServiceImplTest {
         }
     }
 
+    @Nested
+    class WhenAllBreakagesGetting {
 
-//
-//    @Test
-//    void getAllBreakages() {
-//    }
-//
+        private Integer pageSize;
+        private Integer pageIndex;
+        private String defaultSortBy;
+        private String defaultSearchText;
+        private List<Status> defaultStatusList;
+        private List<Priority> defaultPriorityList;
+        private PageRequest defaultPageRequest;
+
+        @BeforeEach
+        void setUp() {
+
+            pageSize = 10;
+            pageIndex = 0;
+            defaultSortBy = "lastUpdatedDate";
+            defaultSearchText = "breakage";
+
+            defaultStatusList = new ArrayList<>();
+            defaultStatusList.add(Status.NEW);
+            defaultStatusList.add(Status.SOLVED);
+            defaultStatusList.add(Status.IN_PROGRESS);
+            defaultStatusList.add(Status.PAUSED);
+            defaultStatusList.add(Status.REDIRECTED);
+            defaultStatusList.add(Status.CANCELLED);
+
+            defaultPriorityList = new ArrayList<>();
+            defaultPriorityList.add(Priority.URGENTLY);
+            defaultPriorityList.add(Priority.HIGH);
+            defaultPriorityList.add(Priority.MEDIUM);
+            defaultPriorityList.add(Priority.LOW);
+
+            Sort sort = Sort.by(Sort.Direction.DESC, defaultSortBy);
+            defaultPageRequest = PageRequest.of(
+                    0, 10, sort);
+        }
+
+        @Nested
+        class WhenAllBreakagesGettingByEmployee {
+
+            private BreakageEmployeeDto breakageEmployeeDto;
+            private List<BreakageEmployeeDto> content;
+            private Page<BreakageEmployeeDto> page;
+
+            @BeforeEach
+            void setUp() {
+
+                breakageEmployeeDto = BreakageEmployeeDto.builder()
+                        .id(testBreakage.getId())
+                        .departmentId(testBreakage.getDepartment().getId())
+                        .departmentName(testBreakage.getDepartment().getName())
+                        .room(testBreakage.getRoom())
+                        .breakageTopic(testBreakage.getBreakageTopic())
+                        .breakageText(testBreakage.getBreakageText())
+                        .status(testBreakage.getStatus())
+                        .breakageExecutor(null)
+                        .createdBy(testBreakage.getCreatedBy())
+                        .createdDate(testBreakage.getCreatedDate())
+                        .build();
+
+                content = List.of(breakageEmployeeDto);
+                page = new PageImpl<>(content, defaultPageRequest, content.size());
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesThenReturnAppPage() {
+
+                when(breakageRepository.getAllEmployeeBreakages(
+                                defaultStatusList, defaultPriorityList, DEPARTMENT_TEST_ID, defaultPageRequest
+                        )
+                ).thenReturn(page);
+
+                AppPage appPage =
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.NO_APPOINTED.name(), false, null,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
+
+                assertEquals(content, appPage.content());
+
+                verify(breakageRepository, times(1))
+                        .getAllEmployeeBreakages(
+                                defaultStatusList, defaultPriorityList, DEPARTMENT_TEST_ID, defaultPageRequest
+                        );
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesByTextThenReturnAppPage() {
+
+                when(breakageRepository.getAllEmployeeBreakagesByText(
+                                defaultStatusList, defaultPriorityList,
+                                DEPARTMENT_TEST_ID, defaultPageRequest, defaultSearchText
+                        )
+                ).thenReturn(page);
+
+                AppPage appPage =
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.NO_APPOINTED.name(), false, defaultSearchText,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
+
+                assertEquals(content, appPage.content());
+
+                verify(breakageRepository, times(1))
+                        .getAllEmployeeBreakagesByText(
+                                defaultStatusList, defaultPriorityList,
+                                DEPARTMENT_TEST_ID, defaultPageRequest, defaultSearchText
+                        );
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesThenReturnEmptyAppPageContent() {
+
+                defaultStatusList.remove(Status.NEW);
+                page = new PageImpl<>(Collections.emptyList(), defaultPageRequest, 0);
+
+                when(breakageRepository.getAllEmployeeBreakages(
+                                defaultStatusList, defaultPriorityList, DEPARTMENT_TEST_ID, defaultPageRequest
+                        )
+                ).thenReturn(page);
+
+                AppPage appPage =
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                false, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.NO_APPOINTED.name(), false, null,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
+
+                assertEquals(Collections.emptyList(), appPage.content());
+
+                verify(breakageRepository, times(1))
+                        .getAllEmployeeBreakages(
+                                defaultStatusList, defaultPriorityList, DEPARTMENT_TEST_ID, defaultPageRequest
+                        );
+            }
+        }
+    }
 
     @Nested
     class WhenBreakageByEmployeeGetting {
