@@ -1023,11 +1023,26 @@ class BreakageServiceImplTest {
                             SOME_NOT_EXIST_ID, createBreakageCommentDto.comment(), USER_TEST_ID, now
                     );
         }
+
+        @Test
+        void whenDeleteBreakageCommentThenReturnOk() {
+
+            String responseMessage = "Комментарий к заявке на неисправность был успешно удален.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            ApiResponse returnedApiResponse =
+                    breakageService.deleteBreakageComment(breakageComment.getId());
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageCommentRepository, times(1))
+                    .deleteById(breakageComment.getId());
+        }
     }
-
-
-//
-//    @Test
-//    void deleteBreakageComment() {
-//    }
 }
