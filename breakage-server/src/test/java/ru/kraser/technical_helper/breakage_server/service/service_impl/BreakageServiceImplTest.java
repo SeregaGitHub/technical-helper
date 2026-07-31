@@ -12,11 +12,13 @@ import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
+import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageCommentMapper;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -24,6 +26,7 @@ import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotCorrectParameter;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
+import ru.kraser.technical_helper.common_module.model.BreakageComment;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.*;
@@ -756,6 +759,8 @@ class BreakageServiceImplTest {
     class WhenBreakageGettingAndBreakageCommentMethodsAreInvoked {
 
         private BreakageDto breakageDto;
+        private BreakageComment breakageComment;
+        private CreateBreakageCommentDto createBreakageCommentDto;
         private BreakageFullDto breakageFullDto;
         private BreakageCommentBackendDto breakageCommentBackendDto;
         private BreakageCommentFrontDto breakageCommentFrontDto;
@@ -781,6 +786,18 @@ class BreakageServiceImplTest {
                     .lastUpdatedDate(testBreakage.getLastUpdatedDate())
                     .deadline(null)
                     .build();
+
+            breakageComment = BreakageComment.builder()
+                    .id(BREAKAGE_COMMENT_TEST_ID)
+                    .breakage(testBreakage)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedBy(testBreakage.getLastUpdatedBy())
+                    .lastUpdatedDate(testBreakage.getLastUpdatedDate())
+                    .build();
+
+            createBreakageCommentDto = new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.IN_PROGRESS);
 
             breakageCommentBackendDto = BreakageCommentBackendDto.builder()
                     .id(BREAKAGE_COMMENT_TEST_ID)
@@ -822,25 +839,6 @@ class BreakageServiceImplTest {
         }
 
         @Test
-        void whenGetBreakageThenReturnNotFoundException() {
-
-            when(breakageRepository.getBreakage(testBreakage.getId()))
-                    .thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
-
-            NotFoundException exception = assertThrows(
-                    NotFoundException.class,
-                    () -> breakageService.getBreakage(
-                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID
-                    )
-            );
-
-            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
-
-            verify(breakageRepository, times(1))
-                    .getBreakage(testBreakage.getId());
-        }
-
-        @Test
         void whenGetBreakageThenReturnBreakage() {
 
             String responseMessage = "Заявка на неисправность с ID=" + testBreakage.getId() + ", получена успешно";
@@ -867,6 +865,112 @@ class BreakageServiceImplTest {
                     .getBreakage(testBreakage.getId());
             verify(breakageCommentRepository, times(1))
                     .getAllBreakageComments(testBreakage.getId());
+        }
+
+        @Test
+        void whenGetBreakageThenReturnNotFoundException() {
+
+            when(breakageRepository.getBreakage(testBreakage.getId()))
+                    .thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.getBreakage(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID
+                    )
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .getBreakage(testBreakage.getId());
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnCreated() {
+
+            String responseMessage = "Комментарий к заявке о неисправности - был успешно создан.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(201)
+                    .httpStatus(HttpStatus.CREATED)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageRepository.getReferenceById(testBreakage.getId()))
+                    .thenReturn(testBreakage);
+            when(breakageCommentRepository.saveAndFlush(breakageComment))
+                    .thenReturn(breakageComment);
+
+            ApiResponse returnedApiResponse =
+                    breakageService.createBreakageComment(createBreakageCommentDto, testBreakage.getId(), USER_TEST_ID);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .getReferenceById(testBreakage.getId());
+            verify(breakageCommentRepository, times(1))
+                    .saveAndFlush(
+                            BreakageCommentMapper.toBreakageComment(
+                                    createBreakageCommentDto, testBreakage, USER_TEST_ID, now
+                            )
+                    );
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnThenReturnNotFoundException() {
+
+            String message = "Заявки на неисправность не существует !!!";
+
+            when(breakageRepository.getReferenceById(testBreakage.getId()))
+                    .thenThrow(new NotFoundException(message));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.createBreakageComment(
+                            createBreakageCommentDto, testBreakage.getId(), USER_TEST_ID
+                    )
+            );
+
+            assertEquals(message, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .getReferenceById(testBreakage.getId());
+            verify(breakageCommentRepository, never())
+                    .saveAndFlush(
+                            BreakageCommentMapper.toBreakageComment(
+                                    createBreakageCommentDto, testBreakage, USER_TEST_ID, now
+                            )
+                    );
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnThenReturnNotCorrectParameter() {
+
+            CreateBreakageCommentDto commentDto =
+                    new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.SOLVED);
+
+            String message = "Комментарии к заявке о неисправности со статусами " +
+                    "\"Решена\" и \"Отменена\" - не создаются !!!";
+
+            NotCorrectParameter exception = assertThrows(
+                    NotCorrectParameter.class,
+                    () -> breakageService.createBreakageComment(
+                            commentDto, testBreakage.getId(), USER_TEST_ID
+                    )
+            );
+
+            assertEquals(message, exception.getMessage());
+
+            verify(breakageRepository, never())
+                    .getReferenceById(testBreakage.getId());
+            verify(breakageCommentRepository, never())
+                    .saveAndFlush(
+                            BreakageCommentMapper.toBreakageComment(
+                                    createBreakageCommentDto, testBreakage, USER_TEST_ID, now
+                            )
+                    );
         }
     }
 
