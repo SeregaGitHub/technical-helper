@@ -10,6 +10,8 @@ public class ConstantForTests {
     public static final String DEFAULT_ADMIN_DEPARTMENT_ID = "d1d11111-11d1-1d11-1111-d111111d1111";
     public static final String DEPARTMENT_TEST_ID = "d1t11111-11d1-1t11-1111-d111111t1111";
     public static final String BREAKAGE_TEST_ID = "b1t11111-11b1-1t11-1111-b111111t1111";
+    public static final String BREAKAGE_COMMENT_TEST_ID = "b1t11111-11c1-1c11-1111-b111111t1111";
+    public static final String BREAKAGE_COMMENT_TEST_TEXT = "breakage_comment_test_text";
     public static final String SOME_NOT_EXIST_ID = "some_not_exist_id";
     public static final String SOME_NOT_EXIST_TEXT = "some_not_exist_text";
 

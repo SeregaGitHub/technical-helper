@@ -10,10 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
+import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.breakage_server.util.mapper.BreakageMapper;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentBackendDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -24,13 +27,13 @@ import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.*;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
-import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +44,8 @@ class BreakageServiceImplTest {
     private Clock clock;
     @Mock
     private BreakageRepository breakageRepository;
+    @Mock
+    private BreakageCommentRepository breakageCommentRepository;
     @InjectMocks
     private BreakageServiceImpl breakageService;
 
@@ -747,10 +752,125 @@ class BreakageServiceImplTest {
         }
     }
 
-//
-//    @Test
-//    void getBreakage() {
-//    }
+    @Nested
+    class WhenBreakageGettingAndBreakageCommentMethodsAreInvoked {
+
+        private BreakageDto breakageDto;
+        private BreakageFullDto breakageFullDto;
+        private BreakageCommentBackendDto breakageCommentBackendDto;
+        private BreakageCommentFrontDto breakageCommentFrontDto;
+
+        @BeforeEach
+        void setUp() {
+
+            breakageDto = BreakageDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .breakageExecutorId(null)
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .priority(testBreakage.getPriority())
+                    .breakageExecutor(null)
+                    .executorAppointedBy(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedBy(testBreakage.getLastUpdatedBy())
+                    .lastUpdatedDate(testBreakage.getLastUpdatedDate())
+                    .deadline(null)
+                    .build();
+
+            breakageCommentBackendDto = BreakageCommentBackendDto.builder()
+                    .id(BREAKAGE_COMMENT_TEST_ID)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .createdBy(USER_TEST_ID)
+                    .creatorName(USER_TEST_NAME)
+                    .createdDate(now)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            breakageCommentFrontDto = BreakageCommentFrontDto.builder()
+                    .id(BREAKAGE_COMMENT_TEST_ID)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .actionEnabled(true)
+                    .creatorName(USER_TEST_NAME)
+                    .createdDate(now)
+                    .lastUpdatedDate(now)
+                    .build();
+
+            breakageFullDto = BreakageFullDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .breakageExecutorId(null)
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .priority(testBreakage.getPriority())
+                    .breakageExecutor(null)
+                    .executorAppointedBy(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedBy(testBreakage.getLastUpdatedBy())
+                    .lastUpdatedDate(testBreakage.getLastUpdatedDate())
+                    .deadline(null)
+                    .comments(List.of(breakageCommentFrontDto))
+                    .build();
+        }
+
+        @Test
+        void whenGetBreakageThenReturnNotFoundException() {
+
+            when(breakageRepository.getBreakage(testBreakage.getId()))
+                    .thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            NotFoundException exception = assertThrows(
+                    NotFoundException.class,
+                    () -> breakageService.getBreakage(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID
+                    )
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, exception.getMessage());
+
+            verify(breakageRepository, times(1))
+                    .getBreakage(testBreakage.getId());
+        }
+
+        @Test
+        void whenGetBreakageThenReturnBreakage() {
+
+            String responseMessage = "Заявка на неисправность с ID=" + testBreakage.getId() + ", получена успешно";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(breakageFullDto)
+                    .build();
+
+            when(breakageRepository.getBreakage(testBreakage.getId()))
+                    .thenReturn(Optional.of(breakageDto));
+            when(breakageCommentRepository.getAllBreakageComments(testBreakage.getId()))
+                    .thenReturn(List.of(breakageCommentBackendDto));
+
+            ApiResponse returnedApiResponse =
+                    breakageService.getBreakage(testBreakage.getId(), USER_TEST_ID);
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageRepository, times(1))
+                    .getBreakage(testBreakage.getId());
+            verify(breakageCommentRepository, times(1))
+                    .getAllBreakageComments(testBreakage.getId());
+        }
+    }
+
+
 //
 //    @Test
 //    void createBreakageComment() {
