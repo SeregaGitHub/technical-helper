@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -184,7 +185,7 @@ class BreakageControllerTest {
                     .status(200)
                     .httpStatus(HttpStatus.OK)
                     .timestamp(now)
-                    .data(USER_TEST_NAME)
+                    .data(DEFAULT_ADMIN_USERNAME)
                     .build();
 
             when(breakageService.cancelBreakage(
@@ -202,6 +203,7 @@ class BreakageControllerTest {
             assertEquals(200, apiResponse.status());
             assertEquals(HttpStatus.OK, apiResponse.httpStatus());
             assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
 
             verify(breakageService, times(1))
                     .cancelBreakage(
@@ -238,6 +240,7 @@ class BreakageControllerTest {
             assertEquals(200, apiResponse.status());
             assertEquals(HttpStatus.OK, apiResponse.httpStatus());
             assertEquals(now, apiResponse.timestamp());
+            assertEquals(USER_TEST_NAME, apiResponse.data());
 
             verify(breakageService, times(1))
                     .cancelBreakage(
@@ -254,7 +257,7 @@ class BreakageControllerTest {
                     .status(404)
                     .httpStatus(HttpStatus.NOT_FOUND)
                     .timestamp(now)
-                    .data(USER_TEST_NAME)
+                    .data(DEFAULT_ADMIN_USERNAME)
                     .build();
 
             when(breakageService.cancelBreakage(
@@ -272,6 +275,7 @@ class BreakageControllerTest {
             assertEquals(404, apiResponse.status());
             assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
             assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
 
             verify(breakageService, times(1))
                     .cancelBreakage(
@@ -309,6 +313,7 @@ class BreakageControllerTest {
             assertEquals(422, apiResponse.status());
             assertEquals(HttpStatus.FORBIDDEN, apiResponse.httpStatus());
             assertEquals(now, apiResponse.timestamp());
+            assertEquals(USER_TEST_NAME, apiResponse.data());
 
             verify(breakageService, times(1))
                     .cancelBreakage(
@@ -318,11 +323,163 @@ class BreakageControllerTest {
         }
     }
 
+    @Nested
+    class WhenBreakageStatusUpdating {
 
-//    @Test
-//    void updateBreakageStatus() {
-//    }
-//
+        private UpdateBreakageStatusDto updateBreakageStatusDto;
+
+        @Test
+        void whenUpdateBreakageStatusThenReturnOk() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.updateBreakageStatus(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
+
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenUpdateBreakageStatusThenResetExecutorAndReturnOk() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.PAUSED);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.updateBreakageStatus(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
+
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenUpdateBreakageWhichNotExistThenReturnNotFoundException() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            SOME_NOT_EXIST_ID, updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.updateBreakageStatus(
+                    DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, updateBreakageStatusDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
+
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            SOME_NOT_EXIST_ID, updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenUpdateBreakageStatusIfStatusIsNewThenReturnNotCorrectParameter() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.NEW);
+
+            String responseMessage = "Заявка на неисправность не может изменить статус на - \"Новая\" !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.updateBreakageStatus(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(400, apiResponse.status());
+            assertEquals(HttpStatus.BAD_REQUEST, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, apiResponse.data());
+
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void updateBreakagePriority() {
 //    }
