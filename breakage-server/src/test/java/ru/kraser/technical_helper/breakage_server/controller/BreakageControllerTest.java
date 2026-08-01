@@ -797,11 +797,75 @@ class BreakageControllerTest {
         }
     }
 
+    @Nested
+    class WhenBreakageExecutorDropping {
 
-//    @Test
-//    void dropBreakageExecutor() {
-//    }
-//
+        @Test
+        void whenDropBreakageThenReturnOk() {
+
+            String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.dropBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(200, returnedApiResponse.status());
+            assertEquals(HttpStatus.OK, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, returnedApiResponse.data());
+
+            verify(breakageService, times(1))
+                    .dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenDropBreakageThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.dropBreakageExecutor(
+                            SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.dropBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .dropBreakageExecutor(
+                            SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void getAllBreakages() {
 //    }
