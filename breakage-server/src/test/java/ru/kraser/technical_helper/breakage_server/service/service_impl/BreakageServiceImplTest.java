@@ -62,7 +62,6 @@ class BreakageServiceImplTest {
     private BreakageServiceImpl breakageService;
 
     private Department testDepartment;
-    // private User user;
     private Breakage testBreakage;
     private LocalDateTime now;
 
@@ -101,19 +100,6 @@ class BreakageServiceImplTest {
                 .lastUpdatedDate(now)
                 .build();
 
-        /*user = User.builder()
-                .id(USER_TEST_ID)
-                .username(USER_TEST_NAME)
-                .password(USER_TEST_PASSWORD)
-                .enabled(true)
-                .role(Role.ADMIN)
-                .department(testDepartment)
-                .createdBy(DEFAULT_ADMIN_USER_ID)
-                .createdDate(now)
-                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
-                .lastUpdatedDate(now)
-                .build();*/
-
         testBreakage = Breakage.builder()
                 .id(BREAKAGE_TEST_ID)
                 .department(testDepartment)
@@ -131,10 +117,6 @@ class BreakageServiceImplTest {
                 .lastUpdatedDate(now)
                 .build();
     }
-
-    /*@AfterEach
-    void tearDown() {
-    }*/
 
     @Nested
     class WhenBreakageCreating {
@@ -679,7 +661,7 @@ class BreakageServiceImplTest {
     }
 
     @Nested
-    class WhenAllBreakagesGetting {
+    class WhenBreakagesGetting {
 
         private Integer pageSize;
         private Integer pageIndex;
@@ -1145,8 +1127,6 @@ class BreakageServiceImplTest {
                 @BeforeEach
                 void setUp() {
 
-                    //testDeadlineBeforeNow = now.minusDays(1);
-
                     breakageTechDto = BreakageTechDto.builder()
                             .id(testBreakage.getId())
                             .departmentId(testBreakage.getDepartment().getId())
@@ -1210,6 +1190,218 @@ class BreakageServiceImplTest {
                             .getAllBreakagesByTextNoAppointed(
                                     defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
                             );
+                }
+            }
+
+            @Nested
+            class WhenAllBreakagesGetting {
+
+                @Nested
+                class WhenAllBreakagesWithDeadlineGetting {
+
+                    @BeforeEach
+                    void setUp() {
+
+                        testDeadlineBeforeNow = now.minusDays(1);
+
+                        breakageTechDto = BreakageTechDto.builder()
+                                .id(testBreakage.getId())
+                                .departmentId(testBreakage.getDepartment().getId())
+                                .departmentName(testBreakage.getDepartment().getName())
+                                .room(testBreakage.getRoom())
+                                .breakageTopic(testBreakage.getBreakageTopic())
+                                .breakageText(testBreakage.getBreakageText())
+                                .status(testBreakage.getStatus())
+                                .priority(testBreakage.getPriority())
+                                .breakageExecutor(DEFAULT_ADMIN_USERNAME)
+                                .createdBy(testBreakage.getCreatedBy())
+                                .createdDate(testBreakage.getCreatedDate())
+                                .deadline(testDeadlineBeforeNow)
+                                .build();
+
+                        content = List.of(breakageTechDto);
+                        page = new PageImpl<>(content, defaultPageRequest, content.size());
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesWithDeadlineThenReturnAppPage() {
+
+                        when(breakageRepository.getAllDeadlineExpiredBreakages(
+                                        defaultShortStatusList, defaultPriorityList, defaultPageRequest, now
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        "ALL", true, null,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(content, appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllDeadlineExpiredBreakages(
+                                        defaultShortStatusList, defaultPriorityList, defaultPageRequest, now
+                                );
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesByTextWithDeadlineThenReturnAppPage() {
+
+                        when(breakageRepository.getAllDeadlineExpiredBreakagesByText(
+                                        defaultShortStatusList, defaultPriorityList, defaultPageRequest,
+                                        now, defaultSearchText
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        "ALL", true, defaultSearchText,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(content, appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllDeadlineExpiredBreakagesByText(
+                                        defaultShortStatusList, defaultPriorityList, defaultPageRequest,
+                                        now, defaultSearchText
+                                );
+                    }
+                }
+
+                @Nested
+                class WhenAllBreakagesWithNoDeadlineGetting {
+
+                    @BeforeEach
+                    void setUp() {
+
+                        breakageTechDto = BreakageTechDto.builder()
+                                .id(testBreakage.getId())
+                                .departmentId(testBreakage.getDepartment().getId())
+                                .departmentName(testBreakage.getDepartment().getName())
+                                .room(testBreakage.getRoom())
+                                .breakageTopic(testBreakage.getBreakageTopic())
+                                .breakageText(testBreakage.getBreakageText())
+                                .status(testBreakage.getStatus())
+                                .priority(testBreakage.getPriority())
+                                .breakageExecutor(null)
+                                .createdBy(testBreakage.getCreatedBy())
+                                .createdDate(testBreakage.getCreatedDate())
+                                .deadline(null)
+                                .build();
+
+                        content = List.of(breakageTechDto);
+                        page = new PageImpl<>(content, defaultPageRequest, content.size());
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesThenReturnAppPage() {
+
+                        when(breakageRepository.getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        null, false, null,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(content, appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                );
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesByTextThenReturnAppPage() {
+
+                        when(breakageRepository.getAllBreakagesByText(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        null, false, defaultSearchText,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(content, appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllBreakagesByText(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                );
+                    }
+                }
+
+                @Nested
+                class WhenAllBreakagesWithNoStatusOrPriorityGetting {
+
+                    @BeforeEach
+                    void setUp() {
+
+                        page = new PageImpl<>(Collections.emptyList(), defaultPageRequest, 0);
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesIfNoStatusThenReturnEmptyAppPage() {
+
+                        defaultStatusList.remove(Status.NEW);
+
+                        when(breakageRepository.getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        false, true, true, true, true,
+                                        true, true, true, true, true,
+                                        null, false, null,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(Collections.emptyList(), appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                );
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesIfNoPriorityThenReturnEmptyAppPage() {
+
+                        defaultPriorityList.remove(Priority.MEDIUM);
+
+                        when(breakageRepository.getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                )
+                        ).thenReturn(page);
+
+                        AppPage appPage =
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                        true, true, true, true, true,
+                                        true, true, true, false, true,
+                                        null, false, null,
+                                        Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
+
+                        assertEquals(Collections.emptyList(), appPage.content());
+
+                        verify(breakageRepository, times(1))
+                                .getAllBreakages(
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest
+                                );
+                    }
                 }
             }
         }
