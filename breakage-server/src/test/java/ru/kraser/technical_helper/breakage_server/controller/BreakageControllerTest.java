@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.breakage.AppointBreakageExecutorDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
 import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
@@ -21,10 +22,7 @@ import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -599,11 +597,207 @@ class BreakageControllerTest {
         }
     }
 
+    @Nested
+    class WhenBreakageExecutorAdding {
 
-//    @Test
-//    void addBreakageExecutor() {
-//    }
-//
+        private LocalDate afterNowDate;
+        private AppointBreakageExecutorDto appointBreakageExecutorDto;
+
+        @BeforeEach
+        void setUp() {
+
+            afterNowDate = now.plusDays(1).toLocalDate();
+        }
+
+        @Test
+        void whenAddBreakageExecutorThenReturnOk() {
+
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(DEFAULT_ADMIN_USER_ID, afterNowDate, Status.NEW);
+
+            String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно назначены.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.addBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), appointBreakageExecutorDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(200, returnedApiResponse.status());
+            assertEquals(HttpStatus.OK, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, returnedApiResponse.data());
+
+            verify(breakageService, times(1))
+                    .addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenAddBreakageExecutorIfBreakageNotExistThenReturnNotFoundException() {
+
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(DEFAULT_ADMIN_USER_ID, afterNowDate, Status.NEW);
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.addBreakageExecutor(
+                            SOME_NOT_EXIST_ID, appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.addBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, appointBreakageExecutorDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+            assertEquals(DEFAULT_ADMIN_USERNAME, returnedApiResponse.data());
+
+            verify(breakageService, times(1))
+                    .addBreakageExecutor(
+                            SOME_NOT_EXIST_ID, appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenAddBreakageExecutorIfExecutorNotExistThenReturnNotFoundException() {
+
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(SOME_NOT_EXIST_ID, afterNowDate, Status.NEW);
+
+            String responseMessage =
+                    "Пользователь, который назначается исполнителем заявки на неисправность, не существует.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.addBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), appointBreakageExecutorDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenAddBreakageExecutorIfDeadlineIsNotCorrectThenReturnNotCorrectParameter() {
+
+            LocalDateTime beforeNow = now.minusDays(1);
+            LocalDate beforeNowDate = beforeNow.toLocalDate();
+
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(DEFAULT_ADMIN_USER_ID, beforeNowDate, Status.NEW);
+
+            String responseMessage = "Необходимо указать корректный срок исполнения заявки на неисправность.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.addBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), appointBreakageExecutorDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(400, returnedApiResponse.status());
+            assertEquals(HttpStatus.BAD_REQUEST, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenAddBreakageExecutorIfStatusIsNotCorrectThenReturnNotCorrectParameter() {
+
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.SOLVED);
+
+            String responseMessage = "Заявке на неисправность со статусами: \"В ожидании\", \"Передана\"" +
+                    ", \"Решена\" или \"Отменена\" - не может быть назначен исполнитель !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse = breakageController.addBreakageExecutor(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), appointBreakageExecutorDto, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(400, returnedApiResponse.status());
+            assertEquals(HttpStatus.BAD_REQUEST, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .addBreakageExecutor(
+                            testBreakage.getId(), appointBreakageExecutorDto,
+                            DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void dropBreakageExecutor() {
 //    }

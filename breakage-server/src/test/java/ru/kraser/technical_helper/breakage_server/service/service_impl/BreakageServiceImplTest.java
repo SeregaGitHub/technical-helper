@@ -467,6 +467,7 @@ class BreakageServiceImplTest {
 
         private LocalDate afterNowDate;
         private LocalDateTime expectedDeadline;
+        private AppointBreakageExecutorDto appointBreakageExecutorDto;
 
         @BeforeEach
         void setUp() {
@@ -478,8 +479,7 @@ class BreakageServiceImplTest {
         @Test
         void whenAddBreakageExecutorThenReturnOk() {
 
-            AppointBreakageExecutorDto appointBreakageExecutorDto =
-                    new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.NEW);
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.NEW);
 
             String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно назначены.";
 
@@ -514,8 +514,7 @@ class BreakageServiceImplTest {
         @Test
         void whenAddBreakageExecutorIfBreakageNotExistThenReturnNotFoundException() {
 
-            AppointBreakageExecutorDto appointBreakageExecutorDto =
-                    new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.NEW);
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.NEW);
 
             when(breakageRepository.addBreakageExecutor(
                     SOME_NOT_EXIST_ID, USER_TEST_ID, expectedDeadline, DEFAULT_ADMIN_USER_ID, now)
@@ -536,8 +535,7 @@ class BreakageServiceImplTest {
         @Test
         void whenAddBreakageExecutorIfExecutorNotExistThenReturnNotFoundException() {
 
-            AppointBreakageExecutorDto appointBreakageExecutorDto =
-                    new AppointBreakageExecutorDto(SOME_NOT_EXIST_ID, afterNowDate, Status.NEW);
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(SOME_NOT_EXIST_ID, afterNowDate, Status.NEW);
 
             String responseMessage =
                     "Пользователь, который назначается исполнителем заявки на неисправность, не существует.";
@@ -567,8 +565,7 @@ class BreakageServiceImplTest {
             LocalDateTime beforeNow = now.minusDays(1);
             LocalDate beforeNowDate = beforeNow.toLocalDate();
 
-            AppointBreakageExecutorDto appointBreakageExecutorDto =
-                    new AppointBreakageExecutorDto(USER_TEST_ID, beforeNowDate, Status.NEW);
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(USER_TEST_ID, beforeNowDate, Status.NEW);
 
             String responseMessage = "Необходимо указать корректный срок исполнения заявки на неисправность.";
 
@@ -588,8 +585,7 @@ class BreakageServiceImplTest {
         @Test
         void whenAddBreakageExecutorIfStatusIsNotCorrectThenReturnNotCorrectParameter() {
 
-            AppointBreakageExecutorDto appointBreakageExecutorDto =
-                    new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.SOLVED);
+            appointBreakageExecutorDto = new AppointBreakageExecutorDto(USER_TEST_ID, afterNowDate, Status.SOLVED);
 
             String responseMessage = "Заявке на неисправность со статусами: \"В ожидании\", \"Передана\"" +
                     ", \"Решена\" или \"Отменена\" - не может быть назначен исполнитель !!!";
