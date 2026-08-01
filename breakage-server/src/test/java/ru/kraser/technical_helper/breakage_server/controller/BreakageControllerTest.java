@@ -11,13 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.AppointBreakageExecutorDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
+import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -26,7 +24,9 @@ import java.time.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
+import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -870,9 +870,80 @@ class BreakageControllerTest {
 //    void getAllBreakages() {
 //    }
 //
-//    @Test
-//    void getBreakageEmployee() {
-//    }
+
+    @Nested
+    class WhenBreakageByEmployeeGetting {
+
+        private BreakageEmployeeDto breakageEmployeeDto;
+
+        @BeforeEach
+        void setUp() {
+
+            breakageEmployeeDto = BreakageEmployeeDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .breakageExecutor(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .build();
+        }
+
+        @Test
+        void whenGetBreakageByEmployeeThenReturnBreakage() {
+
+            when(breakageService.getBreakageEmployee(testBreakage.getId(), DEPARTMENT_TEST_ID))
+                    .thenReturn(breakageEmployeeDto);
+
+            BreakageEmployeeDto returnedBreakageEmployeeDto =
+                    breakageController.getBreakageEmployee(testBreakage.getId(), DEPARTMENT_TEST_ID);
+
+            assertEquals(breakageEmployeeDto, returnedBreakageEmployeeDto);
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(testBreakage.getId(), DEPARTMENT_TEST_ID);
+        }
+
+        @Test
+        void whenGetBreakageByEmployeeThenReturnForbiddenException() {
+
+            String message = "Данный пользователь не имеет право на получение информации по " +
+                    "этой заявке на неисправность !!!";
+
+            when(breakageService.getBreakageEmployee(testBreakage.getId(), SOME_NOT_EXIST_ID))
+                    .thenThrow(new ForbiddenException(message));
+
+            assertThatThrownBy(
+                    () -> breakageController.getBreakageEmployee(testBreakage.getId(), SOME_NOT_EXIST_ID)
+            )
+                    .isInstanceOf(ForbiddenException.class)
+                    .hasMessageContaining(message);
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(testBreakage.getId(), SOME_NOT_EXIST_ID);
+        }
+
+        @Test
+        void whenGetBreakageByEmployeeThenReturnNotFoundException() {
+
+            when(breakageService.getBreakageEmployee(SOME_NOT_EXIST_ID, DEPARTMENT_TEST_ID))
+                    .thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            assertThatThrownBy(
+                    () -> breakageController.getBreakageEmployee(SOME_NOT_EXIST_ID, DEPARTMENT_TEST_ID)
+            )
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(BREAKAGE_NOT_EXIST);
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(SOME_NOT_EXIST_ID, DEPARTMENT_TEST_ID);
+        }
+    }
+
 //
 //    @Test
 //    void getBreakage() {
