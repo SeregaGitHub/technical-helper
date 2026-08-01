@@ -16,6 +16,7 @@ public class ConstantForTests {
     public static final String SOME_NOT_EXIST_TEXT = "some_not_exist_text";
 
     public static final String DEPARTMENT_TEST_NAME = "test_department";
+    public static final String DEFAULT_ADMIN_USERNAME = "default_admin_username";
     public static final String USER_TEST_NAME = "test_username";
 
     public static final String USER_TEST_PASSWORD = "some_password";
