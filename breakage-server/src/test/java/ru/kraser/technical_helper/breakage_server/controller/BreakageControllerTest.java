@@ -12,6 +12,11 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
+import ru.kraser.technical_helper.common_module.enums.Priority;
+import ru.kraser.technical_helper.common_module.enums.Role;
+import ru.kraser.technical_helper.common_module.enums.Status;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
+import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.Clock;
@@ -21,12 +26,13 @@ import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
 class BreakageControllerTest {
 
-//    @Mock
+    //    @Mock
 //    private Clock clock;
     @Mock
     private BreakageService breakageService;
@@ -34,6 +40,8 @@ class BreakageControllerTest {
     private BreakageController breakageController;
 
     private LocalDateTime now;
+    private Department testDepartment;
+    private Breakage testBreakage;
 
     /*private static final ZonedDateTime NOW_ZDT = ZonedDateTime.of(
             2025,
@@ -57,6 +65,33 @@ class BreakageControllerTest {
                 0,
                 0);
 
+        testDepartment = Department.builder()
+                .id(DEPARTMENT_TEST_ID)
+                .name(DEPARTMENT_TEST_NAME)
+                .enabled(true)
+                .createdBy(DEFAULT_ADMIN_USER_ID)
+                .createdDate(now)
+                .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
+                .lastUpdatedDate(now)
+                .build();
+
+        testBreakage = Breakage.builder()
+                .id(BREAKAGE_TEST_ID)
+                .department(testDepartment)
+                .room("some_room")
+                .breakageTopic("test_breakage_topic")
+                .breakageText("test_breakage_text")
+                .status(Status.NEW)
+                .priority(Priority.MEDIUM)
+                .executor(null)
+                .executorAppointedBy(null)
+                .deadline(null)
+                .createdBy(USER_TEST_ID)
+                .createdDate(now)
+                .lastUpdatedBy(USER_TEST_ID)
+                .lastUpdatedDate(now)
+                .build();
+
 //        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
 //        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
     }
@@ -70,21 +105,10 @@ class BreakageControllerTest {
     @Nested
     class WhenBreakageCreating {
 
-        private Department testDepartment;
         private CreateBreakageFullDto createBreakageFullDto;
 
         @BeforeEach
         void setUp() {
-
-            testDepartment = Department.builder()
-                    .id(DEPARTMENT_TEST_ID)
-                    .name(DEPARTMENT_TEST_NAME)
-                    .enabled(true)
-                    .createdBy(DEFAULT_ADMIN_USER_ID)
-                    .createdDate(now)
-                    .lastUpdatedBy(DEFAULT_ADMIN_USER_ID)
-                    .lastUpdatedDate(now)
-                    .build();
 
             createBreakageFullDto = CreateBreakageFullDto.builder()
                     .department(testDepartment)
@@ -147,11 +171,154 @@ class BreakageControllerTest {
         }
     }
 
-//
-//    @Test
-//    void cancelBreakage() {
-//    }
-//
+    @Nested
+    class WhenBreakageCancelling {
+
+        @Test
+        void whenCancelBreakageByTechnicianThenReturnOk() {
+
+            String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageService.cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.cancelBreakage(
+                    DEFAULT_ADMIN_USER_ID, testBreakage.getId(), testBreakage.getDepartment().getId(),
+                    Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenCancelBreakageByEmployeeFromSameDepartmentThenReturnOk() {
+
+            String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageService.cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, testBreakage.getDepartment().getId(), USER_TEST_NAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.cancelBreakage(
+                    USER_TEST_ID, testBreakage.getId(), testBreakage.getDepartment().getId(),
+                    Role.EMPLOYEE, testBreakage.getDepartment().getId(), USER_TEST_NAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(200, apiResponse.status());
+            assertEquals(HttpStatus.OK, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, testBreakage.getDepartment().getId(), USER_TEST_NAME
+                    );
+        }
+
+        @Test
+        void whenCancelBreakageWhichNotExistThenReturnNotFoundException() {
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageService.cancelBreakage(
+                            SOME_NOT_EXIST_ID, testBreakage.getDepartment().getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.cancelBreakage(
+                    DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, testBreakage.getDepartment().getId(),
+                    Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+            );
+
+            assertEquals(BREAKAGE_NOT_EXIST, apiResponse.message());
+            assertEquals(404, apiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .cancelBreakage(
+                            SOME_NOT_EXIST_ID, testBreakage.getDepartment().getId(), DEFAULT_ADMIN_USER_ID,
+                            Role.ADMIN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        void whenCancelBreakageByEmployeeFromOtherDepartmentThenReturnForbiddenException() {
+
+            String responseMessage = "Только технический специалист или сотрудник отдела, " +
+                    "в котором произошла неисправность, могут отменить заявку !!!";
+
+            ApiResponse response = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(422)
+                    .httpStatus(HttpStatus.FORBIDDEN)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageService.cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME
+                    )
+            ).thenReturn(response);
+
+            ApiResponse apiResponse = breakageController.cancelBreakage(
+                    USER_TEST_ID, testBreakage.getId(), testBreakage.getDepartment().getId(),
+                    Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME
+            );
+
+            assertEquals(responseMessage, apiResponse.message());
+            assertEquals(422, apiResponse.status());
+            assertEquals(HttpStatus.FORBIDDEN, apiResponse.httpStatus());
+            assertEquals(now, apiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void updateBreakageStatus() {
 //    }
