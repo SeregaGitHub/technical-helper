@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -21,12 +22,12 @@ import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
-import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -874,12 +875,10 @@ class BreakageControllerTest {
     @Nested
     class WhenBreakageByEmployeeGetting {
 
-        private BreakageEmployeeDto breakageEmployeeDto;
+        @Test
+        void whenGetBreakageByEmployeeThenReturnBreakage() {
 
-        @BeforeEach
-        void setUp() {
-
-            breakageEmployeeDto = BreakageEmployeeDto.builder()
+            BreakageEmployeeDto breakageEmployeeDto = BreakageEmployeeDto.builder()
                     .id(testBreakage.getId())
                     .departmentId(testBreakage.getDepartment().getId())
                     .departmentName(testBreakage.getDepartment().getName())
@@ -891,10 +890,6 @@ class BreakageControllerTest {
                     .createdBy(testBreakage.getCreatedBy())
                     .createdDate(testBreakage.getCreatedDate())
                     .build();
-        }
-
-        @Test
-        void whenGetBreakageByEmployeeThenReturnBreakage() {
 
             when(breakageService.getBreakageEmployee(testBreakage.getId(), DEPARTMENT_TEST_ID))
                     .thenReturn(breakageEmployeeDto);
@@ -944,10 +939,89 @@ class BreakageControllerTest {
         }
     }
 
-//
-//    @Test
-//    void getBreakage() {
-//    }
+    @Nested
+    class WhenBreakageGetting {
+
+        @Test
+        void whenGetBreakageThenReturnBreakage() {
+
+            BreakageCommentFrontDto comment = BreakageCommentFrontDto.builder()
+                    .id(BREAKAGE_COMMENT_TEST_ID)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .actionEnabled(true)
+                    .creatorName(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedDate(testBreakage.getCreatedDate())
+                    .build();
+
+            BreakageFullDto breakageFullDto = BreakageFullDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .breakageExecutorId(null)
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .priority(testBreakage.getPriority())
+                    .breakageExecutor(null)
+                    .executorAppointedBy(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedBy(testBreakage.getCreatedBy())
+                    .lastUpdatedDate(testBreakage.getCreatedDate())
+                    .comments(List.of(comment))
+                    .build();
+
+            String responseMessage = "Заявка на неисправность с ID=" + testBreakage.getId() + ", получена успешно";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(breakageFullDto)
+                    .build();
+
+            when(breakageService.getBreakage(testBreakage.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.getBreakage(DEFAULT_ADMIN_USER_ID, testBreakage.getId());
+
+            assertEquals(apiResponse, returnedApiResponse);
+
+            verify(breakageService, times(1))
+                    .getBreakage(testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenGetBreakageThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.getBreakage(SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.getBreakage(DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID);
+
+            assertEquals(BREAKAGE_NOT_EXIST, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .getBreakage(SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+    }
+
+
 //
 //    @Test
 //    void createBreakageComment() {
