@@ -25,7 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.USER_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
@@ -432,12 +432,11 @@ class UserControllerTest {
 
             when(userService.getUser(USER_TEST_ID)).thenThrow(new NotFoundException(USER_NOT_EXIST));
 
-            NotFoundException exception = assertThrows(
-                    NotFoundException.class,
-                    () -> userService.getUser(USER_TEST_ID)
-            );
-
-            assertEquals(USER_NOT_EXIST, exception.getMessage());
+            assertThatThrownBy(
+                    () -> userController.getUser(USER_TEST_ID)
+            )
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(USER_NOT_EXIST);
 
             verify(userService, times(1)).getUser(USER_TEST_ID);
         }
@@ -486,12 +485,11 @@ class UserControllerTest {
 
             when(userService.getUserByName(USER_TEST_NAME)).thenThrow(new NotFoundException(USER_NOT_EXIST));
 
-            NotFoundException exception = assertThrows(
-                    NotFoundException.class,
-                    () -> userService.getUserByName(USER_TEST_NAME)
-            );
-
-            assertEquals(USER_NOT_EXIST, exception.getMessage());
+            assertThatThrownBy(
+                    () -> userController.getUserByName(USER_TEST_NAME)
+            )
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(USER_NOT_EXIST);
 
             verify(userService, times(1)).getUserByName(USER_TEST_NAME);
         }

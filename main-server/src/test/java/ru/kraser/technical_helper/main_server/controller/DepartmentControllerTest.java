@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -280,14 +281,11 @@ class DepartmentControllerTest {
                     department.getId())
             ).thenThrow(new NotFoundException(DEPARTMENT_NOT_EXIST));
 
-            NotFoundException exception = assertThrows(
-                    NotFoundException.class,
-                    () -> departmentService.getDepartment(
-                            DEPARTMENT_ID_HEADER,
-                            department.getId())
-            );
-
-            assertEquals(DEPARTMENT_NOT_EXIST, exception.getMessage());
+            assertThatThrownBy(
+                    () -> departmentController.getDepartmentById(department.getId())
+            )
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(DEPARTMENT_NOT_EXIST);
 
             verify(departmentService, times(1)).getDepartment(
                     DEPARTMENT_ID_HEADER, department.getId()
