@@ -11,9 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
+import ru.kraser.technical_helper.common_module.dto.user.UserDto;
+import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -23,6 +26,7 @@ import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
 import java.time.*;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -868,11 +872,175 @@ class BreakageControllerTest {
         }
     }
 
+    @Nested
+    class WhenBreakagesGetting {
 
-//    @Test
-//    void getAllBreakages() {
-//    }
-//
+        private Integer pageSize;
+        private Integer pageIndex;
+        private String defaultSortBy;
+        private String defaultDirection;
+        private String defaultExecutor;
+        private String defaultSearchText;
+
+        @BeforeEach
+        void setUp() {
+
+            pageSize = 10;
+            pageIndex = 0;
+            defaultSortBy = "lastUpdatedDate";
+            defaultDirection = "DESC";
+            defaultExecutor = "ALL";
+            defaultSearchText = "breakage";
+        }
+
+        @Nested
+        class WhenAllBreakagesGettingByEmployee {
+
+            private BreakageEmployeeDto breakageEmployeeDto;
+            private List<BreakageEmployeeDto> content;
+            private AppPage employeeAppPage;
+
+            @BeforeEach
+            void setUp() {
+
+                breakageEmployeeDto = BreakageEmployeeDto.builder()
+                        .id(testBreakage.getId())
+                        .departmentId(testBreakage.getDepartment().getId())
+                        .departmentName(testBreakage.getDepartment().getName())
+                        .room(testBreakage.getRoom())
+                        .breakageTopic(testBreakage.getBreakageTopic())
+                        .breakageText(testBreakage.getBreakageText())
+                        .status(testBreakage.getStatus())
+                        .breakageExecutor(null)
+                        .createdBy(testBreakage.getCreatedBy())
+                        .createdDate(testBreakage.getCreatedDate())
+                        .build();
+
+                content = List.of(breakageEmployeeDto);
+
+                employeeAppPage = AppPage.builder()
+                        .content(content)
+                        .totalElements(1L)
+                        .totalPages(1)
+                        .numberOfElements(1)
+                        .pageNumber(0)
+                        .pageSize(10)
+                        .offset(0L)
+                        .first(true)
+                        .last(true)
+                        .isForEmployee(true)
+                        .now(null)
+                        .build();
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesThenReturnAppPage() {
+
+                when(breakageService.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                defaultExecutor, false, null,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        )
+                ).thenReturn(employeeAppPage);
+
+                AppPage returnedAppPage = breakageController.getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        true, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, null,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+
+                assertEquals(employeeAppPage, returnedAppPage);
+
+                verify(breakageService, times(1)).getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        true, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, null,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesByTextThenReturnAppPage() {
+
+                when(breakageService.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                defaultExecutor, false, defaultSearchText,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        )
+                ).thenReturn(employeeAppPage);
+
+                AppPage returnedAppPage = breakageController.getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        true, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, defaultSearchText,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+
+                assertEquals(employeeAppPage, returnedAppPage);
+
+                verify(breakageService, times(1)).getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        true, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, defaultSearchText,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+            }
+
+            @Test
+            void whenGetAllEmployeeBreakagesThenReturnEmptyAppPageContent() {
+
+                AppPage employeeEmptyAppPage = AppPage.builder()
+                        .content(Collections.emptyList())
+                        .totalElements(0L)
+                        .totalPages(0)
+                        .numberOfElements(0)
+                        .pageNumber(0)
+                        .pageSize(10)
+                        .offset(0L)
+                        .first(true)
+                        .last(true)
+                        .isForEmployee(true)
+                        .now(null)
+                        .build();
+
+                when(breakageService.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                false, true, true, true, true,
+                                true, true, true, true, true,
+                                defaultExecutor, false, null,
+                                Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        )
+                ).thenReturn(employeeEmptyAppPage);
+
+                AppPage returnedAppPage = breakageController.getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        false, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, null,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+
+                assertEquals(employeeEmptyAppPage, returnedAppPage);
+
+                verify(breakageService, times(1)).getAllBreakages(
+                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                        false, true, true, true, true,
+                        true, true, true, true, true,
+                        defaultExecutor, false, null,
+                        Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
+                );
+            }
+        }
+    }
 
     @Nested
     class WhenBreakageByEmployeeGetting {
