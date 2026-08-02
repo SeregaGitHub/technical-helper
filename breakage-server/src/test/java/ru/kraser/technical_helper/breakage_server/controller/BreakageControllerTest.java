@@ -1,6 +1,5 @@
 package ru.kraser.technical_helper.breakage_server.controller;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
-import ru.kraser.technical_helper.common_module.dto.user.UserDto;
 import ru.kraser.technical_helper.common_module.enums.Executor;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -1038,6 +1036,226 @@ class BreakageControllerTest {
                         defaultExecutor, false, null,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
+            }
+        }
+
+        @Nested
+        class WhenAllBreakagesGettingByTechnician {
+
+            private BreakageTechDto breakageTechDto;
+            private List<BreakageTechDto> content;
+            private AppPage technicianAppPage;
+            private LocalDateTime testDeadlineBeforeNow;
+            private LocalDateTime testDeadlineAfterNow;
+
+            @Nested
+            class WhenAllBreakagesAppointedToMeGetting {
+
+                @Nested
+                class WhenAllBreakagesWithDeadlineAppointedToMeGetting {
+
+                    @BeforeEach
+                    void setUp() {
+
+                        testDeadlineBeforeNow = now.minusDays(1);
+
+                        breakageTechDto = BreakageTechDto.builder()
+                                .id(testBreakage.getId())
+                                .departmentId(testBreakage.getDepartment().getId())
+                                .departmentName(testBreakage.getDepartment().getName())
+                                .room(testBreakage.getRoom())
+                                .breakageTopic(testBreakage.getBreakageTopic())
+                                .breakageText(testBreakage.getBreakageText())
+                                .status(testBreakage.getStatus())
+                                .priority(Priority.MEDIUM)
+                                .breakageExecutor(USER_TEST_NAME)
+                                .createdBy(testBreakage.getCreatedBy())
+                                .createdDate(testBreakage.getCreatedDate())
+                                .deadline(testDeadlineBeforeNow)
+                                .build();
+
+                        content = List.of(breakageTechDto);
+
+                        technicianAppPage = AppPage.builder()
+                                .content(content)
+                                .totalElements(1L)
+                                .totalPages(1)
+                                .numberOfElements(1)
+                                .pageNumber(0)
+                                .pageSize(10)
+                                .offset(0L)
+                                .first(true)
+                                .last(true)
+                                .isForEmployee(false)
+                                .now(now)
+                                .build();
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesAppointedToMeWithDeadlineThenReturnAppPage() {
+
+                        when(breakageService.getAllBreakages(
+                                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), true, null,
+                                        Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                                )
+                        ).thenReturn(technicianAppPage);
+
+                        AppPage returnedAppPage = breakageController.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), true, null,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+
+                        assertEquals(technicianAppPage, returnedAppPage);
+
+                        verify(breakageService, times(1)).getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), true, null,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesByTextAppointedToMeWithDeadlineThenReturnAppPage() {
+
+                        when(breakageService.getAllBreakages(
+                                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), true, defaultSearchText,
+                                        Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                                )
+                        ).thenReturn(technicianAppPage);
+
+                        AppPage returnedAppPage = breakageController.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), true, defaultSearchText,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+
+                        assertEquals(technicianAppPage, returnedAppPage);
+
+                        verify(breakageService, times(1)).getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), true, defaultSearchText,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+                    }
+                }
+
+                @Nested
+                class WhenAllBreakagesWithNoDeadlineAppointedToMeGetting {
+
+                    @BeforeEach
+                    void setUp() {
+
+                        testDeadlineAfterNow = now.plusDays(1);
+
+                        breakageTechDto = BreakageTechDto.builder()
+                                .id(testBreakage.getId())
+                                .departmentId(testBreakage.getDepartment().getId())
+                                .departmentName(testBreakage.getDepartment().getName())
+                                .room(testBreakage.getRoom())
+                                .breakageTopic(testBreakage.getBreakageTopic())
+                                .breakageText(testBreakage.getBreakageText())
+                                .status(testBreakage.getStatus())
+                                .priority(Priority.MEDIUM)
+                                .breakageExecutor(USER_TEST_NAME)
+                                .createdBy(testBreakage.getCreatedBy())
+                                .createdDate(testBreakage.getCreatedDate())
+                                .deadline(testDeadlineAfterNow)
+                                .build();
+
+                        content = List.of(breakageTechDto);
+
+                        technicianAppPage = AppPage.builder()
+                                .content(content)
+                                .totalElements(1L)
+                                .totalPages(1)
+                                .numberOfElements(1)
+                                .pageNumber(0)
+                                .pageSize(10)
+                                .offset(0L)
+                                .first(true)
+                                .last(true)
+                                .isForEmployee(false)
+                                .now(now)
+                                .build();
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesAppointedToMeWithNoDeadlineThenReturnAppPage() {
+
+                        when(breakageService.getAllBreakages(
+                                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), false, null,
+                                        Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                                )
+                        ).thenReturn(technicianAppPage);
+
+                        AppPage returnedAppPage = breakageController.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), false, null,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+
+                        assertEquals(technicianAppPage, returnedAppPage);
+
+                        verify(breakageService, times(1)).getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), false, null,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+                    }
+
+                    @Test
+                    void whenGetAllBreakagesByTextAppointedToMeWithNoDeadlineThenReturnAppPage() {
+
+                        when(breakageService.getAllBreakages(
+                                        pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                        true, true, true, true, true,
+                                        true, true, true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), false, defaultSearchText,
+                                        Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                                )
+                        ).thenReturn(technicianAppPage);
+
+                        AppPage returnedAppPage = breakageController.getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), false, defaultSearchText,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+
+                        assertEquals(technicianAppPage, returnedAppPage);
+
+                        verify(breakageService, times(1)).getAllBreakages(
+                                pageSize, pageIndex, defaultSortBy, defaultDirection,
+                                true, true, true, true, true,
+                                true, true, true, true, true,
+                                Executor.APPOINTED_TO_ME.name(), false, defaultSearchText,
+                                Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
+                        );
+                    }
+                }
             }
         }
     }
