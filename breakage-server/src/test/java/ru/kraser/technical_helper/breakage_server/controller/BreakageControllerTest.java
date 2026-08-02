@@ -13,6 +13,7 @@ import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -27,6 +28,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_COMMENT_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NOT_EXIST;
 import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
@@ -1021,17 +1023,194 @@ class BreakageControllerTest {
         }
     }
 
+    @Nested
+    class WhenBreakageCommentMethodsAreInvoked {
 
-//
-//    @Test
-//    void createBreakageComment() {
-//    }
-//
-//    @Test
-//    void updateBreakageComment() {
-//    }
-//
-//    @Test
-//    void deleteBreakageComment() {
-//    }
+        private CreateBreakageCommentDto createBreakageCommentDto;
+
+        @BeforeEach
+        void setUp() {
+
+            createBreakageCommentDto =
+                    new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.IN_PROGRESS);
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnCreated() {
+
+            String responseMessage = "Комментарий к заявке о неисправности - был успешно создан.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(201)
+                    .httpStatus(HttpStatus.CREATED)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.createBreakageComment(
+                    createBreakageCommentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.createBreakageComment(
+                            DEFAULT_ADMIN_USER_ID, testBreakage.getId(), createBreakageCommentDto
+                    );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(201, returnedApiResponse.status());
+            assertEquals(HttpStatus.CREATED, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .createBreakageComment(createBreakageCommentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnThenReturnNotFoundException() {
+
+            String responseMessage = "Заявки на неисправность не существует !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.createBreakageComment(
+                    createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.createBreakageComment(
+                            DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, createBreakageCommentDto
+                    );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .createBreakageComment(createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenCreateBreakageCommentThenReturnThenReturnNotCorrectParameter() {
+
+            CreateBreakageCommentDto commentDto =
+                    new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.SOLVED);
+
+            String responseMessage = "Комментарии к заявке о неисправности со статусами " +
+                    "\"Решена\" и \"Отменена\" - не создаются !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.createBreakageComment(
+                    commentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.createBreakageComment(
+                            DEFAULT_ADMIN_USER_ID, testBreakage.getId(), commentDto
+                    );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(400, returnedApiResponse.status());
+            assertEquals(HttpStatus.BAD_REQUEST, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .createBreakageComment(commentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenUpdateBreakageCommentThenReturnOk() {
+
+            String responseMessage = "Комментарий к заявке на неисправность был успешно обновлен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.updateBreakageComment(
+                    createBreakageCommentDto, BREAKAGE_COMMENT_TEST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.updateBreakageComment(
+                            DEFAULT_ADMIN_USER_ID, BREAKAGE_COMMENT_TEST_ID, createBreakageCommentDto
+                    );
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(200, returnedApiResponse.status());
+            assertEquals(HttpStatus.OK, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .updateBreakageComment(createBreakageCommentDto, BREAKAGE_COMMENT_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenUpdateBreakageCommentThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_COMMENT_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.updateBreakageComment(
+                    createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.updateBreakageComment(
+                            DEFAULT_ADMIN_USER_ID, SOME_NOT_EXIST_ID, createBreakageCommentDto
+                    );
+
+            assertEquals(BREAKAGE_COMMENT_NOT_EXIST, returnedApiResponse.message());
+            assertEquals(404, returnedApiResponse.status());
+            assertEquals(HttpStatus.NOT_FOUND, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .updateBreakageComment(createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        void whenDeleteBreakageCommentThenReturnOk() {
+
+            String responseMessage = "Комментарий к заявке на неисправность был успешно удален.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.deleteBreakageComment(BREAKAGE_COMMENT_TEST_ID)).thenReturn(apiResponse);
+
+            ApiResponse returnedApiResponse =
+                    breakageController.deleteBreakageComment(BREAKAGE_COMMENT_TEST_ID);
+
+            assertEquals(responseMessage, returnedApiResponse.message());
+            assertEquals(200, returnedApiResponse.status());
+            assertEquals(HttpStatus.OK, returnedApiResponse.httpStatus());
+            assertEquals(now, returnedApiResponse.timestamp());
+
+            verify(breakageService, times(1))
+                    .deleteBreakageComment(BREAKAGE_COMMENT_TEST_ID);
+        }
+    }
 }
