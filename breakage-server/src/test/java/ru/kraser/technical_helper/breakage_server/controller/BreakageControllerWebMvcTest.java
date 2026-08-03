@@ -322,6 +322,53 @@ class BreakageControllerWebMvcTest {
                             Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, DEFAULT_ADMIN_USERNAME
                     );
         }
+
+        @Test
+        @SneakyThrows
+        void whenCancelBreakageByEmployeeFromOtherDepartmentThenReturnForbiddenException() {
+
+            String responseMessage = "Только технический специалист или сотрудник отдела, " +
+                    "в котором произошла неисправность, могут отменить заявку !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(422)
+                    .httpStatus(HttpStatus.FORBIDDEN)
+                    .timestamp(now)
+                    .data(USER_TEST_NAME)
+                    .build();
+
+            when(breakageService.cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + USER_TEST_NAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, USER_TEST_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId())
+                            .header(DEPARTMENT_ID_HEADER, testBreakage.getDepartment().getId())
+                            .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                            .header(USER_DEPARTMENT_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(422))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.FORBIDDEN.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .cancelBreakage(
+                            testBreakage.getId(), testBreakage.getDepartment().getId(), USER_TEST_ID,
+                            Role.EMPLOYEE, SOME_NOT_EXIST_ID, USER_TEST_NAME
+                    );
+        }
     }
 
 
