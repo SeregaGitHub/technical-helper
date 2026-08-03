@@ -257,7 +257,7 @@ class UserControllerIntegrationTest {
                     .getResponse()
                     .getContentAsString();
 
-            AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
+            NotFoundException exception = objectMapper.readValue(result, NotFoundException.class);
             assertThat(exception.getMessage()).isEqualTo(responseMessage);
         }
     }
