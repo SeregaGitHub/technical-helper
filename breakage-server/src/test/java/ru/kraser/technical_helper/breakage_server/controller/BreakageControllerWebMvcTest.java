@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.breakage_server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +19,7 @@ import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -29,6 +31,8 @@ import ru.kraser.technical_helper.common_module.model.Department;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -1144,10 +1148,120 @@ class BreakageControllerWebMvcTest {
         }
     }
 
-//    @Test
-//    void getBreakage() {
-//    }
-//
+    @Nested
+    class WhenBreakageGetting {
+
+        @Test
+        @SneakyThrows
+        void whenGetBreakageThenReturnBreakage() {
+
+            BreakageCommentFrontDto comment = BreakageCommentFrontDto.builder()
+                    .id(BREAKAGE_COMMENT_TEST_ID)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .actionEnabled(true)
+                    .creatorName(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedDate(testBreakage.getCreatedDate())
+                    .build();
+
+            BreakageFullDto breakageFullDto = BreakageFullDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .breakageExecutorId(null)
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .priority(testBreakage.getPriority())
+                    .breakageExecutor(null)
+                    .executorAppointedBy(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .lastUpdatedBy(testBreakage.getCreatedBy())
+                    .lastUpdatedDate(testBreakage.getCreatedDate())
+                    .comments(List.of(comment))
+                    .build();
+
+            String responseMessage = "Заявка на неисправность с ID=" + testBreakage.getId() + ", получена успешно";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(breakageFullDto)
+                    .build();
+
+            when(breakageService.getBreakage(testBreakage.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + CURRENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            LinkedHashMap<String, Object> dataMap = JsonPath.read(result, "$.data");
+            BreakageFullDto returnedBreakageFullDto = objectMapper.convertValue(dataMap, BreakageFullDto.class);
+
+            assertEquals(breakageFullDto, returnedBreakageFullDto);
+            verify(breakageService, times(1))
+                    .getBreakage(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID
+                    );
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetBreakageThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.getBreakage(SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + CURRENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_NOT_EXIST))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .getBreakage(
+                            SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID
+                    );
+        }
+    }
+
+
+
 //    @Test
 //    void createBreakageComment() {
 //    }
