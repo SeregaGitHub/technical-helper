@@ -17,13 +17,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.AppointBreakageExecutorDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
+import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
+import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
 
@@ -1035,10 +1034,116 @@ class BreakageControllerWebMvcTest {
 //    void getAllBreakages() {
 //    }
 //
-//    @Test
-//    void getBreakageEmployee() {
-//    }
-//
+
+    @Nested
+    class WhenBreakageByEmployeeGetting {
+
+        @Test
+        @SneakyThrows
+        void whenGetBreakageByEmployeeThenReturnBreakage() {
+
+            BreakageEmployeeDto breakageEmployeeDto = BreakageEmployeeDto.builder()
+                    .id(testBreakage.getId())
+                    .departmentId(testBreakage.getDepartment().getId())
+                    .departmentName(testBreakage.getDepartment().getName())
+                    .room(testBreakage.getRoom())
+                    .breakageTopic(testBreakage.getBreakageTopic())
+                    .breakageText(testBreakage.getBreakageText())
+                    .status(testBreakage.getStatus())
+                    .breakageExecutor(null)
+                    .createdBy(testBreakage.getCreatedBy())
+                    .createdDate(testBreakage.getCreatedDate())
+                    .build();
+
+            when(breakageService.getBreakageEmployee(testBreakage.getId(), testBreakage.getDepartment().getId()))
+                    .thenReturn(breakageEmployeeDto);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(USER_DEPARTMENT_ID_HEADER, testBreakage.getDepartment().getId())
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                            .value(breakageEmployeeDto.getId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.departmentId")
+                            .value(breakageEmployeeDto.getDepartmentId()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.departmentName")
+                            .value(breakageEmployeeDto.getDepartmentName()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.room")
+                            .value(breakageEmployeeDto.getRoom()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.breakageTopic")
+                            .value(breakageEmployeeDto.getBreakageTopic()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.breakageText")
+                            .value(breakageEmployeeDto.getBreakageText()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status")
+                            .value(breakageEmployeeDto.getStatus().name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.breakageExecutor")
+                            .value(breakageEmployeeDto.getBreakageExecutor()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdBy")
+                            .value(breakageEmployeeDto.getCreatedBy()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.createdDate")
+                            .value(dtf.format(breakageEmployeeDto.getCreatedDate())))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(breakageEmployeeDto), result);
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(testBreakage.getId(), testBreakage.getDepartment().getId());
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetBreakageByEmployeeThenReturnForbiddenException() {
+
+            String message = "Данный пользователь не имеет право на получение информации по " +
+                    "этой заявке на неисправность !!!";
+
+            when(breakageService.getBreakageEmployee(testBreakage.getId(), SOME_NOT_EXIST_ID))
+                    .thenThrow(new ForbiddenException(message));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(
+                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(USER_DEPARTMENT_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId()))
+                    .andExpect(MockMvcResultMatchers.status().isForbidden())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(message));
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(testBreakage.getId(), SOME_NOT_EXIST_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenGetBreakageByEmployeeThenReturnNotFoundException() {
+
+            when(breakageService.getBreakageEmployee(SOME_NOT_EXIST_ID, DEPARTMENT_TEST_ID))
+                    .thenThrow(new NotFoundException(BREAKAGE_NOT_EXIST));
+
+            mockMvc.perform(MockMvcRequestBuilders.get(
+                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(USER_DEPARTMENT_ID_HEADER, testBreakage.getDepartment().getId())
+                            .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                            .value(BREAKAGE_NOT_EXIST));
+
+            verify(breakageService, times(1))
+                    .getBreakageEmployee(SOME_NOT_EXIST_ID, testBreakage.getDepartment().getId());
+        }
+    }
+
 //    @Test
 //    void getBreakage() {
 //    }
