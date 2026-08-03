@@ -18,6 +18,7 @@ import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
@@ -371,11 +372,191 @@ class BreakageControllerWebMvcTest {
         }
     }
 
+    @Nested
+    class WhenBreakageStatusUpdating {
 
-//    @Test
-//    void updateBreakageStatus() {
-//    }
-//
+        private UpdateBreakageStatusDto updateBreakageStatusDto;
+
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageStatusThenReturnOk() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + STATUS_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId())
+                            .content(objectMapper.writeValueAsString(updateBreakageStatusDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageStatusThenResetExecutorAndReturnOk() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.PAUSED);
+
+            String responseMessage = "Статус заявки на неисправность был успешно изменен";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + STATUS_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId())
+                            .content(objectMapper.writeValueAsString(updateBreakageStatusDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageWhichNotExistThenReturnNotFoundException() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.IN_PROGRESS);
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            SOME_NOT_EXIST_ID, updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + STATUS_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .content(objectMapper.writeValueAsString(updateBreakageStatusDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_NOT_EXIST))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            SOME_NOT_EXIST_ID, updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageStatusIfStatusIsNewThenReturnNotCorrectParameter() {
+
+            updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.NEW);
+
+            String responseMessage = "Заявка на неисправность не может изменить статус на - \"Новая\" !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            TECHNICIAN_URL + STATUS_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId())
+                            .content(objectMapper.writeValueAsString(updateBreakageStatusDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageStatus(
+                            testBreakage.getId(), updateBreakageStatusDto, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void updateBreakagePriority() {
 //    }
