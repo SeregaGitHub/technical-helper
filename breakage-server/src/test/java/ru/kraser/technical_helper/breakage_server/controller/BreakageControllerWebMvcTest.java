@@ -945,11 +945,92 @@ class BreakageControllerWebMvcTest {
         }
     }
 
+    @Nested
+    class WhenBreakageExecutorDropping {
 
-//    @Test
-//    void dropBreakageExecutor() {
-//    }
-//
+        @Test
+        @SneakyThrows
+        void whenDropBreakageThenReturnOk() {
+
+            String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .data(DEFAULT_ADMIN_USERNAME)
+                    .build();
+
+            when(breakageService.dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            ADMIN_URL + EXECUTOR_URL + DELETE_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId()))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .dropBreakageExecutor(
+                            testBreakage.getId(), DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+
+        @Test
+        @SneakyThrows
+        void whenDropBreakageThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.dropBreakageExecutor(
+                            SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    )
+            ).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL +
+                                            ADMIN_URL + EXECUTOR_URL + DELETE_URL + "/" + DEFAULT_ADMIN_USERNAME
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_NOT_EXIST))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .dropBreakageExecutor(
+                            SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID, DEFAULT_ADMIN_USERNAME
+                    );
+        }
+    }
+
+
 //    @Test
 //    void getAllBreakages() {
 //    }
