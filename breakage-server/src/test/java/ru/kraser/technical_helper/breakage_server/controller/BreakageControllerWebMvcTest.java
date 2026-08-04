@@ -3625,6 +3625,86 @@ class BreakageControllerWebMvcTest {
                     .createBreakageComment(createBreakageCommentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
         }
 
+        @Test
+        @SneakyThrows
+        void whenCreateBreakageCommentThenReturnThenReturnNotFoundException() {
+
+            String responseMessage = "Заявки на неисправность не существует !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.createBreakageComment(
+                    createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                                    BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .createBreakageComment(createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenCreateBreakageCommentThenReturnThenReturnNotCorrectParameter() {
+
+            CreateBreakageCommentDto commentDto =
+                    new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.SOLVED);
+
+            String responseMessage = "Комментарии к заявке о неисправности со статусами " +
+                    "\"Решена\" и \"Отменена\" - не создаются !!!";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(400)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.createBreakageComment(
+                    commentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                                    BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_ID_HEADER, testBreakage.getId())
+                            .content(objectMapper.writeValueAsString(commentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .createBreakageComment(commentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
+        }
+
 
     }
 }
