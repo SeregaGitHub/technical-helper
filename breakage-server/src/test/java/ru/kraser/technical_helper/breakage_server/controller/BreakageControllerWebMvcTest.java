@@ -3705,6 +3705,80 @@ class BreakageControllerWebMvcTest {
                     .createBreakageComment(commentDto, testBreakage.getId(), DEFAULT_ADMIN_USER_ID);
         }
 
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageCommentThenReturnOk() {
+
+            String responseMessage = "Комментарий к заявке на неисправность был успешно обновлен.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.updateBreakageComment(
+                    createBreakageCommentDto, BREAKAGE_COMMENT_TEST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_COMMENT_ID_HEADER, BREAKAGE_COMMENT_TEST_ID)
+                            .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageComment(createBreakageCommentDto, BREAKAGE_COMMENT_TEST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
+        @Test
+        @SneakyThrows
+        void whenUpdateBreakageCommentThenReturnNotFoundException() {
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(BREAKAGE_COMMENT_NOT_EXIST)
+                    .status(404)
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.updateBreakageComment(
+                    createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID))
+                    .thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                    BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(CURRENT_USER_ID_HEADER, DEFAULT_ADMIN_USER_ID)
+                            .header(BREAKAGE_COMMENT_ID_HEADER, SOME_NOT_EXIST_ID)
+                            .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_COMMENT_NOT_EXIST))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .updateBreakageComment(createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
+        }
+
 
     }
 }
