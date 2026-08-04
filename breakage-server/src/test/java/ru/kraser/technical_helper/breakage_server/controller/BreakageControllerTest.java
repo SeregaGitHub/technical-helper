@@ -1280,7 +1280,7 @@ class BreakageControllerTest {
                     }
 
                     @Test
-                    void whenGetAllBreakagesAppointedToMeWithDeadlineThenReturnAppPage() {
+                    void whenGetAllBreakagesAppointedToOthersWithDeadlineThenReturnAppPage() {
 
                         when(breakageService.getAllBreakages(
                                         pageSize, pageIndex, defaultSortBy, defaultDirection,
@@ -1311,7 +1311,7 @@ class BreakageControllerTest {
                     }
 
                     @Test
-                    void whenGetAllBreakagesByTextAppointedToMeWithDeadlineThenReturnAppPage() {
+                    void whenGetAllBreakagesByTextAppointedToOthersWithDeadlineThenReturnAppPage() {
 
                         when(breakageService.getAllBreakages(
                                         pageSize, pageIndex, defaultSortBy, defaultDirection,
@@ -1383,7 +1383,7 @@ class BreakageControllerTest {
                     }
 
                     @Test
-                    void whenGetAllBreakagesAppointedToMeWithNoDeadlineThenReturnAppPage() {
+                    void whenGetAllBreakagesAppointedToOthersWithNoDeadlineThenReturnAppPage() {
 
                         when(breakageService.getAllBreakages(
                                         pageSize, pageIndex, defaultSortBy, defaultDirection,
@@ -1414,7 +1414,7 @@ class BreakageControllerTest {
                     }
 
                     @Test
-                    void whenGetAllBreakagesByTextAppointedToMeWithNoDeadlineThenReturnAppPage() {
+                    void whenGetAllBreakagesByTextAppointedToOthersWithNoDeadlineThenReturnAppPage() {
 
                         when(breakageService.getAllBreakages(
                                         pageSize, pageIndex, defaultSortBy, defaultDirection,
