@@ -3779,6 +3779,38 @@ class BreakageControllerWebMvcTest {
                     .updateBreakageComment(createBreakageCommentDto, SOME_NOT_EXIST_ID, DEFAULT_ADMIN_USER_ID);
         }
 
+        @Test
+        @SneakyThrows
+        void whenDeleteBreakageCommentThenReturnOk() {
 
+            String responseMessage = "Комментарий к заявке на неисправность был успешно удален.";
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(responseMessage)
+                    .status(200)
+                    .httpStatus(HttpStatus.OK)
+                    .timestamp(now)
+                    .build();
+
+            when(breakageService.deleteBreakageComment(BREAKAGE_COMMENT_TEST_ID)).thenReturn(apiResponse);
+
+            String result = mockMvc.perform(MockMvcRequestBuilders.delete(
+                                    BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(BREAKAGE_COMMENT_ID_HEADER, BREAKAGE_COMMENT_TEST_ID))
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertEquals(objectMapper.writeValueAsString(apiResponse), result);
+            verify(breakageService, times(1))
+                    .deleteBreakageComment(BREAKAGE_COMMENT_TEST_ID);
+        }
     }
 }
