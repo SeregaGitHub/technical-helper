@@ -88,6 +88,7 @@ class BreakageRepositoryTest {
     }
 
     @Nested
+    @Transactional()
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class WhenBreakageRepositoryDataModifyingMethodsAreInvoked {
 
@@ -131,7 +132,6 @@ class BreakageRepositoryTest {
         class WhenBreakageCreating {
 
             @Test
-            @Transactional()
             void whenCreateBreakageWithNoExecutorThenReturnBreakage() {
 
                 Breakage savedBreakage = breakageRepository.saveAndFlush(testBreakage);
@@ -153,7 +153,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             void whenCreateBreakageWithExecutorThenReturnBreakage() {
 
                 testBreakage.setExecutor(defaultAdminUser);
@@ -212,7 +211,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakageStatusThenReturnOne() {
 
@@ -233,7 +231,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakageStatusAndResetExecutorThenReturnOne() {
 
@@ -260,7 +257,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakagePriorityThenReturnOne() {
 
@@ -294,7 +290,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             @Modifying(clearAutomatically = true)
             void whenAddBreakageExecutorThenReturnOne() {
 
@@ -318,7 +313,6 @@ class BreakageRepositoryTest {
             }
 
             @Test
-            @Transactional()
             @Modifying(clearAutomatically = true)
             void whenDropBreakageExecutorThenReturnOne() {
 
