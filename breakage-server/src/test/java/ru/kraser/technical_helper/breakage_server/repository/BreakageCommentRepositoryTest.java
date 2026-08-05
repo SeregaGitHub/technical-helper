@@ -103,9 +103,9 @@ class BreakageCommentRepositoryTest {
 
             Breakage toSaveBreakage = Breakage.builder()
                     .department(defaultAdminDepartment)
-                    .room("some_room")
-                    .breakageTopic("test_breakage_topic")
-                    .breakageText("test_breakage_text")
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_TOPIC)
+                    .breakageText(BREAKAGE_TEST_TEXT)
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
                     .executor(null)
@@ -124,7 +124,7 @@ class BreakageCommentRepositoryTest {
         void setUp() {
             toSaveBreakageComment = BreakageComment.builder()
                     .breakage(testBreakage)
-                    .comment("test_breakage_comment_text")
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
                     .createdBy(defaultAdminUser.getId())
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
@@ -153,9 +153,9 @@ class BreakageCommentRepositoryTest {
             Breakage notExistBreakage = Breakage.builder()
                     .id(SOME_NOT_EXIST_ID)
                     .department(defaultAdminDepartment)
-                    .room("some_room")
-                    .breakageTopic("test_breakage_topic")
-                    .breakageText("test_breakage_text")
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_TOPIC)
+                    .breakageText(BREAKAGE_TEST_TEXT)
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
                     .executor(null)
@@ -169,7 +169,7 @@ class BreakageCommentRepositoryTest {
 
             BreakageComment toSaveBreakageCommentWithNotExistBreakage = BreakageComment.builder()
                     .breakage(notExistBreakage)
-                    .comment("test_breakage_comment_text")
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
                     .createdBy(defaultAdminUser.getId())
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
@@ -192,7 +192,7 @@ class BreakageCommentRepositoryTest {
 
             int response = breakageCommentRepository.updateBreakageComment(
                     savedBreakageComment.getId(),
-                    "updatedComment",
+                    BREAKAGE_COMMENT_UPDATE_TEST_TEXT,
                     defaultAdminUser.getId(),
                     afterNow
             );
@@ -202,7 +202,7 @@ class BreakageCommentRepositoryTest {
                     breakageCommentRepository.findById(savedBreakageComment.getId()).get();
 
             assertThat(response).isEqualTo(1);
-            assertThat(updatedBreakageComment.getComment()).isEqualTo("updatedComment");
+            assertThat(updatedBreakageComment.getComment()).isEqualTo(BREAKAGE_COMMENT_UPDATE_TEST_TEXT);
         }
 
         @Test
@@ -212,7 +212,7 @@ class BreakageCommentRepositoryTest {
 
             int response = breakageCommentRepository.updateBreakageComment(
                     SOME_NOT_EXIST_ID,
-                    "updatedComment",
+                    BREAKAGE_COMMENT_UPDATE_TEST_TEXT,
                     defaultAdminUser.getId(),
                     now
             );
