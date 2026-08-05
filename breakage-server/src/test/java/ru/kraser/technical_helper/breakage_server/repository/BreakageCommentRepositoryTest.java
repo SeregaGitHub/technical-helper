@@ -12,7 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -88,9 +87,6 @@ class BreakageCommentRepositoryTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class WhenBreakageCommentMethodsAreInvoked {
 
-        @Autowired
-        private TransactionTemplate transactionTemplate;
-
         @BeforeAll
         void insertData() {
 
@@ -136,23 +132,8 @@ class BreakageCommentRepositoryTest {
                     .build();
         }
 
-        @AfterEach
-        void cleanupData() {
-
-            transactionTemplate.execute(status -> {
-                entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment_audit")
-                        .executeUpdate();
-                return null;
-            });
-
-            transactionTemplate.execute(status -> {
-                entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment")
-                        .executeUpdate();
-                return null;
-            });
-        }
-
         @Test
+        @Transactional()
         void whenCreateBreakageCommentThenReturnBreakageComment() {
 
             BreakageComment savedBreakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
@@ -227,7 +208,7 @@ class BreakageCommentRepositoryTest {
         @Test
         @Transactional()
         @Modifying(clearAutomatically = true)
-        void whenUpdateBreakageCommentWithNotExistBreakageThenThrowException() {
+        void whenUpdateBreakageCommentWithNotExistBreakageThenReturnZero() {
 
             int response = breakageCommentRepository.updateBreakageComment(
                     SOME_NOT_EXIST_ID,
@@ -240,10 +221,11 @@ class BreakageCommentRepositoryTest {
         }
 
         @Test
+        @Transactional()
         void whenGetAllBreakageCommentsThenReturnListOfComments() {
 
-            BreakageComment savedBreakageComment =
-                    breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+            breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+
             List<BreakageCommentBackendDto> list =
                     breakageCommentRepository.getAllBreakageComments(testBreakage.getId());
 
