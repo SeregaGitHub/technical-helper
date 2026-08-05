@@ -42,12 +42,12 @@ import static ru.kraser.technical_helper.common_module.util.Constant.BREAKAGE_NO
 public class BreakageServiceImpl implements BreakageService {
     private final BreakageRepository breakageRepository;
     private final BreakageCommentRepository breakageCommentRepository;
-    private final Clock clock;
+    private final Clock breakageClock;
 
     @Override
     @Transactional
     public ApiResponse createBreakage(CreateBreakageFullDto createBreakageFullDto, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
         try {
             breakageRepository.saveAndFlush(BreakageMapper.toBreakage(createBreakageFullDto, currentUserId, now));
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse cancelBreakage(String breakageId, String breakageDepartmentId, String currentUserId,
                                       Role currentUserRole, String currentUserDepartmentId, String currentUsername) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         if (currentUserDepartmentId.equals(breakageDepartmentId) ||
                 currentUserRole == Role.ADMIN || currentUserRole == Role.TECHNICIAN) {
@@ -97,7 +97,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakageStatus(String breakageId, UpdateBreakageStatusDto updatedStatus,
                                             String currentUserId, String currentUsername) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
         if (updatedStatus.status() == Status.NEW) {
             throw new NotCorrectParameter("Заявка на неисправность не может изменить статус на - \"Новая\" !!!");
         } else {
@@ -134,7 +134,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakagePriority(String breakageId, UpdateBreakagePriorityDto updatedPriority,
                                               String currentUserId, String currentUsername) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         if (updatedPriority.status() == Status.SOLVED || updatedPriority.status() == Status.CANCELLED) {
             throw new NotCorrectParameter("Заявка на неисправность со статусом: \"Решена\" или \"Отменена\"" +
@@ -167,7 +167,7 @@ public class BreakageServiceImpl implements BreakageService {
         if (appointBreakageExecutorDto.status() == Status.NEW ||
                 appointBreakageExecutorDto.status() == Status.IN_PROGRESS) {
 
-            LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+            LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
             LocalDate deadline = appointBreakageExecutorDto.deadline();
 
             if (deadline.isBefore(now.toLocalDate())) {
@@ -206,7 +206,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Override
     @Transactional
     public ApiResponse dropBreakageExecutor(String breakageId,String currentUserId, String currentUsername) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         int response = breakageRepository.dropBreakageExecutor(
                 breakageId,
@@ -246,7 +246,7 @@ public class BreakageServiceImpl implements BreakageService {
         List<Priority> priorityList = AppPageUtil.createPriorityList(priorityUrgently, priorityHigh,
                 priorityMedium, priorityLow);
 
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         if (currentUserRole == Role.EMPLOYEE) {
             Page<BreakageEmployeeDto> pageEmployeeBreakages;
@@ -366,7 +366,7 @@ public class BreakageServiceImpl implements BreakageService {
                 .message("Заявка на неисправность с ID=" + breakageId + ", получена успешно")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now(clock).withNano(0))
+                .timestamp(LocalDateTime.now(breakageClock).withNano(0))
                 .data(breakageFullDto)
                 .build();
     }
@@ -376,7 +376,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse createBreakageComment(
             CreateBreakageCommentDto createBreakageCommentDto, String breakageId, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         if (createBreakageCommentDto.status() == Status.SOLVED ||
                 createBreakageCommentDto.status() == Status.CANCELLED) {
@@ -403,7 +403,7 @@ public class BreakageServiceImpl implements BreakageService {
     @Transactional
     public ApiResponse updateBreakageComment(CreateBreakageCommentDto createBreakageCommentDto,
                                              String breakageCommentId, String currentUserId) {
-        LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        LocalDateTime now = LocalDateTime.now(breakageClock).withNano(0);
 
         int response = breakageCommentRepository.updateBreakageComment(breakageCommentId,
                 createBreakageCommentDto.comment(), currentUserId, now);
@@ -428,7 +428,7 @@ public class BreakageServiceImpl implements BreakageService {
                 .message("Комментарий к заявке на неисправность был успешно удален.")
                 .status(200)
                 .httpStatus(HttpStatus.OK)
-                .timestamp(LocalDateTime.now(clock).withNano(0))
+                .timestamp(LocalDateTime.now(breakageClock).withNano(0))
                 .build();
     }
 }

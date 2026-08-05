@@ -53,7 +53,7 @@ import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 class BreakageServiceImplTest {
 
     @Mock
-    private Clock clock;
+    private Clock breakageClock;
     @Mock
     private BreakageRepository breakageRepository;
     @Mock
@@ -87,8 +87,8 @@ class BreakageServiceImplTest {
                 0,
                 0);
 
-        when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
-        when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
+        when(breakageClock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(breakageClock.instant()).thenReturn(NOW_ZDT.toInstant());
 
         testDepartment = Department.builder()
                 .id(DEPARTMENT_TEST_ID)
