@@ -105,9 +105,9 @@ class BreakageRepositoryTest {
 
         testBreakage = Breakage.builder()
                 .department(defaultAdminDepartment)
-                .room("some_room")
-                .breakageTopic("test_breakage_topic")
-                .breakageText("test_breakage_text")
+                .room(BREAKAGE_TEST_ROOM)
+                .breakageTopic(BREAKAGE_TEST_TOPIC)
+                .breakageText(BREAKAGE_TEST_TEXT)
                 .status(Status.NEW)
                 .priority(Priority.MEDIUM)
                 .executor(null)
@@ -232,7 +232,7 @@ class BreakageRepositoryTest {
         @Test
         @Transactional()
         @Modifying(clearAutomatically = true)
-        void updateBreakageStatusAndResetExecutor() {
+        void whenUpdateBreakageStatusAndResetExecutorThenReturnOne() {
 
             testBreakage.setExecutor(defaultAdminUser);
             testBreakage.setExecutorAppointedBy(defaultAdminUser);
@@ -259,7 +259,7 @@ class BreakageRepositoryTest {
         @Test
         @Transactional()
         @Modifying(clearAutomatically = true)
-        void updateBreakagePriority() {
+        void whenUpdateBreakagePriorityThenReturnOne() {
 
             savedBreakage = breakageRepository.saveAndFlush(testBreakage);
 
@@ -293,7 +293,7 @@ class BreakageRepositoryTest {
         @Test
         @Transactional()
         @Modifying(clearAutomatically = true)
-        void addBreakageExecutor() {
+        void whenAddBreakageExecutorThenReturnOne() {
 
             savedBreakage = breakageRepository.saveAndFlush(testBreakage);
 
@@ -317,7 +317,7 @@ class BreakageRepositoryTest {
         @Test
         @Transactional()
         @Modifying(clearAutomatically = true)
-        void dropBreakageExecutor() {
+        void whenDropBreakageExecutorThenReturnOne() {
 
             testBreakage.setExecutor(defaultAdminUser);
             testBreakage.setExecutorAppointedBy(defaultAdminUser);
@@ -379,7 +379,7 @@ class BreakageRepositoryTest {
             beforeLdt = ldt.minusDays(1);
 
             Department emplDepartment = Department.builder()
-                    .name("employee_department")
+                    .name(DEPARTMENT_TEST_NAME)
                     .enabled(true)
                     .createdBy(adminUser.getId())
                     .createdDate(ldt)
@@ -390,7 +390,7 @@ class BreakageRepositoryTest {
             employeeDepartment = departmentRepository.saveAndFlush(emplDepartment);
 
             User emplUser = User.builder()
-                    .username("employee_user")
+                    .username(USER_TEST_NAME)
                     .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.EMPLOYEE)
@@ -404,7 +404,7 @@ class BreakageRepositoryTest {
             employeeUser = userRepository.saveAndFlush(emplUser);
 
             User techUser = User.builder()
-                    .username("technician_user")
+                    .username(USER_TECHNICIAN_TEST_NAME)
                     .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.TECHNICIAN)
@@ -419,9 +419,9 @@ class BreakageRepositoryTest {
 
             Breakage savedByEmplBreakage = Breakage.builder()
                     .department(employeeDepartment)
-                    .room("some_room")
-                    .breakageTopic("saved_by_employee_breakage_topic")
-                    .breakageText("saved_by_employee_breakage_text")
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_EMPLOYEE_TOPIC)
+                    .breakageText(BREAKAGE_TEST_EMPLOYEE_TEXT)
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
                     .executor(technicianUser)
@@ -435,9 +435,9 @@ class BreakageRepositoryTest {
 
             Breakage savedByAdmBreakage = Breakage.builder()
                     .department(adminDepartment)
-                    .room("some_room")
-                    .breakageTopic("saved_by_admin_breakage_topic")
-                    .breakageText("saved_by_admin_breakage_text")
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_ADMIN_TOPIC)
+                    .breakageText(BREAKAGE_TEST_ADMIN_TEXT)
                     .status(Status.NEW)
                     .priority(Priority.MEDIUM)
                     .executor(null)
@@ -472,6 +472,7 @@ class BreakageRepositoryTest {
             });
 
             userRepository.deleteById(employeeUser.getId());
+            userRepository.deleteById(technicianUser.getId());
             departmentRepository.deleteById(employeeDepartment.getId());
         }
 
@@ -498,7 +499,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     employeeDepartment.getId(),
                     defaultPageRequest,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
@@ -547,7 +548,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     employeeDepartment.getId(),
                     defaultPageRequest,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
@@ -578,7 +579,7 @@ class BreakageRepositoryTest {
                     priorityListWithNoMedium,
                     employeeDepartment.getId(),
                     defaultPageRequest,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageEmployeeDto> list = breakageEmployeeDtoPage.getContent();
@@ -654,7 +655,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     technicianUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -670,7 +671,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     technicianUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -686,7 +687,7 @@ class BreakageRepositoryTest {
                     priorityListWithNoMedium,
                     defaultPageRequest,
                     technicianUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -702,7 +703,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     adminUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -783,7 +784,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     technicianUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -800,7 +801,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     technicianUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -817,7 +818,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     technicianUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -834,7 +835,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     adminUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -910,7 +911,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     adminUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -926,7 +927,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     adminUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -942,7 +943,7 @@ class BreakageRepositoryTest {
                     priorityListWithNoMedium,
                     defaultPageRequest,
                     adminUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -958,7 +959,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     technicianUser.getId(),
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1040,7 +1041,7 @@ class BreakageRepositoryTest {
                             defaultPageRequest,
                             adminUser.getId(),
                             ldt,
-                            "by_employee"
+                            BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
                     );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1057,7 +1058,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     adminUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1074,7 +1075,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     adminUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1091,7 +1092,7 @@ class BreakageRepositoryTest {
                     defaultPageRequest,
                     technicianUser.getId(),
                     ldt,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1148,7 +1149,7 @@ class BreakageRepositoryTest {
                     defaultStatusList,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "by_admin"
+                    BREAKAGE_TEST_SEARCH_BY_ADMIN_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1163,7 +1164,7 @@ class BreakageRepositoryTest {
                     statusListWithOnlyInProgress,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "by_admin"
+                    BREAKAGE_TEST_SEARCH_BY_ADMIN_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1178,7 +1179,7 @@ class BreakageRepositoryTest {
                     defaultStatusList,
                     priorityListWithNoMedium,
                     defaultPageRequest,
-                    "by_admin"
+                    BREAKAGE_TEST_SEARCH_BY_ADMIN_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1193,7 +1194,7 @@ class BreakageRepositoryTest {
                     defaultStatusList,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1250,7 +1251,7 @@ class BreakageRepositoryTest {
                     defaultStatusList,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1265,7 +1266,7 @@ class BreakageRepositoryTest {
                     statusListWithOnlyInProgress,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1280,7 +1281,7 @@ class BreakageRepositoryTest {
                     defaultStatusList,
                     priorityListWithNoMedium,
                     defaultPageRequest,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1289,13 +1290,13 @@ class BreakageRepositoryTest {
         }
 
         @Test
-        void whenGetAllBreakagesByTextThenReturnEmptyList() {
+        void whenGetAllBreakagesByTextThenReturnListOfEmployeeBreakages() {
 
             Page<BreakageTechDto> breakagesPage = breakageRepository.getAllBreakagesByText(
                     defaultStatusList,
                     defaultPriorityList,
                     defaultPageRequest,
-                    "by_employee"
+                    BREAKAGE_TEST_SEARCH_BY_EMPLOYEE_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1374,7 +1375,7 @@ class BreakageRepositoryTest {
                             defaultPriorityList,
                             defaultPageRequest,
                             ldt,
-                            "breakage"
+                            BREAKAGE_TEST_SEARCH_TEXT
                     );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1390,7 +1391,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     ldt,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1406,7 +1407,7 @@ class BreakageRepositoryTest {
                     priorityListWithNoMedium,
                     defaultPageRequest,
                     ldt,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
@@ -1424,7 +1425,7 @@ class BreakageRepositoryTest {
                     defaultPriorityList,
                     defaultPageRequest,
                     localDateTime,
-                    "breakage"
+                    BREAKAGE_TEST_SEARCH_TEXT
             );
 
             List<BreakageTechDto> list = breakagesPage.getContent();
