@@ -7,7 +7,7 @@ import java.time.Clock;
 @Configuration
 public class ConfigurationBreakageServer {
 
-    @Bean
+    @Bean(name = "breakageClock")
     public Clock clock() {
         return Clock.systemDefaultZone();
     }
