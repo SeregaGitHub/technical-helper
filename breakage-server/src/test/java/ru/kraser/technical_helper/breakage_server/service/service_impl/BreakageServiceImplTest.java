@@ -103,9 +103,9 @@ class BreakageServiceImplTest {
         testBreakage = Breakage.builder()
                 .id(BREAKAGE_TEST_ID)
                 .department(testDepartment)
-                .room("some_room")
-                .breakageTopic("test_breakage_topic")
-                .breakageText("test_breakage_text")
+                .room(BREAKAGE_TEST_ROOM)
+                .breakageTopic(BREAKAGE_TEST_TOPIC)
+                .breakageText(BREAKAGE_TEST_TEXT)
                 .status(Status.NEW)
                 .priority(Priority.MEDIUM)
                 .executor(null)
@@ -662,7 +662,6 @@ class BreakageServiceImplTest {
         private Integer pageSize;
         private Integer pageIndex;
         private String defaultSortBy;
-        private String defaultSearchText;
         private List<Status> defaultStatusList;
         private List<Status> defaultShortStatusList;
         private List<Priority> defaultPriorityList;
@@ -674,7 +673,6 @@ class BreakageServiceImplTest {
             pageSize = 10;
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
-            defaultSearchText = "breakage";
 
             defaultStatusList = new ArrayList<>();
             defaultStatusList.add(Status.NEW);
@@ -736,8 +734,9 @@ class BreakageServiceImplTest {
 
                 AppPage appPage =
                         breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                true, true, true, true, true,
-                                true, true, true, true, true,
+                                true, true, true, true,
+                                true, true, true,
+                                true, true, true,
                                 Executor.NO_APPOINTED.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
 
@@ -754,15 +753,16 @@ class BreakageServiceImplTest {
 
                 when(breakageRepository.getAllEmployeeBreakagesByText(
                                 defaultStatusList, defaultPriorityList,
-                                DEPARTMENT_TEST_ID, defaultPageRequest, defaultSearchText
+                                DEPARTMENT_TEST_ID, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                         )
                 ).thenReturn(page);
 
                 AppPage appPage =
                         breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                true, true, true, true, true,
-                                true, true, true, true, true,
-                                Executor.NO_APPOINTED.name(), false, defaultSearchText,
+                                true, true, true, true,
+                                true, true, true,
+                                true, true, true,
+                                Executor.NO_APPOINTED.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
 
                 assertEquals(content, appPage.content());
@@ -770,7 +770,7 @@ class BreakageServiceImplTest {
                 verify(breakageRepository, times(1))
                         .getAllEmployeeBreakagesByText(
                                 defaultStatusList, defaultPriorityList,
-                                DEPARTMENT_TEST_ID, defaultPageRequest, defaultSearchText
+                                DEPARTMENT_TEST_ID, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                         );
             }
 
@@ -787,8 +787,9 @@ class BreakageServiceImplTest {
 
                 AppPage appPage =
                         breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                false, true, true, true, true,
-                                true, true, true, true, true,
+                                false, true, true, true,
+                                true, true, true,
+                                true, true, true,
                                 Executor.NO_APPOINTED.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID);
 
@@ -849,8 +850,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
                                         Executor.APPOINTED_TO_ME.name(), true, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -867,15 +869,16 @@ class BreakageServiceImplTest {
 
                         when(breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToMe(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, now, defaultSearchText
+                                        USER_TEST_ID, now, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        Executor.APPOINTED_TO_ME.name(), true, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -883,7 +886,7 @@ class BreakageServiceImplTest {
                         verify(breakageRepository, times(1))
                                 .getAllDeadlineExpiredBreakagesByTextAppointedToMe(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, now, defaultSearchText
+                                        USER_TEST_ID, now, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -923,8 +926,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
                                         Executor.APPOINTED_TO_ME.name(), false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -941,15 +945,16 @@ class BreakageServiceImplTest {
 
                         when(breakageRepository.getAllBreakagesByTextAppointedToMe(
                                         defaultStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, defaultSearchText
+                                        USER_TEST_ID, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        Executor.APPOINTED_TO_ME.name(), false, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
+                                        Executor.APPOINTED_TO_ME.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -957,7 +962,7 @@ class BreakageServiceImplTest {
                         verify(breakageRepository, times(1))
                                 .getAllBreakagesByTextAppointedToMe(
                                         defaultStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, defaultSearchText
+                                        USER_TEST_ID, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -1003,8 +1008,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
                                         Executor.APPOINTED_TO_OTHERS.name(), true, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1021,15 +1027,16 @@ class BreakageServiceImplTest {
 
                         when(breakageRepository.getAllDeadlineExpiredBreakagesByTextAppointedToOthers(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, now, defaultSearchText
+                                        USER_TEST_ID, now, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        Executor.APPOINTED_TO_OTHERS.name(), true, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
+                                        Executor.APPOINTED_TO_OTHERS.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1037,7 +1044,7 @@ class BreakageServiceImplTest {
                         verify(breakageRepository, times(1))
                                 .getAllDeadlineExpiredBreakagesByTextAppointedToOthers(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, now, defaultSearchText
+                                        USER_TEST_ID, now, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -1077,8 +1084,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
                                         Executor.APPOINTED_TO_OTHERS.name(), false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1095,15 +1103,16 @@ class BreakageServiceImplTest {
 
                         when(breakageRepository.getAllBreakagesByTextAppointedToOthers(
                                         defaultStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, defaultSearchText
+                                        USER_TEST_ID, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        Executor.APPOINTED_TO_OTHERS.name(), false, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
+                                        Executor.APPOINTED_TO_OTHERS.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1111,7 +1120,7 @@ class BreakageServiceImplTest {
                         verify(breakageRepository, times(1))
                                 .getAllBreakagesByTextAppointedToOthers(
                                         defaultStatusList, defaultPriorityList, defaultPageRequest,
-                                        USER_TEST_ID, defaultSearchText
+                                        USER_TEST_ID, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -1152,8 +1161,9 @@ class BreakageServiceImplTest {
 
                     AppPage appPage =
                             breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                    true, true, true, true, true,
-                                    true, true, true, true, true,
+                                    true, true, true, true,
+                                    true, true, true,
+                                    true, true, true,
                                     Executor.NO_APPOINTED.name(), false, null,
                                     Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1169,22 +1179,23 @@ class BreakageServiceImplTest {
                 void whenGetAllNoAppointedBreakagesByTextThenReturnAppPage() {
 
                     when(breakageRepository.getAllBreakagesByTextNoAppointed(
-                                    defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                    defaultStatusList, defaultPriorityList, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                             )
                     ).thenReturn(page);
 
                     AppPage appPage =
                             breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                    true, true, true, true, true,
-                                    true, true, true, true, true,
-                                    Executor.NO_APPOINTED.name(), false, defaultSearchText,
+                                    true, true, true, true,
+                                    true, true, true,
+                                    true, true, true,
+                                    Executor.NO_APPOINTED.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                     Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                     assertEquals(content, appPage.content());
 
                     verify(breakageRepository, times(1))
                             .getAllBreakagesByTextNoAppointed(
-                                    defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                    defaultStatusList, defaultPriorityList, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                             );
                 }
             }
@@ -1229,8 +1240,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true, true,
+                                        true, true,
                                         "ALL", true, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1247,15 +1259,16 @@ class BreakageServiceImplTest {
 
                         when(breakageRepository.getAllDeadlineExpiredBreakagesByText(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        now, defaultSearchText
+                                        now, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        "ALL", true, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true, true,
+                                        true, true,
+                                        "ALL", true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1263,7 +1276,7 @@ class BreakageServiceImplTest {
                         verify(breakageRepository, times(1))
                                 .getAllDeadlineExpiredBreakagesByText(
                                         defaultShortStatusList, defaultPriorityList, defaultPageRequest,
-                                        now, defaultSearchText
+                                        now, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -1303,8 +1316,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
+                                        true, true, true, true,
+                                        true, true, true,
+                                        true, true, true,
                                         null, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1320,22 +1334,23 @@ class BreakageServiceImplTest {
                     void whenGetAllBreakagesByTextThenReturnAppPage() {
 
                         when(breakageRepository.getAllBreakagesByText(
-                                        defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                                 )
                         ).thenReturn(page);
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, true, true,
-                                        null, false, defaultSearchText,
+                                        true, true, true, true,
+                                        true, true, true, true,
+                                        true, true,
+                                        null, false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
 
                         verify(breakageRepository, times(1))
                                 .getAllBreakagesByText(
-                                        defaultStatusList, defaultPriorityList, defaultPageRequest, defaultSearchText
+                                        defaultStatusList, defaultPriorityList, defaultPageRequest, BREAKAGE_TEST_SEARCH_TEXT
                                 );
                     }
                 }
@@ -1361,8 +1376,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        false, true, true, true, true,
-                                        true, true, true, true, true,
+                                        false, true, true, true,
+                                        true, true, true, true,
+                                        true, true,
                                         null, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
@@ -1386,8 +1402,9 @@ class BreakageServiceImplTest {
 
                         AppPage appPage =
                                 breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
-                                        true, true, true, true, true,
-                                        true, true, true, false, true,
+                                        true, true, true, true,
+                                        true, true, true, true,
+                                        false, true,
                                         null, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
