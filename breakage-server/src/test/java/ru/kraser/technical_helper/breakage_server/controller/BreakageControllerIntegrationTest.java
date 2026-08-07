@@ -47,6 +47,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -91,13 +92,21 @@ class BreakageControllerIntegrationTest {
 
     private DateTimeFormatter dtf;
     private LocalDateTime now;
-    private Breakage testBreakage;
-    private User defaultAdminUser;
-    //private User employeeCurrentUser;
-    //private User employeeOtherUser;
+    private LocalDateTime afterNow;
+
     private Department defaultAdminDepartment;
-    //private Department employeeCurrentDepartment;
-    //private Department employeeOtherDepartment;
+    private Department employeeCurrentDepartment;
+    private Department employeeOtherDepartment;
+
+    private User defaultAdminUser;
+    private User technicianUser;
+    private User employeeCurrentUser;
+    private User employeeOtherUser;
+
+    private Breakage testBreakage;
+    private Breakage employeeCurrentBreakage;
+
+
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -127,6 +136,13 @@ class BreakageControllerIntegrationTest {
         postgreSQLContainer.stop();
     }
 
+    @BeforeEach
+    void setUp() {
+
+        when(breakageClock.getZone()).thenReturn(NOW_ZDT.getZone());
+        when(breakageClock.instant()).thenReturn(NOW_ZDT.toInstant());
+    }
+
     @Nested
     @Transactional()
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -134,19 +150,6 @@ class BreakageControllerIntegrationTest {
 
         @BeforeAll
         void insertData() {
-
-            defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
-            defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
-        }
-
-        @AfterAll
-        @Sql(statements = "TRUNCATE TABLE breakage CASCADE")
-        void tearDown() {
-
-        }
-
-        @BeforeEach
-        void setUp() {
 
             now = LocalDateTime.of(
                     2025,
@@ -158,8 +161,109 @@ class BreakageControllerIntegrationTest {
 
             dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
-            when(breakageClock.getZone()).thenReturn(NOW_ZDT.getZone());
-            when(breakageClock.instant()).thenReturn(NOW_ZDT.toInstant());
+            defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+            defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
+
+            Department toSaveEmployeeCurrentDepartment = Department.builder()
+                    .name(DEPARTMENT_TEST_NAME)
+                    .enabled(true)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            Department toSaveEmployeeOtherDepartment = Department.builder()
+                    .name(DEPARTMENT_TEST_OTHER_NAME)
+                    .enabled(true)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            employeeCurrentDepartment = departmentRepository.saveAndFlush(toSaveEmployeeCurrentDepartment);
+            employeeOtherDepartment = departmentRepository.saveAndFlush(toSaveEmployeeOtherDepartment);
+
+            User toSaveEmployeeUser = User.builder()
+                    .username(USER_TEST_OTHER_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.EMPLOYEE)
+                    .department(employeeCurrentDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User toSaveEmployeeOtherUser = User.builder()
+                    .username(USER_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.EMPLOYEE)
+                    .department(employeeOtherDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            User toSaveTechnicianUser = User.builder()
+                    .username(USER_TECHNICIAN_TEST_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.TECHNICIAN)
+                    .department(defaultAdminDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            employeeCurrentUser = userRepository.saveAndFlush(toSaveEmployeeUser);
+            employeeOtherUser = userRepository.saveAndFlush(toSaveEmployeeOtherUser);
+            technicianUser = userRepository.saveAndFlush(toSaveTechnicianUser);
+
+            Breakage toSaveEmployeeBreakage = Breakage.builder()
+                    .department(employeeCurrentDepartment)
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_TOPIC)
+                    .breakageText(BREAKAGE_TEST_TEXT)
+                    .status(Status.NEW)
+                    .priority(Priority.MEDIUM)
+                    .executor(null)
+                    .executorAppointedBy(null)
+                    .deadline(null)
+                    .createdBy(employeeCurrentUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(employeeCurrentUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            employeeCurrentBreakage = breakageRepository.saveAndFlush(toSaveEmployeeBreakage);
+        }
+
+        @AfterAll
+        void cleanupData() {
+
+            transactionTemplate.execute(status -> {
+                entityManager.createNativeQuery("TRUNCATE TABLE breakage CASCADE")
+                        .executeUpdate();
+                return null;
+            });
+
+            userRepository.deleteById(employeeCurrentUser.getId());
+            userRepository.deleteById(employeeOtherUser.getId());
+            userRepository.deleteById(technicianUser.getId());
+            departmentRepository.deleteById(employeeCurrentDepartment.getId());
+        }
+
+        @BeforeEach
+        void setUp() {
+
+//            when(breakageClock.getZone()).thenReturn(NOW_ZDT.getZone());
+//            when(breakageClock.instant()).thenReturn(NOW_ZDT.toInstant());
 
             testBreakage = Breakage.builder()
                     .department(defaultAdminDepartment)
@@ -186,8 +290,6 @@ class BreakageControllerIntegrationTest {
             @Test
             @SneakyThrows
             void whenCreateBreakageThenReturnCreated() {
-
-                testBreakage.setDepartment(defaultAdminDepartment);
 
                 createBreakageFullDto = CreateBreakageFullDto.builder()
                         .department(testBreakage.getDepartment())
@@ -263,18 +365,18 @@ class BreakageControllerIntegrationTest {
                         .lastUpdatedDate(now)
                         .build();
 
-                ApiResponse apiResponse = ApiResponse.builder()
-                        .message(responseMessage)
-                        .status(404)
-                        .httpStatus(HttpStatus.NOT_FOUND)
-                        .timestamp(now)
-                        .build();
-
                 createBreakageFullDto = CreateBreakageFullDto.builder()
                         .department(notExistDepartment)
                         .room(testBreakage.getRoom())
                         .breakageTopic(testBreakage.getBreakageTopic())
                         .breakageText(testBreakage.getBreakageText())
+                        .build();
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
                         .build();
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + BREAKAGE_URL + EMPLOYEE_URL)
@@ -294,15 +396,180 @@ class BreakageControllerIntegrationTest {
             }
         }
 
+        @Nested
+        class WhenBreakageCancelling {
+
+            @Test
+            @SneakyThrows
+            void whenCancelBreakageByTechnicianThenReturnOk() {
+
+                String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(now)
+                        .data(technicianUser.getUsername())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + technicianUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId())
+                                .header(DEPARTMENT_ID_HEADER, employeeCurrentBreakage.getDepartment().getId())
+                                .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                .header(USER_DEPARTMENT_ID_HEADER, technicianUser.getDepartment().getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+                assertThat(actualApiResponse.status()).isEqualTo(apiResponse.status());
+                assertThat(actualApiResponse.httpStatus()).isEqualTo(apiResponse.httpStatus());
+                assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
+                assertThat(actualApiResponse.data()).isEqualTo(apiResponse.data());
+
+                Breakage cancelledBreakage = breakageRepository.findById(employeeCurrentBreakage.getId()).get();
+
+                assertThat(cancelledBreakage.getStatus()).isEqualTo(Status.CANCELLED);
+                assertThat(cancelledBreakage.getLastUpdatedBy()).isEqualTo(technicianUser.getId());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenCancelBreakageByEmployeeFromSameDepartmentThenReturnOk() {
+
+                when(breakageClock.getZone()).thenReturn(NOW_ZDT.plusHours(1).getZone());
+                when(breakageClock.instant()).thenReturn(NOW_ZDT.plusHours(1).toInstant());
+                afterNow = now.plusHours(1);
+
+                String responseMessage = "Заявка на неисправность была успешно отменена.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(afterNow)
+                        .data(employeeCurrentUser.getUsername())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" +
+                                                employeeCurrentUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, employeeCurrentUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId())
+                                .header(DEPARTMENT_ID_HEADER, employeeCurrentBreakage.getDepartment().getId())
+                                .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentUser.getDepartment().getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(afterNow)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+                assertThat(actualApiResponse.status()).isEqualTo(apiResponse.status());
+                assertThat(actualApiResponse.httpStatus()).isEqualTo(apiResponse.httpStatus());
+                assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
+                assertThat(actualApiResponse.data()).isEqualTo(apiResponse.data());
+
+                Breakage cancelledBreakage = breakageRepository.findById(employeeCurrentBreakage.getId()).get();
+
+                assertThat(cancelledBreakage.getStatus()).isEqualTo(Status.CANCELLED);
+                assertThat(cancelledBreakage.getLastUpdatedBy()).isEqualTo(employeeCurrentUser.getId());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenCancelBreakageWhichNotExistThenReturnNotFoundException() {
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(BREAKAGE_NOT_EXIST)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .data(defaultAdminUser.getUsername())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" + defaultAdminUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getUsername())
+                                .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID)
+                                .header(DEPARTMENT_ID_HEADER, employeeCurrentDepartment.getId())
+                                .header(USER_ROLE_HEADER, Role.ADMIN)
+                                .header(USER_DEPARTMENT_ID_HEADER, defaultAdminUser.getDepartment().getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_NOT_EXIST))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenCancelBreakageByEmployeeFromOtherDepartmentThenReturnForbiddenException() {
+
+                String responseMessage = "Только технический специалист или сотрудник отдела, " +
+                        "в котором произошла неисправность, могут отменить заявку !!!";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(422)
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .timestamp(now)
+                        .data(employeeOtherUser.getUsername())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + "/" +
+                                                employeeOtherUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, employeeOtherUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId())
+                                .header(DEPARTMENT_ID_HEADER, employeeCurrentBreakage.getDepartment().getId())
+                                .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                .header(USER_DEPARTMENT_ID_HEADER, employeeOtherUser.getDepartment().getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+        }
+
 
     }
 
 
 
-//    @Test
-//    void cancelBreakage() {
-//    }
-//
 //    @Test
 //    void updateBreakageStatus() {
 //    }
