@@ -1,6 +1,7 @@
 package ru.kraser.technical_helper.breakage_server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.SneakyThrows;
@@ -25,9 +26,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.BreakageServer;
+import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -35,6 +38,7 @@ import ru.kraser.technical_helper.common_module.enums.Status;
 import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
+import ru.kraser.technical_helper.common_module.model.BreakageComment;
 import ru.kraser.technical_helper.common_module.model.Department;
 import ru.kraser.technical_helper.common_module.model.User;
 import ru.kraser.technical_helper.main_server.repository.DepartmentRepository;
@@ -43,6 +47,8 @@ import ru.kraser.technical_helper.main_server.util.mapper.UserMapper;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,6 +76,8 @@ class BreakageControllerIntegrationTest {
     private TransactionTemplate transactionTemplate;
     @Autowired
     private BreakageRepository breakageRepository;
+    @Autowired
+    private BreakageCommentRepository breakageCommentRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -1321,12 +1329,144 @@ class BreakageControllerIntegrationTest {
                 assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
             }
         }
+
+        @Nested
+        class WhenBreakageGetting {
+
+            private BreakageComment breakageComment;
+
+            @Test
+            @SneakyThrows
+            void whenGetBreakageThenReturnBreakage() {
+
+                BreakageComment toSaveBreakageComment = BreakageComment.builder()
+                        .breakage(employeeCurrentBreakage)
+                        .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+
+                breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+
+                BreakageCommentFrontDto comment = BreakageCommentFrontDto.builder()
+                        .id(breakageComment.getId())
+                        .comment(breakageComment.getComment())
+                        .actionEnabled(false)
+                        .creatorName(defaultAdminUser.getUsername())
+                        .createdDate(breakageComment.getCreatedDate())
+                        .lastUpdatedDate(breakageComment.getLastUpdatedDate())
+                        .build();
+
+                BreakageFullDto breakageFullDto = BreakageFullDto.builder()
+                        .id(employeeCurrentBreakage.getId())
+                        .departmentId(employeeCurrentBreakage.getDepartment().getId())
+                        .breakageExecutorId("")
+                        .departmentName(employeeCurrentBreakage.getDepartment().getName())
+                        .room(employeeCurrentBreakage.getRoom())
+                        .breakageTopic(employeeCurrentBreakage.getBreakageTopic())
+                        .breakageText(employeeCurrentBreakage.getBreakageText())
+                        .status(employeeCurrentBreakage.getStatus())
+                        .priority(employeeCurrentBreakage.getPriority())
+                        .breakageExecutor(NO_APPOINTED_EXECUTOR)
+                        .executorAppointedBy(EXECUTOR_APPOINTED_BY)
+                        .createdBy(employeeCurrentUser.getUsername())
+                        .createdDate(employeeCurrentBreakage.getCreatedDate())
+                        .lastUpdatedBy(employeeCurrentUser.getUsername())
+                        .lastUpdatedDate(employeeCurrentBreakage.getCreatedDate())
+                        .comments(List.of(comment))
+                        .build();
+
+                String responseMessage = "Заявка на неисправность с ID=" + employeeCurrentBreakage.getId() +
+                        ", получена успешно";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(now)
+                        .data(breakageFullDto)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                        BASE_URL + BREAKAGE_URL +
+                                                TECHNICIAN_URL + CURRENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                LinkedHashMap<String, Object> dataMap = JsonPath.read(result, "$.data");
+                BreakageFullDto returnedBreakageFullDto = objectMapper.convertValue(dataMap, BreakageFullDto.class);
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+                assertThat(actualApiResponse.status()).isEqualTo(apiResponse.status());
+                assertThat(actualApiResponse.httpStatus()).isEqualTo(apiResponse.httpStatus());
+                assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
+                assertThat(returnedBreakageFullDto).isEqualTo(apiResponse.data());
+
+                assertThat(returnedBreakageFullDto.id())
+                        .isEqualTo(breakageFullDto.id());
+                assertThat(returnedBreakageFullDto.departmentId())
+                        .isEqualTo(breakageFullDto.departmentId());
+                assertThat(returnedBreakageFullDto.departmentName())
+                        .isEqualTo(breakageFullDto.departmentName());
+                assertThat(returnedBreakageFullDto.breakageExecutorId())
+                        .isEqualTo(breakageFullDto.breakageExecutorId());
+                assertThat(returnedBreakageFullDto.room())
+                        .isEqualTo(breakageFullDto.room());
+                assertThat(returnedBreakageFullDto.breakageTopic())
+                        .isEqualTo(breakageFullDto.breakageTopic());
+                assertThat(returnedBreakageFullDto.breakageText())
+                        .isEqualTo(breakageFullDto.breakageText());
+                assertThat(returnedBreakageFullDto.status())
+                        .isEqualTo(breakageFullDto.status());
+                assertThat(returnedBreakageFullDto.priority())
+                        .isEqualTo(breakageFullDto.priority());
+                assertThat(returnedBreakageFullDto.breakageExecutor())
+                        .isEqualTo(breakageFullDto.breakageExecutor());
+                assertThat(returnedBreakageFullDto.executorAppointedBy())
+                        .isEqualTo(breakageFullDto.executorAppointedBy());
+                assertThat(returnedBreakageFullDto.createdBy())
+                        .isEqualTo(breakageFullDto.createdBy());
+                assertThat(returnedBreakageFullDto.createdDate())
+                        .isEqualTo(breakageFullDto.createdDate());
+                assertThat(returnedBreakageFullDto.lastUpdatedBy())
+                        .isEqualTo(breakageFullDto.lastUpdatedBy());
+                assertThat(returnedBreakageFullDto.lastUpdatedDate())
+                        .isEqualTo(breakageFullDto.lastUpdatedDate());
+                assertThat(returnedBreakageFullDto.deadline())
+                        .isEqualTo(breakageFullDto.deadline());
+                assertThat(returnedBreakageFullDto.comments().getFirst())
+                        .isEqualTo(breakageFullDto.comments().getFirst());
+                transactionTemplate.execute(status -> {
+                    entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment CASCADE")
+                            .executeUpdate();
+                    return null;
+                });
+            }
+        }
+
+        /*@Nested
+        class WhenBreakageGettingAndBreakageCommentMethodsAreInvoked {
+
+
+        }*/
     }
 
 
-//    @Test
-//    void getBreakage() {
-//    }
+
 //
 //    @Test
 //    void createBreakageComment() {

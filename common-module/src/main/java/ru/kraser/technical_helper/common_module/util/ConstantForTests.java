@@ -34,6 +34,7 @@ public class ConstantForTests {
     public static final String BREAKAGE_TEST_SEARCH_BY_ADMIN_TEXT = "by_admin";
 
     public static final String NO_APPOINTED_EXECUTOR = "Не назначен";
+    public static final String EXECUTOR_APPOINTED_BY = "Отсутствует";
     public static final String GET_BREAKAGE_NOT_EXIST = "Данная заявка на неисправность не существует.";
 
     public static final String BREAKAGE_COMMENT_TEST_ID = "b1t11111-11c1-1c11-1111-b111111t1111";
