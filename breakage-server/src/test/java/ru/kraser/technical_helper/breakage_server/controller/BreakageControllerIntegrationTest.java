@@ -27,14 +27,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
-import ru.kraser.technical_helper.common_module.dto.breakage.AppointBreakageExecutorDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.CreateBreakageFullDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakagePriorityDto;
-import ru.kraser.technical_helper.common_module.dto.breakage.UpdateBreakageStatusDto;
+import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
 import ru.kraser.technical_helper.common_module.enums.Status;
+import ru.kraser.technical_helper.common_module.exception.ForbiddenException;
 import ru.kraser.technical_helper.common_module.exception.NotFoundException;
 import ru.kraser.technical_helper.common_module.model.Breakage;
 import ru.kraser.technical_helper.common_module.model.Department;
@@ -182,7 +180,7 @@ class BreakageControllerIntegrationTest {
             employeeOtherDepartment = departmentRepository.saveAndFlush(toSaveEmployeeOtherDepartment);
 
             User toSaveEmployeeUser = User.builder()
-                    .username(USER_TEST_OTHER_NAME)
+                    .username(USER_TEST_NAME)
                     .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.EMPLOYEE)
@@ -194,7 +192,7 @@ class BreakageControllerIntegrationTest {
                     .build();
 
             User toSaveEmployeeOtherUser = User.builder()
-                    .username(USER_TEST_NAME)
+                    .username(USER_TEST_OTHER_NAME)
                     .password(USER_TEST_PASSWORD)
                     .enabled(true)
                     .role(Role.EMPLOYEE)
@@ -1180,19 +1178,152 @@ class BreakageControllerIntegrationTest {
             }
         }
 
+        //    @Test
+        //    void getAllBreakages() {
+        //    }
 
+        @Nested
+        class WhenBreakageByEmployeeGetting {
+
+            @Test
+            @SneakyThrows
+            void whenGetBreakageByEmployeeThenReturnBreakage() {
+
+                BreakageEmployeeDto expectedBreakageEmployeeDto = BreakageEmployeeDto.builder()
+                        .id(employeeCurrentBreakage.getId())
+                        .departmentId(employeeCurrentBreakage.getDepartment().getId())
+                        .departmentName(employeeCurrentBreakage.getDepartment().getName())
+                        .room(employeeCurrentBreakage.getRoom())
+                        .breakageTopic(employeeCurrentBreakage.getBreakageTopic())
+                        .breakageText(employeeCurrentBreakage.getBreakageText())
+                        .status(employeeCurrentBreakage.getStatus())
+                        .breakageExecutor(NO_APPOINTED_EXECUTOR)
+                        .createdBy(USER_TEST_NAME)
+                        .createdDate(employeeCurrentBreakage.getCreatedDate())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentBreakage.getDepartment().getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId()))
+                        .andExpect(MockMvcResultMatchers.status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                                .value(expectedBreakageEmployeeDto.getId()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.departmentId")
+                                .value(expectedBreakageEmployeeDto.getDepartmentId()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.departmentName")
+                                .value(expectedBreakageEmployeeDto.getDepartmentName()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.room")
+                                .value(expectedBreakageEmployeeDto.getRoom()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.breakageTopic")
+                                .value(expectedBreakageEmployeeDto.getBreakageTopic()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.breakageText")
+                                .value(expectedBreakageEmployeeDto.getBreakageText()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status")
+                                .value(expectedBreakageEmployeeDto.getStatus().name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.breakageExecutor")
+                                .value(expectedBreakageEmployeeDto.getBreakageExecutor()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.createdBy")
+                                .value(expectedBreakageEmployeeDto.getCreatedBy()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.createdDate")
+                                .value(dtf.format(expectedBreakageEmployeeDto.getCreatedDate())))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                BreakageEmployeeDto actualBreakageEmployeeDto =
+                        objectMapper.readValue(result, BreakageEmployeeDto.class);
+
+                assertThat(actualBreakageEmployeeDto.getId())
+                        .isEqualTo(expectedBreakageEmployeeDto.getId());
+                assertThat(actualBreakageEmployeeDto.getDepartmentId())
+                        .isEqualTo(expectedBreakageEmployeeDto.getDepartmentId());
+                assertThat(actualBreakageEmployeeDto.getDepartmentName())
+                        .isEqualTo(expectedBreakageEmployeeDto.getDepartmentName());
+                assertThat(actualBreakageEmployeeDto.getRoom())
+                        .isEqualTo(expectedBreakageEmployeeDto.getRoom());
+                assertThat(actualBreakageEmployeeDto.getBreakageTopic())
+                        .isEqualTo(expectedBreakageEmployeeDto.getBreakageTopic());
+                assertThat(actualBreakageEmployeeDto.getBreakageText())
+                        .isEqualTo(expectedBreakageEmployeeDto.getBreakageText());
+                assertThat(actualBreakageEmployeeDto.getStatus())
+                        .isEqualTo(expectedBreakageEmployeeDto.getStatus());
+                assertThat(actualBreakageEmployeeDto.getBreakageExecutor())
+                        .isEqualTo(expectedBreakageEmployeeDto.getBreakageExecutor());
+                assertThat(actualBreakageEmployeeDto.getCreatedBy())
+                        .isEqualTo(expectedBreakageEmployeeDto.getCreatedBy());
+                assertThat(actualBreakageEmployeeDto.getCreatedDate())
+                        .isEqualTo(expectedBreakageEmployeeDto.getCreatedDate());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenGetBreakageByEmployeeThenReturnForbiddenException() {
+
+                String message = "Данный пользователь не имеет право на получение информации по " +
+                        "этой заявке на неисправность !!!";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(message)
+                        .status(403)
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(USER_DEPARTMENT_ID_HEADER, employeeOtherDepartment.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId()))
+                        .andExpect(MockMvcResultMatchers.status().isForbidden())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(message))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenGetBreakageByEmployeeThenReturnNotFoundException() {
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(GET_BREAKAGE_NOT_EXIST)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                        BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentBreakage.getDepartment().getId())
+                                .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                        .andExpect(MockMvcResultMatchers.status().isNotFound())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                                .value(GET_BREAKAGE_NOT_EXIST))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+        }
     }
 
 
-//
-//    @Test
-//    void getAllBreakages() {
-//    }
-//
-//    @Test
-//    void getBreakageEmployee() {
-//    }
-//
 //    @Test
 //    void getBreakage() {
 //    }

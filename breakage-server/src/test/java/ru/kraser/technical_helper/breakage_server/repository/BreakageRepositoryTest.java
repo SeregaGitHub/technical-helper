@@ -128,7 +128,7 @@ class BreakageRepositoryTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageCreating {
 
             @Test
@@ -199,7 +199,7 @@ class BreakageRepositoryTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageStatusOrPriorityUpdating {
 
             private Breakage savedBreakage;
@@ -279,7 +279,7 @@ class BreakageRepositoryTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageExecutorAddingOrDropping {
 
             private Breakage savedBreakage;
