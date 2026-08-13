@@ -972,7 +972,7 @@ class BreakageControllerWebMvcTest {
 
         @Test
         @SneakyThrows
-        void whenDropBreakageThenReturnOk() {
+        void whenDropBreakageExecutorThenReturnOk() {
 
             String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
 
@@ -1014,7 +1014,7 @@ class BreakageControllerWebMvcTest {
 
         @Test
         @SneakyThrows
-        void whenDropBreakageThenReturnNotFoundException() {
+        void whenDropBreakageExecutorThenReturnNotFoundException() {
 
             ApiResponse apiResponse = ApiResponse.builder()
                     .message(BREAKAGE_NOT_EXIST)

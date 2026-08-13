@@ -103,10 +103,7 @@ class BreakageControllerIntegrationTest {
     private User employeeCurrentUser;
     private User employeeOtherUser;
 
-    //private Breakage testBreakage;
     private Breakage employeeCurrentBreakage;
-
-
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -259,7 +256,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageCreating {
 
             private CreateBreakageFullDto createBreakageFullDto;
@@ -394,7 +391,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageCancelling {
 
             @Test
@@ -566,7 +563,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageStatusUpdating {
 
             private UpdateBreakageStatusDto updateBreakageStatusDto;
@@ -751,7 +748,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakagePriorityUpdating {
 
             private UpdateBreakagePriorityDto updateBreakagePriorityDto;
@@ -874,7 +871,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        @Transactional()
+        @Transactional
         class WhenBreakageExecutorAdding {
 
             private LocalDateTime afterNowDateTime;
@@ -1085,13 +1082,108 @@ class BreakageControllerIntegrationTest {
                 assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
             }
         }
+
+        @Nested
+        @Transactional
+        class WhenBreakageExecutorDropping {
+
+            @Test
+            @SneakyThrows
+            void whenDropBreakageExecutorThenReturnOk() {
+
+                when(breakageClock.getZone()).thenReturn(NOW_ZDT.plusHours(1).getZone());
+                when(breakageClock.instant()).thenReturn(NOW_ZDT.plusHours(1).toInstant());
+                afterNow = now.plusHours(1);
+
+                LocalDateTime appointedDeadline = now.plusDays(1).plusHours(10).plusMinutes(59).plusSeconds(59);
+
+                Breakage breakage = breakageRepository.findById(employeeCurrentBreakage.getId()).get();
+                breakage.setExecutor(technicianUser);
+                breakage.setExecutorAppointedBy(defaultAdminUser);
+                breakage.setDeadline(appointedDeadline);
+                breakage.setLastUpdatedBy(defaultAdminUser.getId());
+
+                breakageRepository.saveAndFlush(breakage);
+
+                String responseMessage = "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(afterNow)
+                        .data(defaultAdminUser.getUsername())
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL +
+                                                ADMIN_URL + EXECUTOR_URL + DELETE_URL + "/" +
+                                                defaultAdminUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(afterNow)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+                assertThat(actualApiResponse.status()).isEqualTo(apiResponse.status());
+                assertThat(actualApiResponse.httpStatus()).isEqualTo(apiResponse.httpStatus());
+                assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
+                assertThat(actualApiResponse.data()).isEqualTo(apiResponse.data());
+
+                entityManager.clear();
+                Breakage updatedBreakage = breakageRepository.findById(employeeCurrentBreakage.getId()).get();
+
+                assertThat(updatedBreakage.getExecutor()).isNull();
+                assertThat(updatedBreakage.getExecutorAppointedBy()).isNull();
+                assertThat(updatedBreakage.getDeadline()).isNull();
+                assertThat(updatedBreakage.getLastUpdatedBy()).isEqualTo(defaultAdminUser.getId());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenDropBreakageExecutorThenReturnNotFoundException() {
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(BREAKAGE_NOT_EXIST)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL +
+                                                ADMIN_URL + EXECUTOR_URL + DELETE_URL + "/" +
+                                                defaultAdminUser.getUsername()
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                                .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_NOT_EXIST))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+        }
+
+
     }
 
 
-//
-//    @Test
-//    void dropBreakageExecutor() {
-//    }
 //
 //    @Test
 //    void getAllBreakages() {
