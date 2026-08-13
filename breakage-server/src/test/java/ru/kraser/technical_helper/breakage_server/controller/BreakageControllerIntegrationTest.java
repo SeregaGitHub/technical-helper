@@ -1350,6 +1350,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
+        @Transactional
         class WhenBreakageGetting {
 
             @Test
@@ -1541,15 +1542,170 @@ class BreakageControllerIntegrationTest {
                 assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
                 assertThat(actualApiResponse.data()).isEqualTo(apiResponse.data());
             }
+
+            @Test
+            @SneakyThrows
+            void whenCreateBreakageCommentThenReturnThenReturnNotFoundException() {
+
+                String responseMessage = "Заявки на неисправность не существует !!!";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID)
+                                .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNotFound())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenCreateBreakageCommentThenReturnThenReturnNotCorrectParameter() {
+
+                CreateBreakageCommentDto commentDto =
+                        new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.SOLVED);
+
+                String responseMessage = "Комментарии к заявке о неисправности со статусами " +
+                        "\"Решена\" и \"Отменена\" - не создаются !!!";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(400)
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId())
+                                .content(objectMapper.writeValueAsString(commentDto)))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenUpdateBreakageCommentThenReturnOk() {
+
+                String responseMessage = "Комментарий к заявке на неисправность был успешно обновлен.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_COMMENT_ID_HEADER, breakageComment.getId())
+                                .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse).isEqualTo(apiResponse);
+            }
+
+            @Test
+            @SneakyThrows
+            void whenUpdateBreakageCommentThenReturnNotFoundException() {
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(BREAKAGE_COMMENT_NOT_EXIST)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_COMMENT_ID_HEADER, SOME_NOT_EXIST_ID)
+                                .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNotFound())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(BREAKAGE_COMMENT_NOT_EXIST))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
+
+            @Test
+            @SneakyThrows
+            void whenDeleteBreakageCommentThenReturnOk() {
+
+                String responseMessage = "Комментарий к заявке на неисправность был успешно удален.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(200)
+                        .httpStatus(HttpStatus.OK)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.delete(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(BREAKAGE_COMMENT_ID_HEADER, breakageComment.getId()))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.OK.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse).isEqualTo(apiResponse);
+            }
         }
     }
-
-
-//    @Test
-//    void updateBreakageComment() {
-//    }
-//
-//    @Test
-//    void deleteBreakageComment() {
-//    }
 }
