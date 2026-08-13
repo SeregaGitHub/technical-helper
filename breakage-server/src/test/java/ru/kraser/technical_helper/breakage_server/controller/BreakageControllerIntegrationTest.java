@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +29,7 @@ import ru.kraser.technical_helper.BreakageServer;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageCommentRepository;
 import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
+import ru.kraser.technical_helper.common_module.dto.api.AppPage;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
@@ -111,6 +112,7 @@ class BreakageControllerIntegrationTest {
     private User employeeOtherUser;
 
     private Breakage employeeCurrentBreakage;
+    private BreakageEmployeeDto expectedBreakageEmployeeDto;
     private BreakageComment breakageComment;
 
     @Container
@@ -257,6 +259,19 @@ class BreakageControllerIntegrationTest {
                     .build();
 
             breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+
+            expectedBreakageEmployeeDto = BreakageEmployeeDto.builder()
+                    .id(employeeCurrentBreakage.getId())
+                    .departmentId(employeeCurrentBreakage.getDepartment().getId())
+                    .departmentName(employeeCurrentBreakage.getDepartment().getName())
+                    .room(employeeCurrentBreakage.getRoom())
+                    .breakageTopic(employeeCurrentBreakage.getBreakageTopic())
+                    .breakageText(employeeCurrentBreakage.getBreakageText())
+                    .status(employeeCurrentBreakage.getStatus())
+                    .breakageExecutor(NO_APPOINTED_EXECUTOR)
+                    .createdBy(USER_TEST_NAME)
+                    .createdDate(employeeCurrentBreakage.getCreatedDate())
+                    .build();
         }
 
         @AfterAll
@@ -1205,9 +1220,198 @@ class BreakageControllerIntegrationTest {
             }
         }
 
-        //    @Test
-        //    void getAllBreakages() {
-        //    }
+        @Nested
+        class WhenBreakagesGetting {
+
+            private Integer pageSize;
+            private Integer pageIndex;
+            private String defaultSortBy;
+            private String defaultDirection;
+            private String defaultExecutor;
+
+            @BeforeEach
+            void setUp() {
+
+                pageSize = 10;
+                pageIndex = 0;
+                defaultSortBy = "lastUpdatedDate";
+                defaultDirection = "DESC";
+                defaultExecutor = "ALL";
+            }
+
+            @Nested
+            class WhenAllBreakagesGettingByEmployee {
+
+                @Test
+                @SneakyThrows
+                void whenGetAllEmployeeBreakagesThenReturnAppPage() {
+
+                    mockMvc.perform(MockMvcRequestBuilders.get(
+                                            BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                    )
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                    .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentUser.getDepartment().getId())
+                                    .header(CURRENT_USER_ID_HEADER, employeeCurrentUser.getId())
+                                    .param("pageSize", pageSize.toString())
+                                    .param("pageIndex", pageIndex.toString())
+                                    .param("sortBy", defaultSortBy)
+                                    .param("direction", defaultDirection)
+                                    .param("statusNew", String.valueOf(true))
+                                    .param("statusSolved", String.valueOf(true))
+                                    .param("statusInProgress", String.valueOf(true))
+                                    .param("statusPaused", String.valueOf(true))
+                                    .param("statusRedirected", String.valueOf(true))
+                                    .param("statusCancelled", String.valueOf(true))
+                                    .param("priorityUrgently", String.valueOf(true))
+                                    .param("priorityHigh", String.valueOf(true))
+                                    .param("priorityMedium", String.valueOf(true))
+                                    .param("priorityLow", String.valueOf(true))
+                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("deadline", String.valueOf(false))
+                                    .param("searchText", (String) null))
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(MockMvcResultMatchers.status().isOk())
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                    .value(expectedBreakageEmployeeDto.getId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentName()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                    .value(expectedBreakageEmployeeDto.getRoom()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                    .value(expectedBreakageEmployeeDto.getBreakageTopic()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                    .value(expectedBreakageEmployeeDto.getBreakageText()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                    .value(expectedBreakageEmployeeDto.getStatus().name()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                    .value(expectedBreakageEmployeeDto.getBreakageExecutor()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                    .value(expectedBreakageEmployeeDto.getCreatedBy()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                    .value(dtf.format(expectedBreakageEmployeeDto.getCreatedDate())))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(pageIndex))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(pageSize))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.offset").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.first").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.last").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.now").value((String) null));
+                }
+
+                @Test
+                @SneakyThrows
+                void whenGetAllEmployeeBreakagesByTextThenReturnAppPage() {
+
+                    mockMvc.perform(MockMvcRequestBuilders.get(
+                                            BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                    )
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                    .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentUser.getDepartment().getId())
+                                    .header(CURRENT_USER_ID_HEADER, employeeCurrentUser.getId())
+                                    .param("pageSize", pageSize.toString())
+                                    .param("pageIndex", pageIndex.toString())
+                                    .param("sortBy", defaultSortBy)
+                                    .param("direction", defaultDirection)
+                                    .param("statusNew", String.valueOf(true))
+                                    .param("statusSolved", String.valueOf(true))
+                                    .param("statusInProgress", String.valueOf(true))
+                                    .param("statusPaused", String.valueOf(true))
+                                    .param("statusRedirected", String.valueOf(true))
+                                    .param("statusCancelled", String.valueOf(true))
+                                    .param("priorityUrgently", String.valueOf(true))
+                                    .param("priorityHigh", String.valueOf(true))
+                                    .param("priorityMedium", String.valueOf(true))
+                                    .param("priorityLow", String.valueOf(true))
+                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("deadline", String.valueOf(false))
+                                    .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(MockMvcResultMatchers.status().isOk())
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                    .value(expectedBreakageEmployeeDto.getId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentName()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                    .value(expectedBreakageEmployeeDto.getRoom()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                    .value(expectedBreakageEmployeeDto.getBreakageTopic()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                    .value(expectedBreakageEmployeeDto.getBreakageText()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                    .value(expectedBreakageEmployeeDto.getStatus().name()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                    .value(expectedBreakageEmployeeDto.getBreakageExecutor()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                    .value(expectedBreakageEmployeeDto.getCreatedBy()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                    .value(dtf.format(expectedBreakageEmployeeDto.getCreatedDate())))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(pageIndex))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(pageSize))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.offset").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.first").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.last").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.now").value((String) null));
+                }
+
+                @Test
+                @SneakyThrows
+                void whenGetAllEmployeeBreakagesThenReturnEmptyAppPageContent() {
+
+                    mockMvc.perform(MockMvcRequestBuilders.get(
+                                            BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                    )
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                    .header(USER_DEPARTMENT_ID_HEADER, employeeOtherUser.getDepartment().getId())
+                                    .header(CURRENT_USER_ID_HEADER, employeeOtherUser.getId())
+                                    .param("pageSize", pageSize.toString())
+                                    .param("pageIndex", pageIndex.toString())
+                                    .param("sortBy", defaultSortBy)
+                                    .param("direction", defaultDirection)
+                                    .param("statusNew", String.valueOf(true))
+                                    .param("statusSolved", String.valueOf(true))
+                                    .param("statusInProgress", String.valueOf(true))
+                                    .param("statusPaused", String.valueOf(true))
+                                    .param("statusRedirected", String.valueOf(true))
+                                    .param("statusCancelled", String.valueOf(true))
+                                    .param("priorityUrgently", String.valueOf(true))
+                                    .param("priorityHigh", String.valueOf(true))
+                                    .param("priorityMedium", String.valueOf(true))
+                                    .param("priorityLow", String.valueOf(true))
+                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("deadline", String.valueOf(false))
+                                    .param("searchText", (String) null))
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(MockMvcResultMatchers.status().isOk())
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(pageIndex))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(pageSize))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.offset").value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.first").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.last").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee").value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.now").value((String) null));
+                }
+            }
+
+
+        }
 
         @Nested
         class WhenBreakageByEmployeeGetting {
@@ -1215,19 +1419,6 @@ class BreakageControllerIntegrationTest {
             @Test
             @SneakyThrows
             void whenGetBreakageByEmployeeThenReturnBreakage() {
-
-                BreakageEmployeeDto expectedBreakageEmployeeDto = BreakageEmployeeDto.builder()
-                        .id(employeeCurrentBreakage.getId())
-                        .departmentId(employeeCurrentBreakage.getDepartment().getId())
-                        .departmentName(employeeCurrentBreakage.getDepartment().getName())
-                        .room(employeeCurrentBreakage.getRoom())
-                        .breakageTopic(employeeCurrentBreakage.getBreakageTopic())
-                        .breakageText(employeeCurrentBreakage.getBreakageText())
-                        .status(employeeCurrentBreakage.getStatus())
-                        .breakageExecutor(NO_APPOINTED_EXECUTOR)
-                        .createdBy(USER_TEST_NAME)
-                        .createdDate(employeeCurrentBreakage.getCreatedDate())
-                        .build();
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
                                         BASE_URL + BREAKAGE_URL + EMPLOYEE_URL + CURRENT_URL
