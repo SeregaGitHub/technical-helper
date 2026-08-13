@@ -31,6 +31,7 @@ import ru.kraser.technical_helper.breakage_server.repository.BreakageRepository;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
 import ru.kraser.technical_helper.common_module.dto.breakage.*;
 import ru.kraser.technical_helper.common_module.dto.breakage_comment.BreakageCommentFrontDto;
+import ru.kraser.technical_helper.common_module.dto.breakage_comment.CreateBreakageCommentDto;
 import ru.kraser.technical_helper.common_module.dto.user.CreateUserDto;
 import ru.kraser.technical_helper.common_module.enums.Priority;
 import ru.kraser.technical_helper.common_module.enums.Role;
@@ -110,6 +111,7 @@ class BreakageControllerIntegrationTest {
     private User employeeOtherUser;
 
     private Breakage employeeCurrentBreakage;
+    private BreakageComment breakageComment;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -148,7 +150,7 @@ class BreakageControllerIntegrationTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class WhenBreakageRepositoryDataModifyingMethodsAreInvoked {
+    class WhenBreakageRepositoryMethodsAreInvoked {
 
         @BeforeAll
         void insertData() {
@@ -244,10 +246,27 @@ class BreakageControllerIntegrationTest {
                     .build();
 
             employeeCurrentBreakage = breakageRepository.saveAndFlush(toSaveEmployeeBreakage);
+
+            BreakageComment toSaveBreakageComment = BreakageComment.builder()
+                    .breakage(employeeCurrentBreakage)
+                    .comment(BREAKAGE_COMMENT_TEST_TEXT)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
         }
 
         @AfterAll
         void cleanupData() {
+
+            transactionTemplate.execute(status -> {
+                entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment CASCADE")
+                        .executeUpdate();
+                return null;
+            });
 
             transactionTemplate.execute(status -> {
                 entityManager.createNativeQuery("TRUNCATE TABLE breakage CASCADE")
@@ -1333,22 +1352,9 @@ class BreakageControllerIntegrationTest {
         @Nested
         class WhenBreakageGetting {
 
-            private BreakageComment breakageComment;
-
             @Test
             @SneakyThrows
             void whenGetBreakageThenReturnBreakage() {
-
-                BreakageComment toSaveBreakageComment = BreakageComment.builder()
-                        .breakage(employeeCurrentBreakage)
-                        .comment(BREAKAGE_COMMENT_TEST_TEXT)
-                        .createdBy(defaultAdminUser.getId())
-                        .createdDate(now)
-                        .lastUpdatedBy(defaultAdminUser.getId())
-                        .lastUpdatedDate(now)
-                        .build();
-
-                breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
 
                 BreakageCommentFrontDto comment = BreakageCommentFrontDto.builder()
                         .id(breakageComment.getId())
@@ -1390,8 +1396,7 @@ class BreakageControllerIntegrationTest {
                         .build();
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
-                                        BASE_URL + BREAKAGE_URL +
-                                                TECHNICIAN_URL + CURRENT_URL
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + CURRENT_URL
                                 )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
@@ -1450,11 +1455,6 @@ class BreakageControllerIntegrationTest {
                         .isEqualTo(breakageFullDto.deadline());
                 assertThat(returnedBreakageFullDto.comments().getFirst())
                         .isEqualTo(breakageFullDto.comments().getFirst());
-                transactionTemplate.execute(status -> {
-                    entityManager.createNativeQuery("TRUNCATE TABLE breakage_comment CASCADE")
-                            .executeUpdate();
-                    return null;
-                });
             }
 
             @Test
@@ -1488,20 +1488,63 @@ class BreakageControllerIntegrationTest {
             }
         }
 
-        /*@Nested
+        @Nested
+        @Transactional
         class WhenBreakageCommentMethodsAreInvoked {
 
+            private CreateBreakageCommentDto createBreakageCommentDto;
 
-        }*/
+            @BeforeEach
+            void setUp() {
+
+                createBreakageCommentDto =
+                        new CreateBreakageCommentDto(BREAKAGE_COMMENT_TEST_TEXT, Status.NEW);
+            }
+
+            @Test
+            @SneakyThrows
+            void whenCreateBreakageCommentThenReturnCreated() {
+
+                String responseMessage = "Комментарий к заявке о неисправности - был успешно создан.";
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(responseMessage)
+                        .status(201)
+                        .httpStatus(HttpStatus.CREATED)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                                        BASE_URL + BREAKAGE_URL + TECHNICIAN_URL + BREAKAGE_COMMENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                .header(BREAKAGE_ID_HEADER, employeeCurrentBreakage.getId())
+                                .content(objectMapper.writeValueAsString(createBreakageCommentDto)))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(201))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.httpStatus").value(HttpStatus.CREATED.name()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value(dtf.format(now)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                List<BreakageComment> breakageComments = breakageCommentRepository.findAll();
+                assertThat(breakageComments.size()).isEqualTo(2);
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+                assertThat(actualApiResponse.status()).isEqualTo(apiResponse.status());
+                assertThat(actualApiResponse.httpStatus()).isEqualTo(apiResponse.httpStatus());
+                assertThat(actualApiResponse.timestamp()).isEqualTo(apiResponse.timestamp());
+                assertThat(actualApiResponse.data()).isEqualTo(apiResponse.data());
+            }
+        }
     }
 
 
-
-//
-//    @Test
-//    void createBreakageComment() {
-//    }
-//
 //    @Test
 //    void updateBreakageComment() {
 //    }
