@@ -1456,10 +1456,40 @@ class BreakageControllerIntegrationTest {
                     return null;
                 });
             }
+
+            @Test
+            @SneakyThrows
+            void whenGetBreakageThenReturnNotFoundException() {
+
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .message(GET_BREAKAGE_NOT_EXIST)
+                        .status(404)
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .timestamp(now)
+                        .build();
+
+                String result = mockMvc.perform(MockMvcRequestBuilders.get(
+                                        BASE_URL + BREAKAGE_URL +
+                                                TECHNICIAN_URL + CURRENT_URL
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
+                                .header(BREAKAGE_ID_HEADER, SOME_NOT_EXIST_ID))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNotFound())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(GET_BREAKAGE_NOT_EXIST))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+                ApiResponse actualApiResponse = objectMapper.readValue(result, ApiResponse.class);
+
+                assertThat(actualApiResponse.message()).isEqualTo(apiResponse.message());
+            }
         }
 
         /*@Nested
-        class WhenBreakageGettingAndBreakageCommentMethodsAreInvoked {
+        class WhenBreakageCommentMethodsAreInvoked {
 
 
         }*/
