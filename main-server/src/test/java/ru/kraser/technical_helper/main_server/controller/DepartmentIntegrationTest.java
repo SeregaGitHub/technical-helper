@@ -249,7 +249,7 @@ public class DepartmentIntegrationTest {
             @SneakyThrows
             void whenUpdateDepartmentThenReturnOk() {
 
-                CreateDepartmentDto updateDepartmentDto = new CreateDepartmentDto("new_department_name");
+                CreateDepartmentDto updateDepartmentDto = new CreateDepartmentDto(DEPARTMENT_TEST_NEW_NAME);
 
                 String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
 
@@ -326,7 +326,7 @@ public class DepartmentIntegrationTest {
                                 )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
-                                .header(DEPARTMENT_ID_HEADER, "some_not_exist_id")
+                                .header(DEPARTMENT_ID_HEADER, SOME_NOT_EXIST_ID)
                                 .content(objectMapper.writeValueAsString(createDepartmentDto)))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -343,21 +343,6 @@ public class DepartmentIntegrationTest {
 
         @Nested
         class WhenGetMethodsAreExecuting {
-
-            DepartmentDto expectedDepartmentDto;
-
-            @BeforeEach
-            void initializeDepartmentDto() {
-
-                expectedDepartmentDto = DepartmentDto.builder()
-                        .id(defaultAdminDepartment.getId())
-                        .name(defaultAdminDepartment.getName())
-                        .createdBy(defaultAdminUser.getUsername())
-                        .createdDate(defaultAdminDepartment.getCreatedDate())
-                        .lastUpdatedBy(defaultAdminUser.getUsername())
-                        .lastUpdatedDate(defaultAdminDepartment.getLastUpdatedDate())
-                        .build();
-            }
 
             @Test
             @SneakyThrows
@@ -382,6 +367,15 @@ public class DepartmentIntegrationTest {
             @Test
             @SneakyThrows
             void whenGetDepartmentByIdThenReturnDepartmentDto() {
+
+                DepartmentDto expectedDepartmentDto = DepartmentDto.builder()
+                        .id(defaultAdminDepartment.getId())
+                        .name(defaultAdminDepartment.getName())
+                        .createdBy(defaultAdminUser.getUsername())
+                        .createdDate(defaultAdminDepartment.getCreatedDate())
+                        .lastUpdatedBy(defaultAdminUser.getUsername())
+                        .lastUpdatedDate(defaultAdminDepartment.getLastUpdatedDate())
+                        .build();
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
                                         BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
@@ -434,7 +428,7 @@ public class DepartmentIntegrationTest {
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
                                         BASE_URL + ADMIN_URL + DEPARTMENT_URL + CURRENT_URL)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header(DEPARTMENT_ID_HEADER, "some_not_exist_department_id"))
+                                .header(DEPARTMENT_ID_HEADER, SOME_NOT_EXIST_ID))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNotFound())
                         .andReturn()
