@@ -60,7 +60,7 @@ import static ru.kraser.technical_helper.common_module.util.ConstantForTests.DEF
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = BreakageServer.class)
-class BreakageControllerIntegrationTest {
+class BreakageIntegrationTest {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -147,7 +147,7 @@ class BreakageControllerIntegrationTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class WhenBreakageControllerMethodsAreInvoked {
+    class WhenBreakageMethods {
 
         @BeforeAll
         void insertData() {
@@ -1480,7 +1480,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        class WhenBreakagesGetting {
+        class WhenBreakagesGet {
 
             private Integer pageSize;
             private Integer pageIndex;
@@ -1499,7 +1499,7 @@ class BreakageControllerIntegrationTest {
             }
 
             @Nested
-            class WhenAllBreakagesGettingByEmployee {
+            class WhenAllBreakagesGetByEmployee {
 
                 @Test
                 @SneakyThrows
@@ -1774,7 +1774,7 @@ class BreakageControllerIntegrationTest {
 
             @Nested
             @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-            class WhenAllBreakagesGettingByTechnician {
+            class WhenAllBreakagesGetByTech {
 
                 private DateTimeFormatter dtfTechAppPage;
                 private Breakage deadlineAppointedToMeBreakage;
@@ -1874,11 +1874,11 @@ class BreakageControllerIntegrationTest {
                     dtfTechAppPage = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
                 }
 
-                @Nested
-                class WhenAllBreakagesWithExecutorGetting {
+//                @Nested
+//                class WhenAllBreakagesWithExecutorGet {
 
                     @Nested
-                    class WhenAllBreakagesWithDeadlineAppointedToMeGetting {
+                    class WhenAllBreakagesWithDeadlineAppointedToMeGet {
 
                         @Test
                         @SneakyThrows
@@ -2034,7 +2034,7 @@ class BreakageControllerIntegrationTest {
                     }
 
                     @Nested
-                    class WhenAllBreakagesWithDeadlineAppointedToOthersGetting {
+                    class WhenAllBreakagesWithDeadlineAppointedToOthersGet {
 
                         @Test
                         @SneakyThrows
@@ -2190,7 +2190,7 @@ class BreakageControllerIntegrationTest {
                     }
 
                     @Nested
-                    class WhenAllBreakagesAppointedToMeGetting {
+                    class WhenAllBreakagesAppointedToMeGet {
 
                         @Test
                         @SneakyThrows
@@ -2346,7 +2346,7 @@ class BreakageControllerIntegrationTest {
                     }
 
                     @Nested
-                    class WhenAllBreakagesAppointedToOthersGetting {
+                    class WhenAllBreakagesAppointedToOthersGet {
 
                         @Test
                         @SneakyThrows
@@ -2500,10 +2500,10 @@ class BreakageControllerIntegrationTest {
                                             .value(dtfTechAppPage.format(now)));
                         }
                     }
-                }
+                //}
 
                 @Nested
-                class WhenAllNoAppointedBreakagesGetting {
+                class WhenAllNoAppointedBreakagesGet {
 
                     @Test
                     @SneakyThrows
@@ -2659,10 +2659,10 @@ class BreakageControllerIntegrationTest {
                 }
 
                 @Nested
-                class WhenAllBreakagesGetting {
+                class WhenAllBreakagesGet {
 
                     @Nested
-                    class WhenAllBreakagesWithDeadlineGetting {
+                    class WhenAllBreakagesWithDeadlineGet {
 
                         @Test
                         @SneakyThrows
@@ -2774,7 +2774,7 @@ class BreakageControllerIntegrationTest {
                     }
 
                     @Nested
-                    class WhenAllBreakagesWithNoDeadlineGetting {
+                    class WhenAllBreakagesWithNoDeadlineGet {
 
                         @Test
                         @SneakyThrows
@@ -2887,7 +2887,7 @@ class BreakageControllerIntegrationTest {
 
                     @Nested
                     @Transactional
-                    class WhenAllBreakagesWithFilterStatusOrPriorityGetting {
+                    class WhenAllBreakagesWithFilterStatusOrPriorityGet {
 
                         @Test
                         @SneakyThrows
