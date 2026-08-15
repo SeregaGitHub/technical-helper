@@ -18,6 +18,7 @@ public class ConstantForTests {
     public static final String USER_TECHNICIAN_TEST_NAME = "test_technician_username";
 
     public static final String USER_TEST_PASSWORD = "some_password";
+    public static final String USER_NEW_TEST_PASSWORD = "new_user_password";
 
     public static final String BREAKAGE_TEST_ID = "b1t11111-11b1-1t11-1111-b111111t1111";
     public static final String BREAKAGE_TEST_ROOM = "some_room";

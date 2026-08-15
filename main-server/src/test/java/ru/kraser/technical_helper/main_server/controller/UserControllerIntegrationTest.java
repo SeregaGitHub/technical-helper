@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
 import static ru.kraser.technical_helper.common_module.util.Constant.CURRENT_USER_ID_HEADER;
-import static ru.kraser.technical_helper.main_server.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @Testcontainers
 @SpringBootTest
