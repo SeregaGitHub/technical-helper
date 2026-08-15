@@ -1480,7 +1480,7 @@ class BreakageControllerIntegrationTest {
                 pageSize = 10;
                 pageIndex = 0;
                 defaultSortBy = "lastUpdatedDate";
-                defaultDirection = "DESC";
+                defaultDirection = Sort.Direction.DESC.name();
                 defaultExecutor = "ALL";
             }
 
