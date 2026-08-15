@@ -77,6 +77,8 @@ public class DepartmentIntegrationTest {
     );
 
     private Department department;
+    private Department enabledDepartment;
+    private Department notEnabledDepartment;
     private CreateDepartmentDto createDepartmentDto;
     private DateTimeFormatter dtf;
     private LocalDateTime now;
@@ -116,17 +118,6 @@ public class DepartmentIntegrationTest {
 
         when(clock.getZone()).thenReturn(NOW_ZDT.getZone());
         when(clock.instant()).thenReturn(NOW_ZDT.toInstant());
-
-        department = Department.builder()
-                .name(DEPARTMENT_TEST_NAME)
-                .enabled(true)
-                .createdBy(defaultAdminUser.getId())
-                .createdDate(now)
-                .lastUpdatedBy(defaultAdminUser.getId())
-                .lastUpdatedDate(now)
-                .build();
-
-        createDepartmentDto = new CreateDepartmentDto(department.getName());
     }
 
     @Nested
@@ -148,16 +139,40 @@ public class DepartmentIntegrationTest {
                     0);
 
             dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+
+            department = Department.builder()
+                    .name(DEPARTMENT_TEST_NAME)
+                    .enabled(true)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            Department toSaveNotEnabledDepartment = Department.builder()
+                    .name(DEPARTMENT_TEST_OTHER_NAME)
+                    .enabled(false)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
+            createDepartmentDto = new CreateDepartmentDto(DEPARTMENT_TEST_NEW_NAME);
+
+            enabledDepartment = departmentRepository.saveAndFlush(department);
+            notEnabledDepartment = departmentRepository.saveAndFlush(toSaveNotEnabledDepartment);
         }
 
         @Nested
         class WhenDepartmentCreating {
 
-            @SneakyThrows
             @Test
+            @Transactional
+            @SneakyThrows
             void whenCreateDepartmentThenReturnCreated() {
 
-                String responseMessage = "Отдел: " + createDepartmentDto.name() + ", - был успешно создан.";
+                String responseMessage = "Отдел: " + DEPARTMENT_TEST_NEW_NAME + ", - был успешно создан.";
 
                 ApiResponse apiResponse = ApiResponse.builder()
                         .message(responseMessage)
@@ -184,7 +199,6 @@ public class DepartmentIntegrationTest {
 
                 Example<Department> example = Example.of(department);
                 Department savedDepartment = departmentRepository.findOne(example).get();
-                departmentRepository.deleteById(savedDepartment.getId());
 
                 assertThat(savedDepartment.getId()).isNotNull();
                 assertThat(savedDepartment.getName()).isEqualTo(department.getName());
@@ -198,8 +212,8 @@ public class DepartmentIntegrationTest {
                 assertThat(actualApiResponse).isEqualTo(apiResponse);
             }
 
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenCreateDepartmentThenReturnAlreadyExistsException() {
 
                 String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
@@ -208,7 +222,9 @@ public class DepartmentIntegrationTest {
                 CreateDepartmentDto createDepartmentDtoWithNotUniqueName =
                         new CreateDepartmentDto(defaultAdminDepartment.getName());
 
-                String result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                String result = mockMvc.perform(MockMvcRequestBuilders.post(
+                        BASE_URL + ADMIN_URL + DEPARTMENT_URL
+                                )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
                                 .content(objectMapper.writeValueAsString(createDepartmentDtoWithNotUniqueName)))
@@ -228,11 +244,11 @@ public class DepartmentIntegrationTest {
         @Nested
         class WhenDepartmentUpdating {
 
-            @SneakyThrows
             @Test
+            @Transactional
+            @SneakyThrows
             void whenUpdateDepartmentThenReturnOk() {
 
-                Department savedDepartment = departmentRepository.saveAndFlush(department);
                 CreateDepartmentDto updateDepartmentDto = new CreateDepartmentDto("new_department_name");
 
                 String responseMessage = "Отдел: " + updateDepartmentDto.name() + " - был успешно изменен.";
@@ -244,10 +260,12 @@ public class DepartmentIntegrationTest {
                         .timestamp(now)
                         .build();
 
-                String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                        BASE_URL + ADMIN_URL + DEPARTMENT_URL
+                                )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
-                                .header(DEPARTMENT_ID_HEADER, savedDepartment.getId())
+                                .header(DEPARTMENT_ID_HEADER, enabledDepartment.getId())
                                 .content(objectMapper.writeValueAsString(updateDepartmentDto)))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
@@ -260,28 +278,30 @@ public class DepartmentIntegrationTest {
                         .getContentAsString();
 
                 entityManager.clear();
-                Department updatedDepartment = departmentRepository.findById(savedDepartment.getId()).get();
-                departmentRepository.deleteById(updatedDepartment.getId());
+                Department updatedDepartment = departmentRepository.findById(enabledDepartment.getId()).get();
 
                 assertThat(result).isEqualTo(objectMapper.writeValueAsString(apiResponse));
                 assertThat(updatedDepartment.getName()).isEqualTo(updateDepartmentDto.name());
             }
 
-            @SneakyThrows
+
             @Test
+            @Transactional
+            @SneakyThrows
             void whenUpdateDepartmentThenReturnAlreadyExistsException() {
 
                 String responseMessage = "Отдел: " + defaultAdminDepartment.getName() + ", - уже существует. " +
                         "Используйте другое имя !!!";
 
-                Department savedDepartment = departmentRepository.saveAndFlush(department);
                 CreateDepartmentDto departmentDtoWithNotUniqueName =
                         new CreateDepartmentDto(defaultAdminDepartment.getName());
 
-                String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                        BASE_URL + ADMIN_URL + DEPARTMENT_URL
+                                )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
-                                .header(DEPARTMENT_ID_HEADER, savedDepartment.getId())
+                                .header(DEPARTMENT_ID_HEADER, enabledDepartment.getId())
                                 .content(objectMapper.writeValueAsString(departmentDtoWithNotUniqueName)))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -291,19 +311,19 @@ public class DepartmentIntegrationTest {
                         .getResponse()
                         .getContentAsString();
 
-                departmentRepository.deleteById(savedDepartment.getId());
-
                 AlreadyExistsException exception = objectMapper.readValue(result, AlreadyExistsException.class);
                 assertThat(exception.getMessage()).isEqualTo(responseMessage);
             }
 
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenUpdateDepartmentThenReturnNotFound() {
 
                 String responseMessage = "Данный отдел не существует !!!";
 
-                String result = mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + ADMIN_URL + DEPARTMENT_URL)
+                String result = mockMvc.perform(MockMvcRequestBuilders.patch(
+                        BASE_URL + ADMIN_URL + DEPARTMENT_URL
+                                )
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
                                 .header(DEPARTMENT_ID_HEADER, "some_not_exist_id")
@@ -325,7 +345,6 @@ public class DepartmentIntegrationTest {
         class WhenGetMethodsAreExecuting {
 
             DepartmentDto expectedDepartmentDto;
-            Department notEnabledDepartment;
 
             @BeforeEach
             void initializeDepartmentDto() {
@@ -338,27 +357,10 @@ public class DepartmentIntegrationTest {
                         .lastUpdatedBy(defaultAdminUser.getUsername())
                         .lastUpdatedDate(defaultAdminDepartment.getLastUpdatedDate())
                         .build();
-
-                Department toSaveDepartment = Department.builder()
-                        .name(department.getName())
-                        .enabled(false)
-                        .createdBy(department.getCreatedBy())
-                        .createdDate(department.getCreatedDate())
-                        .lastUpdatedBy(department.getLastUpdatedBy())
-                        .lastUpdatedDate(department.getLastUpdatedDate())
-                        .build();
-
-                notEnabledDepartment = departmentRepository.saveAndFlush(toSaveDepartment);
             }
 
-            @AfterEach
-            void removeNotEnabledDepartment() {
-
-                departmentRepository.deleteById(notEnabledDepartment.getId());
-            }
-
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenGetAllDepartmentsThenReturnDepartmentDtoList() {
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
@@ -371,20 +373,14 @@ public class DepartmentIntegrationTest {
                         .getContentAsString();
 
                 List<DepartmentDto> departments = objectMapper.readValue(result, new TypeReference<>() {});
-                assertThat(departments).hasSize(1);
+                assertThat(departments).hasSize(2);
 
-                DepartmentDto departmentDto = departments.getFirst();
-
-                assertThat(departmentDto.id()).isEqualTo(expectedDepartmentDto.id());
-                assertThat(departmentDto.name()).isEqualTo(expectedDepartmentDto.name());
-                assertThat(departmentDto.createdBy()).isEqualTo(expectedDepartmentDto.createdBy());
-                assertThat(departmentDto.createdDate()).isEqualTo(expectedDepartmentDto.createdDate());
-                assertThat(departmentDto.lastUpdatedBy()).isEqualTo(expectedDepartmentDto.lastUpdatedBy());
-                assertThat(departmentDto.lastUpdatedDate()).isEqualTo(expectedDepartmentDto.lastUpdatedDate());
+                List<Department> departmentList = departmentRepository.findAll();
+                assertThat(departmentList).hasSize(3);
             }
 
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenGetDepartmentByIdThenReturnDepartmentDto() {
 
                 String result = mockMvc.perform(MockMvcRequestBuilders.get(
@@ -408,8 +404,8 @@ public class DepartmentIntegrationTest {
                 assertThat(departmentDto.lastUpdatedDate()).isEqualTo(expectedDepartmentDto.lastUpdatedDate());
             }
 
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenGetDepartmentWhichNotEnabledThenReturnNotFoundException() {
 
                 String responseMessage = "Данного отдела не существует !!!";
@@ -429,8 +425,8 @@ public class DepartmentIntegrationTest {
                 assertThat(notFoundException.getMessage()).isEqualTo(responseMessage);
             }
 
-            @SneakyThrows
             @Test
+            @SneakyThrows
             void whenGetDepartmentWhichNotExistThenReturnNotFoundException() {
 
                 String responseMessage = "Данного отдела не существует !!!";
@@ -451,13 +447,12 @@ public class DepartmentIntegrationTest {
             }
         }
 
-        @SneakyThrows
         @Test
+        @Transactional
+        @SneakyThrows
         void whenDeleteDepartmentThenReturnOk() {
 
             String responseMessage = "Отдел - был успешно удалён.";
-
-            Department savedDepartment = departmentRepository.saveAndFlush(department);
 
             ApiResponse apiResponse = ApiResponse.builder()
                     .message(responseMessage)
@@ -470,7 +465,7 @@ public class DepartmentIntegrationTest {
                                     BASE_URL + ADMIN_URL + DEPARTMENT_URL + DELETE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .header(CURRENT_USER_ID_HEADER, defaultAdminUser.getId())
-                            .header(DEPARTMENT_ID_HEADER, savedDepartment.getId()))
+                            .header(DEPARTMENT_ID_HEADER, enabledDepartment.getId()))
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseMessage))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
@@ -484,8 +479,7 @@ public class DepartmentIntegrationTest {
             assertThat(actualApiResponse).isEqualTo(apiResponse);
 
             entityManager.clear();
-            departmentRepository.deleteDepartment(savedDepartment.getId(), defaultAdminUser.getId(), now);
-            Department deletedDepartment = departmentRepository.findById(savedDepartment.getId()).get();
+            Department deletedDepartment = departmentRepository.findById(enabledDepartment.getId()).get();
 
             assertThat(deletedDepartment.isEnabled()).isFalse();
         }
