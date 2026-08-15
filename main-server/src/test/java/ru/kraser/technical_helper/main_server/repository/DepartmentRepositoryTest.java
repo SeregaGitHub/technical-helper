@@ -208,7 +208,7 @@ class DepartmentRepositoryTest {
 
                 int response = departmentRepository.updateDepartment(
                         savedDepartment.getId(),
-                        "updated_department_name",
+                        DEPARTMENT_TEST_UPDATED_NAME,
                         defaultAdminUser.getId(),
                         now);
 
@@ -222,7 +222,7 @@ class DepartmentRepositoryTest {
 
                 int response = departmentRepository.updateDepartment(
                         SOME_NOT_EXIST_ID,
-                        "updated_department_name",
+                        DEPARTMENT_TEST_UPDATED_NAME,
                         defaultAdminUser.getId(),
                         now);
 

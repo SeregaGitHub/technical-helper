@@ -8,6 +8,7 @@ public class ConstantForTests {
     public static final String DEFAULT_ADMIN_DEPARTMENT_ID = "d1d11111-11d1-1d11-1111-d111111d1111";
     public static final String DEPARTMENT_TEST_ID = "d1t11111-11d1-1t11-1111-d111111t1111";
     public static final String DEPARTMENT_TEST_NAME = "test_department";
+    public static final String DEPARTMENT_TEST_UPDATED_NAME = "updated_department_name";
     public static final String DEPARTMENT_TEST_OTHER_NAME = "test_other_department";
 
     public static final String DEFAULT_ADMIN_USER_ID = "u1u11111-11u1-1u11-1111-u111111u1111";
