@@ -133,7 +133,7 @@ class BreakageCommentRepositoryTest {
         }
 
         @Test
-        @Transactional()
+        @Transactional
         void whenCreateBreakageCommentThenReturnBreakageComment() {
 
             BreakageComment savedBreakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
@@ -183,7 +183,7 @@ class BreakageCommentRepositoryTest {
         }
 
         @Test
-        @Transactional()
+        @Transactional
         @Modifying(clearAutomatically = true)
         void whenUpdateBreakageCommentThenReturnOne() {
 
@@ -206,7 +206,7 @@ class BreakageCommentRepositoryTest {
         }
 
         @Test
-        @Transactional()
+        @Transactional
         @Modifying(clearAutomatically = true)
         void whenUpdateBreakageCommentWithNotExistBreakageThenReturnZero() {
 
@@ -221,7 +221,7 @@ class BreakageCommentRepositoryTest {
         }
 
         @Test
-        @Transactional()
+        @Transactional
         void whenGetAllBreakageCommentsThenReturnListOfComments() {
 
             breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
