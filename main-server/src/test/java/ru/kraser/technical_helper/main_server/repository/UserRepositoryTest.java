@@ -38,8 +38,12 @@ class UserRepositoryTest {
     UserRepository userRepository;
 
     private Department defaultAdminDepartment;
+    private Department employeeDepartment;
     private LocalDateTime now;
     private User defaultAdminUser;
+    private User enabledTechnicianUser;
+    private User notEnabledTechnicianUser;
+    private User enabledEmployeeUser;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -69,336 +73,27 @@ class UserRepositoryTest {
         postgreSQLContainer.stop();
     }
 
-    @BeforeEach
-    @SneakyThrows
-    void setUp() {
-
-        defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
-        defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
-
-        now = LocalDateTime.of(
-                2025,
-                9,
-                29,
-                13,
-                0,
-                0);
-    }
-
     @Nested
-    class WhenUserCreating {
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class WhenUserRepositoryMethodsAreInvoked {
 
-        @Test
-        void whenCreateUserThenReturnUser() {
+        @BeforeAll
+        void beforeAll() {
 
-            User toSaveUser = User.builder()
-                    .username(USER_TEST_NAME)
-                    .password(USER_TEST_PASSWORD)
-                    .enabled(true)
-                    .role(Role.ADMIN)
-                    .department(defaultAdminDepartment)
-                    .createdBy(defaultAdminUser.getId())
-                    .createdDate(now)
-                    .lastUpdatedBy(defaultAdminUser.getId())
-                    .lastUpdatedDate(now)
-                    .build();
+            defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+            defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
 
-            User savedUser = userRepository.saveAndFlush(toSaveUser);
+            now = LocalDateTime.of(
+                    2025,
+                    9,
+                    29,
+                    13,
+                    0,
+                    0);
 
-            userRepository.deleteById(savedUser.getId());
-
-            assertThat(savedUser.getId()).isNotNull();
-            assertThat(savedUser.getUsername()).isEqualTo(toSaveUser.getUsername());
-            assertThat(savedUser.getPassword()).isNotNull();
-            assertThat(savedUser.isEnabled()).isTrue();
-            assertThat(savedUser.getRole()).isEqualTo(toSaveUser.getRole());
-            assertThat(savedUser.getDepartment().getId()).isEqualTo(toSaveUser.getDepartment().getId());
-            assertThat(savedUser.getCreatedBy()).isEqualTo(toSaveUser.getCreatedBy());
-            assertThat(savedUser.getCreatedDate()).isEqualTo(toSaveUser.getCreatedDate());
-            assertThat(savedUser.getLastUpdatedBy()).isEqualTo(toSaveUser.getLastUpdatedBy());
-            assertThat(savedUser.getLastUpdatedDate()).isEqualTo(toSaveUser.getLastUpdatedDate());
-        }
-
-        @Test
-        void whenCreateUserWithNotUniqueNameThenThrowException() {
-
-            String existUserName = defaultAdminUser.getUsername();
-
-            User toSaveUserWithNotUniqueName = User.builder()
-                    .username(existUserName)
-                    .password(USER_TEST_PASSWORD)
-                    .enabled(true)
-                    .role(Role.ADMIN)
-                    .department(defaultAdminDepartment)
-                    .createdBy(defaultAdminUser.getId())
-                    .createdDate(now)
-                    .lastUpdatedBy(defaultAdminUser.getId())
-                    .lastUpdatedDate(now)
-                    .build();
-
-            assertThrows(
-                    DataIntegrityViolationException.class,
-                    () -> userRepository.saveAndFlush(toSaveUserWithNotUniqueName)
-            );
-        }
-
-        @Test
-        void whenCreateUserWithNotExistDepartmentThenThrowException() {
-
-            Department notExistDepartment = Department.builder()
-                    .id(SOME_NOT_EXIST_ID)
-                    .name(DEPARTMENT_TEST_NAME)
-                    .enabled(true)
-                    .createdBy(defaultAdminUser.getId())
-                    .createdDate(now)
-                    .lastUpdatedBy(defaultAdminUser.getId())
-                    .lastUpdatedDate(now)
-                    .build();
-
-            User toSaveUserWithNotExistDepartment = User.builder()
-                    .username(USER_TEST_NAME)
-                    .password(USER_TEST_PASSWORD)
-                    .enabled(true)
-                    .role(Role.ADMIN)
-                    .department(notExistDepartment)
-                    .createdBy(defaultAdminUser.getId())
-                    .createdDate(now)
-                    .lastUpdatedBy(defaultAdminUser.getId())
-                    .lastUpdatedDate(now)
-                    .build();
-
-            assertThrows(
-                    DataIntegrityViolationException.class,
-                    () -> userRepository.saveAndFlush(toSaveUserWithNotExistDepartment)
-            );
-        }
-    }
-
-    @Nested
-    class WhenUserUpdating {
-
-        private Department savedDepartment;
-        private User savedUser;
-
-        @BeforeEach
-        void setUp() {
-
-            savedDepartment = departmentRepository.saveAndFlush(
-                    Department.builder()
-                            .name(DEPARTMENT_TEST_NAME)
-                            .enabled(true)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
-
-            savedUser = userRepository.saveAndFlush(
+            enabledTechnicianUser = userRepository.saveAndFlush(
                     User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(true)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
-        }
-
-        @AfterEach
-        @SneakyThrows
-        void tearDown() {
-            userRepository.deleteById(savedUser.getId());
-            departmentRepository.deleteById(savedDepartment.getId());
-        }
-
-        @Test
-        @Transactional()
-        @Modifying(clearAutomatically = true)
-        void whenUpdateUserThenReturnOne() {
-
-            int response = userRepository.updateUser(
-                    savedUser.getId(),
-                    "new_username",
-                    savedDepartment.getId(),
-                    Role.EMPLOYEE,
-                    defaultAdminUser.getId(),
-                    now
-            );
-
-            assertThat(response).isEqualTo(1);
-        }
-
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenUpdateUserWhichNotExistThenReturnZero() {
-
-            int response = userRepository.updateUser(
-                    SOME_NOT_EXIST_ID,
-                    "new_username",
-                    savedDepartment.getId(),
-                    Role.EMPLOYEE,
-                    defaultAdminUser.getId(),
-                    now
-            );
-
-            assertThat(response).isEqualTo(0);
-        }
-
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenUpdateUserWithNotUniqueNameThenThrowException() {
-
-            String existUsername = defaultAdminUser.getUsername();
-
-            assertThrows(
-                    DataIntegrityViolationException.class,
-                    () -> userRepository.updateUser(
-                            savedUser.getId(),
-                            existUsername,
-                            savedDepartment.getId(),
-                            Role.EMPLOYEE,
-                            defaultAdminUser.getId(),
-                            now
-                    )
-            );
-        }
-
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenUpdateUserWithNotExistDepartmentThenThrowException() {
-
-            assertThrows(
-                    DataIntegrityViolationException.class,
-                    () -> userRepository.updateUser(
-                            savedUser.getId(),
-                            "new_username",
-                            SOME_NOT_EXIST_ID,
-                            Role.EMPLOYEE,
-                            defaultAdminUser.getId(),
-                            now
-                    )
-            );
-        }
-    }
-
-    @Nested
-    class WhenUserChangingPassword {
-
-        private User savedUser;
-
-        @BeforeEach
-        void setUp() {
-
-            savedUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(true)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
-        }
-
-        @AfterEach
-        @SneakyThrows
-        void tearDown() {
-            userRepository.deleteById(savedUser.getId());
-        }
-
-        @Test
-        @Transactional()
-        @Modifying(clearAutomatically = true)
-        void whenChangeUserPasswordThenReturnOne() {
-
-            int response = userRepository.changeUserPassword(
-                    savedUser.getId(),
-                    USER_NEW_TEST_PASSWORD,
-                    defaultAdminUser.getId(),
-                    now
-            );
-
-            assertThat(response).isEqualTo(1);
-        }
-
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenChangeUserPasswordWhichNotExistThenReturnZero() {
-
-            int response = userRepository.changeUserPassword(
-                    SOME_NOT_EXIST_ID,
-                    USER_NEW_TEST_PASSWORD,
-                    defaultAdminUser.getId(),
-                    now
-            );
-
-            assertThat(response).isEqualTo(0);
-        }
-    }
-
-    @Nested
-    class WhenGetAllUsers {
-
-        @Test
-        void whenGetAllUsersThenReturnListOfUsers() {
-
-            List<UserDto> userDtoList = userRepository.getAllUsers();
-
-            assertThat(userDtoList.size()).isEqualTo(1);
-        }
-
-        @Test
-        void whenGetAllUsersAndSomeUserEnabledIsFalseThenReturnListOfUsers() {
-
-            User notEnabledUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(false)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
-
-            List<UserDto> enabledUsers = userRepository.getAllUsers();
-            List<User> allUsers = userRepository.findAll();
-
-            userRepository.deleteById(notEnabledUser.getId());
-
-            assertThat(enabledUsers.size()).isEqualTo(1);
-            assertThat(allUsers.size()).isEqualTo(2);
-        }
-    }
-
-    @Nested
-    class WhenGetAllAdminAndTechnician {
-
-        private User technicianUser;
-        private User employeeUser;
-
-        @BeforeEach
-        void setUp() {
-
-            technicianUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username("technician_user")
+                            .username(USER_TECHNICIAN_TEST_NAME)
                             .password(USER_TEST_PASSWORD)
                             .enabled(true)
                             .role(Role.TECHNICIAN)
@@ -410,13 +105,38 @@ class UserRepositoryTest {
                             .build()
             );
 
-            employeeUser = userRepository.saveAndFlush(
+            notEnabledTechnicianUser = userRepository.saveAndFlush(
                     User.builder()
-                            .username("employee_user")
+                            .username(USER_TEST_OTHER_NAME)
+                            .password(USER_TEST_PASSWORD)
+                            .enabled(false)
+                            .role(Role.TECHNICIAN)
+                            .department(defaultAdminDepartment)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            employeeDepartment = departmentRepository.saveAndFlush(
+                    Department.builder()
+                            .name(DEPARTMENT_TEST_NAME)
+                            .enabled(true)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build()
+            );
+
+            enabledEmployeeUser = userRepository.saveAndFlush(
+                    User.builder()
+                            .username(USER_TEST_NAME)
                             .password(USER_TEST_PASSWORD)
                             .enabled(true)
                             .role(Role.EMPLOYEE)
-                            .department(defaultAdminDepartment)
+                            .department(employeeDepartment)
                             .createdBy(defaultAdminUser.getId())
                             .createdDate(now)
                             .lastUpdatedBy(defaultAdminUser.getId())
@@ -425,232 +145,371 @@ class UserRepositoryTest {
             );
         }
 
-        @AfterEach
-        @SneakyThrows
-        void tearDown() {
-            userRepository.deleteById(technicianUser.getId());
-            userRepository.deleteById(employeeUser.getId());
+        @Nested
+        class WhenUserCreating {
+
+            @Test
+            @Transactional
+            void whenCreateUserThenReturnUser() {
+
+                User toSaveUser = User.builder()
+                        .username(USER_NEW_TEST_NAME)
+                        .password(USER_TEST_PASSWORD)
+                        .enabled(true)
+                        .role(Role.EMPLOYEE)
+                        .department(employeeDepartment)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+
+                User savedUser = userRepository.saveAndFlush(toSaveUser);
+
+                assertThat(savedUser.getId()).isNotNull();
+                assertThat(savedUser.getUsername()).isEqualTo(toSaveUser.getUsername());
+                assertThat(savedUser.getPassword()).isNotNull();
+                assertThat(savedUser.isEnabled()).isTrue();
+                assertThat(savedUser.getRole()).isEqualTo(toSaveUser.getRole());
+                assertThat(savedUser.getDepartment().getId()).isEqualTo(toSaveUser.getDepartment().getId());
+                assertThat(savedUser.getCreatedBy()).isEqualTo(toSaveUser.getCreatedBy());
+                assertThat(savedUser.getCreatedDate()).isEqualTo(toSaveUser.getCreatedDate());
+                assertThat(savedUser.getLastUpdatedBy()).isEqualTo(toSaveUser.getLastUpdatedBy());
+                assertThat(savedUser.getLastUpdatedDate()).isEqualTo(toSaveUser.getLastUpdatedDate());
+            }
+
+            @Test
+            void whenCreateUserWithNotUniqueNameThenThrowException() {
+
+                String existUserName = defaultAdminUser.getUsername();
+
+                User toSaveUserWithNotUniqueName = User.builder()
+                        .username(existUserName)
+                        .password(USER_TEST_PASSWORD)
+                        .enabled(true)
+                        .role(Role.EMPLOYEE)
+                        .department(employeeDepartment)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+
+                assertThrows(
+                        DataIntegrityViolationException.class,
+                        () -> userRepository.saveAndFlush(toSaveUserWithNotUniqueName)
+                );
+            }
+
+            @Test
+            void whenCreateUserWithNotExistDepartmentThenThrowException() {
+
+                Department notExistDepartment = Department.builder()
+                        .id(SOME_NOT_EXIST_ID)
+                        .name(DEPARTMENT_TEST_OTHER_NAME)
+                        .enabled(true)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+
+                User toSaveUserWithNotExistDepartment = User.builder()
+                        .username(USER_TEST_SAME_DEPARTMENT_NAME)
+                        .password(USER_TEST_PASSWORD)
+                        .enabled(true)
+                        .role(Role.ADMIN)
+                        .department(notExistDepartment)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+
+                assertThrows(
+                        DataIntegrityViolationException.class,
+                        () -> userRepository.saveAndFlush(toSaveUserWithNotExistDepartment)
+                );
+            }
         }
 
-        @Test
-        void whenGetAllAdminAndTechnicianThenReturnList() {
+        @Nested
+        class WhenUserUpdating {
 
-            List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenUpdateUserThenReturnOne() {
 
-            assertThat(userDtoList.size()).isEqualTo(2);
+                int response = userRepository.updateUser(
+                        enabledTechnicianUser.getId(),
+                        USER_NEW_TEST_NAME,
+                        employeeDepartment.getId(),
+                        Role.EMPLOYEE,
+                        defaultAdminUser.getId(),
+                        now
+                );
+
+                assertThat(response).isEqualTo(1);
+            }
+
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenUpdateUserWhichNotExistThenReturnZero() {
+
+                int response = userRepository.updateUser(
+                        SOME_NOT_EXIST_ID,
+                        USER_NEW_TEST_NAME,
+                        employeeDepartment.getId(),
+                        Role.EMPLOYEE,
+                        defaultAdminUser.getId(),
+                        now
+                );
+
+                assertThat(response).isEqualTo(0);
+            }
+
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenUpdateUserWithNotUniqueNameThenThrowException() {
+
+                String existUsername = defaultAdminUser.getUsername();
+
+                assertThrows(
+                        DataIntegrityViolationException.class,
+                        () -> userRepository.updateUser(
+                                enabledTechnicianUser.getId(),
+                                existUsername,
+                                employeeDepartment.getId(),
+                                Role.EMPLOYEE,
+                                defaultAdminUser.getId(),
+                                now
+                        )
+                );
+            }
+
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenUpdateUserWithNotExistDepartmentThenThrowException() {
+
+                assertThrows(
+                        DataIntegrityViolationException.class,
+                        () -> userRepository.updateUser(
+                                enabledTechnicianUser.getId(),
+                                USER_NEW_TEST_NAME,
+                                SOME_NOT_EXIST_ID,
+                                Role.EMPLOYEE,
+                                defaultAdminUser.getId(),
+                                now
+                        )
+                );
+            }
         }
 
-        @Test
-        void whenGetAllAdminAndTechnicianThenReturnOnlyEnabledList() {
+        @Nested
+        class WhenUserChangingPassword {
 
-            User notEnabledUser = userRepository.findById(technicianUser.getId()).get();
-            notEnabledUser.setEnabled(false);
-            userRepository.saveAndFlush(notEnabledUser);
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenChangeUserPasswordThenReturnOne() {
 
-            List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
+                int response = userRepository.changeUserPassword(
+                        enabledTechnicianUser.getId(),
+                        USER_NEW_TEST_PASSWORD,
+                        defaultAdminUser.getId(),
+                        now
+                );
 
-            assertThat(userDtoList.size()).isEqualTo(1);
-        }
-    }
+                assertThat(response).isEqualTo(1);
+            }
 
-    @Nested
-    class WhenGetUser {
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenChangeUserPasswordWhichNotExistThenReturnZero() {
 
-        @Test
-        void whenGetUserThenReturnUserDto() {
+                int response = userRepository.changeUserPassword(
+                        SOME_NOT_EXIST_ID,
+                        USER_NEW_TEST_PASSWORD,
+                        defaultAdminUser.getId(),
+                        now
+                );
 
-            Optional<UserDto> optional =
-                    userRepository.getUserById(defaultAdminUser.getId());
-
-            assertThat(optional).isNotEmpty();
-        }
-
-        @Test
-        void whenGetUserWhichNotExistThenReturnEmptyOptional() {
-
-            Optional<UserDto> optional =
-                    userRepository.getUserById(SOME_NOT_EXIST_ID);
-
-            assertThat(optional).isEmpty();
-        }
-
-        @Test
-        void whenGetUserWhichNotEnabledThenReturnEmptyOptional() {
-
-            User notEnabledUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(false)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
-
-            Optional<UserDto> optional =
-                    userRepository.getUserById(notEnabledUser.getId());
-
-            userRepository.deleteById(notEnabledUser.getId());
-
-            assertThat(optional).isEmpty();
-        }
-    }
-
-    @Nested
-    class WhenFindUserByUsername {
-
-        @Test
-        void whenFindUserByUsernameThenReturnUser() {
-
-            Optional<User> optional =
-                    userRepository.findUserByUsername(defaultAdminUser.getUsername());
-
-            assertThat(optional).isNotEmpty();
+                assertThat(response).isEqualTo(0);
+            }
         }
 
-        @Test
-        void whenFindUserByUsernameWhichNotEnabledThenReturnUser() {
+        @Nested
+        class WhenGetAllUsers {
 
-            User notEnabledUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(false)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
+            @Test
+            void whenGetAllUsersThenReturnListOfUsers() {
 
-            Optional<User> optional =
-                    userRepository.findUserByUsername(notEnabledUser.getUsername());
+                List<UserDto> userDtoList = userRepository.getAllUsers();
 
-            userRepository.deleteById(notEnabledUser.getId());
+                assertThat(userDtoList.size()).isEqualTo(3);
+            }
 
-            assertThat(optional).isNotEmpty();
-        }
-    }
+            @Test
+            void whenGetAllUsersAndSomeUserEnabledIsFalseThenReturnListOfUsers() {
 
-    @Nested
-    class WhenGetUserByUsernameAndEnabledTrue {
+                List<UserDto> enabledUsers = userRepository.getAllUsers();
+                List<User> allUsers = userRepository.findAll();
 
-        @Test
-        void whenGetUserByUsernameAndEnabledTrueThenReturnUser() {
-
-            Optional<UserFullDto> optional =
-                    userRepository.getUserByUsernameAndEnabledTrue(defaultAdminUser.getUsername());
-
-            assertThat(optional).isNotEmpty();
+                assertThat(enabledUsers.size()).isEqualTo(3);
+                assertThat(allUsers.size()).isEqualTo(4);
+            }
         }
 
-        @Test
-        void whenGetUserByUsernameAndEnabledTrueWhichNotEnabledThenReturnEmptyOption() {
+        @Nested
+        class WhenGetAllAdminAndTechnician {
 
-            User notEnabledUser = userRepository.saveAndFlush(
-                    User.builder()
-                            .username(USER_TEST_NAME)
-                            .password(USER_TEST_PASSWORD)
-                            .enabled(false)
-                            .role(Role.ADMIN)
-                            .department(defaultAdminDepartment)
-                            .createdBy(defaultAdminUser.getId())
-                            .createdDate(now)
-                            .lastUpdatedBy(defaultAdminUser.getId())
-                            .lastUpdatedDate(now)
-                            .build()
-            );
+            @Test
+            void whenGetAllAdminAndTechnicianThenReturnOnlyEnabledList() {
 
-            Optional<UserFullDto> optional =
-                    userRepository.getUserByUsernameAndEnabledTrue(notEnabledUser.getUsername());
+                List<UserShortDto> userDtoList = userRepository.getAdminAndTechnicianList();
 
-            userRepository.deleteById(notEnabledUser.getId());
-
-            assertThat(optional).isEmpty();
-        }
-    }
-
-    @Nested
-    class WhenFindTop1ByRoleAndEnabledTrue {
-
-        @Test
-        void whenFindTop1ByRoleAndEnabledTrueThenReturnUser() {
-
-            Optional<User> optional =
-                    userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
-
-            assertThat(optional).isNotEmpty();
+                assertThat(userDtoList.size()).isEqualTo(2);
+            }
         }
 
-        @Test
-        void whenFindTop1ByRoleAndEnabledTrueIfNoOneAdminThenReturnEmptyOptional() {
+        @Nested
+        class WhenGetUser {
 
-            User notEnabledAdmin = userRepository.findById(defaultAdminUser.getId()).get();
-            notEnabledAdmin.setEnabled(false);
-            userRepository.saveAndFlush(notEnabledAdmin);
+            @Test
+            void whenGetUserThenReturnUserDto() {
 
-            Optional<User> optional =
-                    userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+                Optional<UserDto> optional =
+                        userRepository.getUserById(defaultAdminUser.getId());
 
-            User enabledAdmin = userRepository.findById(defaultAdminUser.getId()).get();
-            enabledAdmin.setEnabled(true);
-            userRepository.saveAndFlush(enabledAdmin);
+                assertThat(optional).isNotEmpty();
+            }
 
-            assertThat(optional).isEmpty();
-        }
-    }
+            @Test
+            void whenGetUserWhichNotExistThenReturnEmptyOptional() {
 
-    @Nested
-    class WhenUserDeleting {
+                Optional<UserDto> optional =
+                        userRepository.getUserById(SOME_NOT_EXIST_ID);
 
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenDeleteUserThenReturnOne() {
+                assertThat(optional).isEmpty();
+            }
 
-            User toSaveUser = User.builder()
-                    .username(USER_TEST_NAME)
-                    .password(USER_TEST_PASSWORD)
-                    .enabled(true)
-                    .role(Role.ADMIN)
-                    .department(defaultAdminDepartment)
-                    .createdBy(defaultAdminUser.getId())
-                    .createdDate(now)
-                    .lastUpdatedBy(defaultAdminUser.getId())
-                    .lastUpdatedDate(now)
-                    .build();
+            @Test
+            void whenGetUserWhichNotEnabledThenReturnEmptyOptional() {
 
-            User savedUser = userRepository.saveAndFlush(toSaveUser);
+                Optional<UserDto> optional =
+                        userRepository.getUserById(notEnabledTechnicianUser.getId());
 
-            int response = userRepository.deleteUser(
-                    savedUser.getId(),
-                    defaultAdminUser.getId(),
-                    now
-            );
-
-            userRepository.deleteById(savedUser.getId());
-
-            assertThat(response).isEqualTo(1);
+                assertThat(optional).isEmpty();
+            }
         }
 
-        @Test
-        @Transactional
-        @Modifying(clearAutomatically = true)
-        void whenDeleteUserThenReturnZero() {
+        @Nested
+        class WhenFindUserByUsername {
 
-            int response = userRepository.deleteUser(
-                    SOME_NOT_EXIST_ID,
-                    defaultAdminUser.getId(),
-                    now
-            );
+            @Test
+            void whenFindUserByUsernameThenReturnUser() {
 
-            assertThat(response).isEqualTo(0);
+                Optional<User> optional =
+                        userRepository.findUserByUsername(defaultAdminUser.getUsername());
+
+                assertThat(optional).isNotEmpty();
+            }
+
+            @Test
+            void whenFindUserByUsernameWhichNotEnabledThenReturnUser() {
+
+                Optional<User> optional =
+                        userRepository.findUserByUsername(notEnabledTechnicianUser.getUsername());
+
+                assertThat(optional).isNotEmpty();
+            }
+        }
+
+        @Nested
+        class WhenGetUserByUsernameAndEnabledTrue {
+
+            @Test
+            void whenGetUserByUsernameAndEnabledTrueThenReturnUser() {
+
+                Optional<UserFullDto> optional =
+                        userRepository.getUserByUsernameAndEnabledTrue(defaultAdminUser.getUsername());
+
+                assertThat(optional).isNotEmpty();
+            }
+
+            @Test
+            void whenGetUserByUsernameAndEnabledTrueWhichNotEnabledThenReturnEmptyOption() {
+
+                Optional<UserFullDto> optional =
+                        userRepository.getUserByUsernameAndEnabledTrue(notEnabledTechnicianUser.getUsername());
+
+                assertThat(optional).isEmpty();
+            }
+        }
+
+        @Nested
+        class WhenFindTop1ByRoleAndEnabledTrue {
+
+            @Test
+            void whenFindTop1ByRoleAndEnabledTrueThenReturnUser() {
+
+                Optional<User> optional =
+                        userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+
+                assertThat(optional).isNotEmpty();
+            }
+
+            @Test
+            @Transactional
+            void whenFindTop1ByRoleAndEnabledTrueIfNoOneAdminThenReturnEmptyOptional() {
+
+                User userAdm = userRepository.findById(defaultAdminUser.getId()).get();
+                userAdm.setEnabled(false);
+
+                userRepository.saveAndFlush(userAdm);
+
+                Optional<User> optional =
+                        userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
+
+                assertThat(optional).isEmpty();
+            }
+        }
+
+        @Nested
+        class WhenUserDeleting {
+
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenDeleteUserThenReturnOne() {
+
+                int response = userRepository.deleteUser(
+                        enabledTechnicianUser.getId(),
+                        defaultAdminUser.getId(),
+                        now
+                );
+
+                assertThat(response).isEqualTo(1);
+            }
+
+            @Test
+            @Transactional
+            @Modifying(clearAutomatically = true)
+            void whenDeleteUserThenReturnZero() {
+
+                int response = userRepository.deleteUser(
+                        SOME_NOT_EXIST_ID,
+                        defaultAdminUser.getId(),
+                        now
+                );
+
+                assertThat(response).isEqualTo(0);
+            }
         }
     }
 }
