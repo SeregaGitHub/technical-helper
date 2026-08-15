@@ -35,6 +35,7 @@ class DepartmentRepositoryTest {
     UserRepository userRepository;
 
     private Department defaultAdminDepartment;
+    private Department notEnabledDepartment;
     private LocalDateTime now;
     private User defaultAdminUser;
 
@@ -83,6 +84,16 @@ class DepartmentRepositoryTest {
                     13,
                     0,
                     0);
+
+            notEnabledDepartment = departmentRepository.saveAndFlush(
+                    Department.builder()
+                            .name(DEPARTMENT_TEST_NAME)
+                            .enabled(false)
+                            .createdBy(defaultAdminUser.getId())
+                            .createdDate(now)
+                            .lastUpdatedBy(defaultAdminUser.getId())
+                            .lastUpdatedDate(now)
+                            .build());
         }
 
         @Nested
@@ -93,7 +104,7 @@ class DepartmentRepositoryTest {
             void whenCreateDepartmentThenReturnDepartment() {
 
                 Department toSaveDepartment = Department.builder()
-                        .name(DEPARTMENT_TEST_NAME)
+                        .name(DEPARTMENT_TEST_OTHER_NAME)
                         .enabled(true)
                         .createdBy(defaultAdminUser.getId())
                         .createdDate(now)
@@ -148,19 +159,8 @@ class DepartmentRepositoryTest {
             @Transactional
             void whenDepartmentFindByNameThenReturnDepartmentEvenWhenEnabledIsFalse() {
 
-                Department savedDepartment = departmentRepository.saveAndFlush(
-                        Department.builder()
-                                .name(DEPARTMENT_TEST_NAME)
-                                .enabled(false)
-                                .createdBy(defaultAdminUser.getId())
-                                .createdDate(now)
-                                .lastUpdatedBy(defaultAdminUser.getId())
-                                .lastUpdatedDate(now)
-                                .build()
-                );
-
                 Optional<Department> departmentWithEnabledIsFalse =
-                        departmentRepository.findByName(savedDepartment.getName());
+                        departmentRepository.findByName(notEnabledDepartment.getName());
 
                 assertThat(departmentWithEnabledIsFalse).isNotEmpty();
             }
@@ -168,7 +168,7 @@ class DepartmentRepositoryTest {
             @Test
             void whenDepartmentFindByNameThenReturnEmptyOptionalIfNameNotExist() {
 
-                Optional<Department> department = departmentRepository.findByName(DEPARTMENT_TEST_NAME);
+                Optional<Department> department = departmentRepository.findByName(SOME_NOT_EXIST_TEXT);
 
                 assertThat(department).isEmpty();
             }
@@ -178,36 +178,13 @@ class DepartmentRepositoryTest {
         @TestInstance(TestInstance.Lifecycle.PER_CLASS)
         class WhenDepartmentUpdating {
 
-            private Department savedDepartment;
-
-            @BeforeAll
-            void insertData() {
-
-                savedDepartment = departmentRepository.saveAndFlush(
-                        Department.builder()
-                                .name(DEPARTMENT_TEST_NAME)
-                                .enabled(true)
-                                .createdBy(defaultAdminUser.getId())
-                                .createdDate(now)
-                                .lastUpdatedBy(defaultAdminUser.getId())
-                                .lastUpdatedDate(now)
-                                .build()
-                );
-            }
-
-            @AfterAll
-            void tearDown() {
-
-                departmentRepository.deleteById(savedDepartment.getId());
-            }
-
             @Test
             @Transactional
             @Modifying(clearAutomatically = true)
             void whenUpdateDepartmentThenReturnOne() {
 
                 int response = departmentRepository.updateDepartment(
-                        savedDepartment.getId(),
+                        defaultAdminDepartment.getId(),
                         DEPARTMENT_TEST_UPDATED_NAME,
                         defaultAdminUser.getId(),
                         now);
@@ -235,12 +212,12 @@ class DepartmentRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenUpdateDepartmentWithNotUniqueNameThenThrowException() {
 
-                String existDepartmentName = defaultAdminDepartment.getName();
+                String existDepartmentName = notEnabledDepartment.getName();
 
                 assertThrows(
                         DataIntegrityViolationException.class,
                         () -> departmentRepository.updateDepartment(
-                                savedDepartment.getId(),
+                                defaultAdminDepartment.getId(),
                                 existDepartmentName,
                                 defaultAdminUser.getId(),
                                 now)
@@ -262,17 +239,6 @@ class DepartmentRepositoryTest {
             @Test
             @Transactional
             void whenGetAllDepartmentsAndSomeDepartmentEnabledIsFalseThenReturnListOfDepartments() {
-
-                departmentRepository.saveAndFlush(
-                        Department.builder()
-                                .name(DEPARTMENT_TEST_NAME)
-                                .enabled(false)
-                                .createdBy(defaultAdminUser.getId())
-                                .createdDate(now)
-                                .lastUpdatedBy(defaultAdminUser.getId())
-                                .lastUpdatedDate(now)
-                                .build()
-                );
 
                 List<DepartmentDto> enabledDepartments = departmentRepository.getAllDepartments();
                 List<Department> allDepartments = departmentRepository.findAll();
@@ -307,19 +273,8 @@ class DepartmentRepositoryTest {
             @Transactional
             void whenGetDepartmentWhichNotEnabledThenReturnEmptyOptional() {
 
-                Department savedDepartment = departmentRepository.saveAndFlush(
-                        Department.builder()
-                                .name(DEPARTMENT_TEST_NAME)
-                                .enabled(false)
-                                .createdBy(defaultAdminUser.getId())
-                                .createdDate(now)
-                                .lastUpdatedBy(defaultAdminUser.getId())
-                                .lastUpdatedDate(now)
-                                .build()
-                );
-
                 Optional<DepartmentDto> optional =
-                        departmentRepository.getDepartmentById(savedDepartment.getId());
+                        departmentRepository.getDepartmentById(notEnabledDepartment.getId());
 
                 assertThat(optional).isEmpty();
             }
@@ -333,19 +288,8 @@ class DepartmentRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenDeleteDepartmentThenReturnOne() {
 
-                Department savedDepartment = departmentRepository.saveAndFlush(
-                        Department.builder()
-                                .name(DEPARTMENT_TEST_NAME)
-                                .enabled(true)
-                                .createdBy(defaultAdminUser.getId())
-                                .createdDate(now)
-                                .lastUpdatedBy(defaultAdminUser.getId())
-                                .lastUpdatedDate(now)
-                                .build()
-                );
-
                 int response = departmentRepository.deleteDepartment(
-                        savedDepartment.getId(), defaultAdminUser.getId(), now
+                        defaultAdminDepartment.getId(), defaultAdminUser.getId(), now
                 );
 
                 assertThat(response).isEqualTo(1);
