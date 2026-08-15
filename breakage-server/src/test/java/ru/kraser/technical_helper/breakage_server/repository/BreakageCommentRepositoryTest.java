@@ -88,7 +88,7 @@ class BreakageCommentRepositoryTest {
     class WhenBreakageCommentMethodsAreInvoked {
 
         @BeforeAll
-        void insertData() {
+        void beforeAll() {
 
             defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
             defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();

@@ -92,7 +92,7 @@ class BreakageRepositoryTest {
     class WhenBreakageRepositoryDataModifyingMethodsAreInvoked {
 
         @BeforeAll
-        void insertData() {
+        void beforeAll() {
 
             defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
             defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
@@ -365,7 +365,7 @@ class BreakageRepositoryTest {
         List<Priority> priorityListWithNoMedium;
 
         @BeforeAll
-        void insertData() {
+        void beforeAll() {
 
             adminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
             adminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
@@ -464,7 +464,7 @@ class BreakageRepositoryTest {
         }
 
         @AfterAll
-        void cleanupData() {
+        void afterAll() {
 
             transactionTemplate.execute(status -> {
                 entityManager.createNativeQuery("TRUNCATE TABLE breakage CASCADE")

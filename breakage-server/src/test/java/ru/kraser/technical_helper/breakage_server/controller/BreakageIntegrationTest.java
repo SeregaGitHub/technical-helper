@@ -150,7 +150,7 @@ class BreakageIntegrationTest {
     class WhenBreakageMethods {
 
         @BeforeAll
-        void insertData() {
+        void beforeAll() {
 
             now = LocalDateTime.of(
                     2025,
@@ -1783,7 +1783,7 @@ class BreakageIntegrationTest {
                 private BreakageTechDto deadlineAppointedToOthersBreakageTechDto;
 
                 @BeforeAll
-                void insertData() {
+                void beforeAll() {
 
                     LocalDateTime testDeadlineBeforeNow = now.minusDays(1);
 
@@ -1856,7 +1856,7 @@ class BreakageIntegrationTest {
                 }
 
                 @AfterAll
-                void cleanupData() {
+                void afterAll() {
 
                     transactionTemplate.execute(status -> {
                         entityManager.createNativeQuery("TRUNCATE TABLE breakage_audit")
