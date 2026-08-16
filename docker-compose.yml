@@ -4,7 +4,7 @@ services:
     build:
       context: ./frontend
       args:
-        HOST_SERVER_IP: "158.160.221.34"
+        HOST_SERVER_IP: 158.160.221.34
       dockerfile: Dockerfile
     image: th-frontend:1.1.0
     restart: on-failure

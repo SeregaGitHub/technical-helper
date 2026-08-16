@@ -159,7 +159,7 @@ class BreakageRepositoryTest {
                 testBreakage.setExecutorAppointedBy(defaultAdminUser);
                 testBreakage.setDeadline(now);
 
-                Breakage savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                Breakage savedBreakage = breakageRepository.save(testBreakage);
 
                 assertThat(savedBreakage.getId()).isNotNull();
                 assertThat(savedBreakage.getDepartment().getId()).isEqualTo(testBreakage.getDepartment().getId());
@@ -215,7 +215,7 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakageStatusThenReturnOne() {
 
-                savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                savedBreakage = breakageRepository.save(testBreakage);
 
                 int response = breakageRepository.updateBreakageStatus(
                         savedBreakage.getId(),
@@ -239,7 +239,7 @@ class BreakageRepositoryTest {
                 testBreakage.setExecutorAppointedBy(defaultAdminUser);
                 testBreakage.setDeadline(now);
 
-                savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                savedBreakage = breakageRepository.save(testBreakage);
 
                 int response = breakageRepository.updateBreakageStatusAndResetExecutor(
                         savedBreakage.getId(),
@@ -261,7 +261,7 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakagePriorityThenReturnOne() {
 
-                savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                savedBreakage = breakageRepository.save(testBreakage);
 
                 int response = breakageRepository.updateBreakagePriority(
                         savedBreakage.getId(),
@@ -295,7 +295,7 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenAddBreakageExecutorThenReturnOne() {
 
-                savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                savedBreakage = breakageRepository.save(testBreakage);
 
                 int response = breakageRepository.addBreakageExecutor(
                         savedBreakage.getId(),
@@ -322,7 +322,7 @@ class BreakageRepositoryTest {
                 testBreakage.setExecutorAppointedBy(defaultAdminUser);
                 testBreakage.setDeadline(afterNow);
 
-                savedBreakage = breakageRepository.saveAndFlush(testBreakage);
+                savedBreakage = breakageRepository.save(testBreakage);
 
                 int response = breakageRepository.dropBreakageExecutor(
                         savedBreakage.getId(),
@@ -388,7 +388,7 @@ class BreakageRepositoryTest {
                     .lastUpdatedDate(ldt)
                     .build();
 
-            employeeDepartment = departmentRepository.saveAndFlush(emplDepartment);
+            employeeDepartment = departmentRepository.save(emplDepartment);
 
             User emplUser = User.builder()
                     .username(USER_TEST_NAME)
@@ -402,7 +402,7 @@ class BreakageRepositoryTest {
                     .lastUpdatedDate(ldt)
                     .build();
 
-            employeeUser = userRepository.saveAndFlush(emplUser);
+            employeeUser = userRepository.save(emplUser);
 
             User techUser = User.builder()
                     .username(USER_TECHNICIAN_TEST_NAME)
@@ -416,7 +416,7 @@ class BreakageRepositoryTest {
                     .lastUpdatedDate(ldt)
                     .build();
 
-            technicianUser = userRepository.saveAndFlush(techUser);
+            technicianUser = userRepository.save(techUser);
 
             Breakage savedByEmplBreakage = Breakage.builder()
                     .department(employeeDepartment)
@@ -450,8 +450,8 @@ class BreakageRepositoryTest {
                     .lastUpdatedDate(ldt)
                     .build();
 
-            savedByAdminBreakage = breakageRepository.saveAndFlush(savedByAdmBreakage);
-            savedByEmployeeBreakage = breakageRepository.saveAndFlush(savedByEmplBreakage);
+            savedByAdminBreakage = breakageRepository.save(savedByAdmBreakage);
+            savedByEmployeeBreakage = breakageRepository.save(savedByEmplBreakage);
 
             defaultPageRequest = PageRequest.of(
                     0, 10, Sort.by(Sort.Direction.DESC, "lastUpdatedDate"));

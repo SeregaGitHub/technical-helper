@@ -85,7 +85,7 @@ class DepartmentRepositoryTest {
                     0,
                     0);
 
-            notEnabledDepartment = departmentRepository.saveAndFlush(
+            notEnabledDepartment = departmentRepository.save(
                     Department.builder()
                             .name(DEPARTMENT_TEST_NAME)
                             .enabled(false)

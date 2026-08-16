@@ -183,8 +183,8 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentDepartment = departmentRepository.saveAndFlush(toSaveEmployeeCurrentDepartment);
-            employeeOtherDepartment = departmentRepository.saveAndFlush(toSaveEmployeeOtherDepartment);
+            employeeCurrentDepartment = departmentRepository.save(toSaveEmployeeCurrentDepartment);
+            employeeOtherDepartment = departmentRepository.save(toSaveEmployeeOtherDepartment);
 
             User toSaveEmployeeUser = User.builder()
                     .username(USER_TEST_NAME)
@@ -234,10 +234,10 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentUser = userRepository.saveAndFlush(toSaveEmployeeUser);
-            employeeSameCurrentUser = userRepository.saveAndFlush(toSaveEmployeeSameUser);
-            employeeOtherUser = userRepository.saveAndFlush(toSaveEmployeeOtherUser);
-            technicianUser = userRepository.saveAndFlush(toSaveTechnicianUser);
+            employeeCurrentUser = userRepository.save(toSaveEmployeeUser);
+            employeeSameCurrentUser = userRepository.save(toSaveEmployeeSameUser);
+            employeeOtherUser = userRepository.save(toSaveEmployeeOtherUser);
+            technicianUser = userRepository.save(toSaveTechnicianUser);
 
             Breakage toSaveEmployeeBreakage = Breakage.builder()
                     .department(employeeCurrentDepartment)
@@ -255,7 +255,7 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentBreakage = breakageRepository.saveAndFlush(toSaveEmployeeBreakage);
+            employeeCurrentBreakage = breakageRepository.save(toSaveEmployeeBreakage);
 
             BreakageComment toSaveBreakageComment = BreakageComment.builder()
                     .breakage(employeeCurrentBreakage)
@@ -266,7 +266,7 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+            breakageComment = breakageCommentRepository.save(toSaveBreakageComment);
 
             expectedBreakageEmployeeDto = BreakageEmployeeDto.builder()
                     .id(employeeCurrentBreakage.getId())
@@ -676,7 +676,7 @@ class BreakageIntegrationTest {
                     breakage.setDeadline(now);
                     breakage.setLastUpdatedBy(defaultAdminUser.getId());
                     breakage.setLastUpdatedDate(afterNow);
-                    breakageRepository.saveAndFlush(breakage);
+                    breakageRepository.save(breakage);
 
                     updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.PAUSED);
 
@@ -1164,7 +1164,7 @@ class BreakageIntegrationTest {
                     breakage.setDeadline(appointedDeadline);
                     breakage.setLastUpdatedBy(defaultAdminUser.getId());
 
-                    breakageRepository.saveAndFlush(breakage);
+                    breakageRepository.save(breakage);
 
                     String responseMessage =
                             "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
@@ -1820,9 +1820,9 @@ class BreakageIntegrationTest {
                             .build();
 
                     deadlineAppointedToMeBreakage =
-                            breakageRepository.saveAndFlush(toSaveDeadlineAppointedToMeBreakage);
+                            breakageRepository.save(toSaveDeadlineAppointedToMeBreakage);
                     deadlineAppointedToOthersBreakage =
-                            breakageRepository.saveAndFlush(toSaveDeadlineAppointedToOtherBreakage);
+                            breakageRepository.save(toSaveDeadlineAppointedToOtherBreakage);
 
                     deadlineAppointedToMeBreakageTechDto = BreakageTechDto.builder()
                             .id(deadlineAppointedToMeBreakage.getId())
