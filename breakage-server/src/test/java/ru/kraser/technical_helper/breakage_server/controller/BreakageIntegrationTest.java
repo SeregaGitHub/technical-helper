@@ -60,7 +60,7 @@ import static ru.kraser.technical_helper.common_module.util.ConstantForTests.DEF
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = BreakageServer.class)
-class BreakageControllerIntegrationTest {
+class BreakageIntegrationTest {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -103,6 +103,7 @@ class BreakageControllerIntegrationTest {
     private User defaultAdminUser;
     private User technicianUser;
     private User employeeCurrentUser;
+    private User employeeSameCurrentUser;
     private User employeeOtherUser;
 
     private Breakage employeeCurrentBreakage;
@@ -146,10 +147,10 @@ class BreakageControllerIntegrationTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class WhenBreakageControllerMethodsAreInvoked {
+    class WhenBreakageMethods {
 
         @BeforeAll
-        void insertData() {
+        void beforeAll() {
 
             now = LocalDateTime.of(
                     2025,
@@ -209,6 +210,18 @@ class BreakageControllerIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
+            User toSaveEmployeeSameUser = User.builder()
+                    .username(USER_TEST_SAME_DEPARTMENT_NAME)
+                    .password(USER_TEST_PASSWORD)
+                    .enabled(true)
+                    .role(Role.EMPLOYEE)
+                    .department(employeeCurrentDepartment)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build();
+
             User toSaveTechnicianUser = User.builder()
                     .username(USER_TECHNICIAN_TEST_NAME)
                     .password(USER_TEST_PASSWORD)
@@ -222,6 +235,7 @@ class BreakageControllerIntegrationTest {
                     .build();
 
             employeeCurrentUser = userRepository.saveAndFlush(toSaveEmployeeUser);
+            employeeSameCurrentUser = userRepository.saveAndFlush(toSaveEmployeeSameUser);
             employeeOtherUser = userRepository.saveAndFlush(toSaveEmployeeOtherUser);
             technicianUser = userRepository.saveAndFlush(toSaveTechnicianUser);
 
@@ -1466,7 +1480,7 @@ class BreakageControllerIntegrationTest {
         }
 
         @Nested
-        class WhenBreakagesGetting {
+        class WhenBreakagesGet {
 
             private Integer pageSize;
             private Integer pageIndex;
@@ -1480,12 +1494,12 @@ class BreakageControllerIntegrationTest {
                 pageSize = 10;
                 pageIndex = 0;
                 defaultSortBy = "lastUpdatedDate";
-                defaultDirection = "DESC";
+                defaultDirection = Sort.Direction.DESC.name();
                 defaultExecutor = "ALL";
             }
 
             @Nested
-            class WhenAllBreakagesGettingByEmployee {
+            class WhenAllBreakagesGetByEmployee {
 
                 @Test
                 @SneakyThrows
@@ -1498,6 +1512,78 @@ class BreakageControllerIntegrationTest {
                                     .header(USER_ROLE_HEADER, Role.EMPLOYEE)
                                     .header(USER_DEPARTMENT_ID_HEADER, employeeCurrentUser.getDepartment().getId())
                                     .header(CURRENT_USER_ID_HEADER, employeeCurrentUser.getId())
+                                    .param("pageSize", pageSize.toString())
+                                    .param("pageIndex", pageIndex.toString())
+                                    .param("sortBy", defaultSortBy)
+                                    .param("direction", defaultDirection)
+                                    .param("statusNew", String.valueOf(true))
+                                    .param("statusSolved", String.valueOf(true))
+                                    .param("statusInProgress", String.valueOf(true))
+                                    .param("statusPaused", String.valueOf(true))
+                                    .param("statusRedirected", String.valueOf(true))
+                                    .param("statusCancelled", String.valueOf(true))
+                                    .param("priorityUrgently", String.valueOf(true))
+                                    .param("priorityHigh", String.valueOf(true))
+                                    .param("priorityMedium", String.valueOf(true))
+                                    .param("priorityLow", String.valueOf(true))
+                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("deadline", String.valueOf(false))
+                                    .param("searchText", (String) null))
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(MockMvcResultMatchers.status().isOk())
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                    .value(expectedBreakageEmployeeDto.getId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentId()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                    .value(expectedBreakageEmployeeDto.getDepartmentName()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                    .value(expectedBreakageEmployeeDto.getRoom()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                    .value(expectedBreakageEmployeeDto.getBreakageTopic()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                    .value(expectedBreakageEmployeeDto.getBreakageText()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                    .value(expectedBreakageEmployeeDto.getStatus().name()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                    .value(expectedBreakageEmployeeDto.getBreakageExecutor()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                    .value(expectedBreakageEmployeeDto.getCreatedBy()))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                    .value(dtf.format(expectedBreakageEmployeeDto.getCreatedDate())))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                    .value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                    .value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                    .value(1))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                    .value(pageIndex))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                    .value(pageSize))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                    .value(0))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                    .value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                    .value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                    .value(true))
+                            .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                    .value((String) null));
+                }
+
+                @Test
+                @SneakyThrows
+                void whenGetAllEmployeeBreakagesIfEmployeeFromSameDepartmentThenReturnAppPage() {
+
+                    mockMvc.perform(MockMvcRequestBuilders.get(
+                                            BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                    )
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header(USER_ROLE_HEADER, Role.EMPLOYEE)
+                                    .header(USER_DEPARTMENT_ID_HEADER, employeeSameCurrentUser.getDepartment().getId())
+                                    .header(CURRENT_USER_ID_HEADER, employeeSameCurrentUser.getId())
                                     .param("pageSize", pageSize.toString())
                                     .param("pageIndex", pageIndex.toString())
                                     .param("sortBy", defaultSortBy)
@@ -1688,7 +1774,7 @@ class BreakageControllerIntegrationTest {
 
             @Nested
             @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-            class WhenAllBreakagesGettingByTechnician {
+            class WhenAllBreakagesGetByTechnician {
 
                 private DateTimeFormatter dtfTechAppPage;
                 private Breakage deadlineAppointedToMeBreakage;
@@ -1697,7 +1783,7 @@ class BreakageControllerIntegrationTest {
                 private BreakageTechDto deadlineAppointedToOthersBreakageTechDto;
 
                 @BeforeAll
-                void insertData() {
+                void beforeAll() {
 
                     LocalDateTime testDeadlineBeforeNow = now.minusDays(1);
 
@@ -1770,7 +1856,7 @@ class BreakageControllerIntegrationTest {
                 }
 
                 @AfterAll
-                void cleanupData() {
+                void afterAll() {
 
                     transactionTemplate.execute(status -> {
                         entityManager.createNativeQuery("TRUNCATE TABLE breakage_audit")
@@ -1789,635 +1875,631 @@ class BreakageControllerIntegrationTest {
                 }
 
                 @Nested
-                class WhenAllBreakagesWithExecutorGetting {
+                class WhenAllBreakagesWithDeadlineAppointedToMeGet {
 
-                    @Nested
-                    class WhenAllBreakagesWithDeadlineAppointedToMeGetting {
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesAppointedToMeWithDeadlineThenReturnAppPage() {
 
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesAppointedToMeWithDeadlineThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
-                                            .param("deadline", String.valueOf(true))
-                                            .param("searchText", (String) null))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToMeBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToMeBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToMeBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesByTextAppointedToMeWithDeadlineThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
-                                            .param("deadline", String.valueOf(true))
-                                            .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToMeBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToMeBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToMeBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
+                                        .param("deadline", String.valueOf(true))
+                                        .param("searchText", (String) null))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToMeBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToMeBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToMeBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
                     }
 
-                    @Nested
-                    class WhenAllBreakagesWithDeadlineAppointedToOthersGetting {
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesByTextAppointedToMeWithDeadlineThenReturnAppPage() {
 
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesAppointedToOthersWithDeadlineThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
-                                            .param("deadline", String.valueOf(true))
-                                            .param("searchText", (String) null))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesByTextAppointedToOthersWithDeadlineThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
-                                            .param("deadline", String.valueOf(true))
-                                            .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-                    }
-
-                    @Nested
-                    class WhenAllBreakagesAppointedToMeGetting {
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesAppointedToMeThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
-                                            .param("deadline", String.valueOf(false))
-                                            .param("searchText", (String) null))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToMeBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToMeBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToMeBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesByTextAppointedToMeThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
-                                            .param("deadline", String.valueOf(false))
-                                            .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToMeBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToMeBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToMeBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-                    }
-
-                    @Nested
-                    class WhenAllBreakagesAppointedToOthersGetting {
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesAppointedToOthersThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
-                                            .param("deadline", String.valueOf(false))
-                                            .param("searchText", (String) null))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
-
-                        @Test
-                        @SneakyThrows
-                        void whenGetAllBreakagesByTextAppointedToOthersThenReturnAppPage() {
-
-                            mockMvc.perform(MockMvcRequestBuilders.get(
-                                                    BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
-                                            )
-                                            .accept(MediaType.APPLICATION_JSON)
-                                            .header(USER_ROLE_HEADER, Role.TECHNICIAN)
-                                            .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
-                                            .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
-                                            .param("pageSize", pageSize.toString())
-                                            .param("pageIndex", pageIndex.toString())
-                                            .param("sortBy", defaultSortBy)
-                                            .param("direction", defaultDirection)
-                                            .param("statusNew", String.valueOf(true))
-                                            .param("statusSolved", String.valueOf(true))
-                                            .param("statusInProgress", String.valueOf(true))
-                                            .param("statusPaused", String.valueOf(true))
-                                            .param("statusRedirected", String.valueOf(true))
-                                            .param("statusCancelled", String.valueOf(true))
-                                            .param("priorityUrgently", String.valueOf(true))
-                                            .param("priorityHigh", String.valueOf(true))
-                                            .param("priorityMedium", String.valueOf(true))
-                                            .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
-                                            .param("deadline", String.valueOf(false))
-                                            .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                    .andExpect(MockMvcResultMatchers.status().isOk())
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.id()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.room()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
-                                            .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
-                                            .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
-                                            .value(1))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
-                                            .value(pageIndex))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
-                                            .value(pageSize))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
-                                            .value(0))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.first")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.last")
-                                            .value(true))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
-                                            .value(false))
-                                    .andExpect(MockMvcResultMatchers.jsonPath("$.now")
-                                            .value(dtfTechAppPage.format(now)));
-                        }
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
+                                        .param("deadline", String.valueOf(true))
+                                        .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToMeBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToMeBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToMeBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
                     }
                 }
 
                 @Nested
-                class WhenAllNoAppointedBreakagesGetting {
+                class WhenAllBreakagesWithDeadlineAppointedToOthersGet {
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesAppointedToOthersWithDeadlineThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
+                                        .param("deadline", String.valueOf(true))
+                                        .param("searchText", (String) null))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesByTextAppointedToOthersWithDeadlineThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
+                                        .param("deadline", String.valueOf(true))
+                                        .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+                }
+
+                @Nested
+                class WhenAllBreakagesAppointedToMeGet {
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesAppointedToMeThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
+                                        .param("deadline", String.valueOf(false))
+                                        .param("searchText", (String) null))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToMeBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToMeBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToMeBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesByTextAppointedToMeThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_ME.name())
+                                        .param("deadline", String.valueOf(false))
+                                        .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToMeBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToMeBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToMeBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToMeBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToMeBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToMeBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToMeBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToMeBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+                }
+
+                @Nested
+                class WhenAllBreakagesAppointedToOthersGet {
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesAppointedToOthersThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
+                                        .param("deadline", String.valueOf(false))
+                                        .param("searchText", (String) null))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+
+                    @Test
+                    @SneakyThrows
+                    void whenGetAllBreakagesByTextAppointedToOthersThenReturnAppPage() {
+
+                        mockMvc.perform(MockMvcRequestBuilders.get(
+                                                BASE_URL + BREAKAGE_URL + EMPLOYEE_URL
+                                        )
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .header(USER_ROLE_HEADER, Role.TECHNICIAN)
+                                        .header(USER_DEPARTMENT_ID_HEADER, defaultAdminDepartment.getId())
+                                        .header(CURRENT_USER_ID_HEADER, technicianUser.getId())
+                                        .param("pageSize", pageSize.toString())
+                                        .param("pageIndex", pageIndex.toString())
+                                        .param("sortBy", defaultSortBy)
+                                        .param("direction", defaultDirection)
+                                        .param("statusNew", String.valueOf(true))
+                                        .param("statusSolved", String.valueOf(true))
+                                        .param("statusInProgress", String.valueOf(true))
+                                        .param("statusPaused", String.valueOf(true))
+                                        .param("statusRedirected", String.valueOf(true))
+                                        .param("statusCancelled", String.valueOf(true))
+                                        .param("priorityUrgently", String.valueOf(true))
+                                        .param("priorityHigh", String.valueOf(true))
+                                        .param("priorityMedium", String.valueOf(true))
+                                        .param("priorityLow", String.valueOf(true))
+                                        .param("breakageExecutor", Executor.APPOINTED_TO_OTHERS.name())
+                                        .param("deadline", String.valueOf(false))
+                                        .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.id()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentId")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentId()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].departmentName")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.departmentName()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].room")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.room()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageTopic")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageTopic()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageText")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageText()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.status().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].priority")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.priority().name()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].breakageExecutor")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.breakageExecutor()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdBy")
+                                        .value(deadlineAppointedToOthersBreakageTechDto.createdBy()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].createdDate")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.createdDate())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].deadline")
+                                        .value(dtf.format(deadlineAppointedToOthersBreakageTechDto.deadline())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements")
+                                        .value(1))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber")
+                                        .value(pageIndex))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize")
+                                        .value(pageSize))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.offset")
+                                        .value(0))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.first")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.last")
+                                        .value(true))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isForEmployee")
+                                        .value(false))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.now")
+                                        .value(dtfTechAppPage.format(now)));
+                    }
+                }
+
+                @Nested
+                class WhenAllNoAppointedBreakagesGet {
 
                     @Test
                     @SneakyThrows
@@ -2573,10 +2655,10 @@ class BreakageControllerIntegrationTest {
                 }
 
                 @Nested
-                class WhenAllBreakagesGetting {
+                class WhenAllBreakagesGet {
 
                     @Nested
-                    class WhenAllBreakagesWithDeadlineGetting {
+                    class WhenAllBreakagesWithDeadlineGet {
 
                         @Test
                         @SneakyThrows
@@ -2688,7 +2770,7 @@ class BreakageControllerIntegrationTest {
                     }
 
                     @Nested
-                    class WhenAllBreakagesWithNoDeadlineGetting {
+                    class WhenAllBreakagesWithNoDeadlineGet {
 
                         @Test
                         @SneakyThrows
@@ -2801,7 +2883,7 @@ class BreakageControllerIntegrationTest {
 
                     @Nested
                     @Transactional
-                    class WhenAllBreakagesWithFilterStatusOrPriorityGetting {
+                    class WhenAllBreakagesWithFilterStatusOrPriorityGet {
 
                         @Test
                         @SneakyThrows

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -1067,7 +1068,7 @@ class BreakageControllerWebMvcTest {
             pageSize = 10;
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
-            defaultDirection = "DESC";
+            defaultDirection = Sort.Direction.DESC.name();
             defaultExecutor = "ALL";
         }
 
@@ -1146,7 +1147,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", "ALL")
+                                .param("breakageExecutor", defaultExecutor)
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", (String) null))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1233,7 +1234,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", "ALL")
+                                .param("breakageExecutor", defaultExecutor)
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1334,7 +1335,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", "ALL")
+                                .param("breakageExecutor", defaultExecutor)
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", (String) null))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -666,6 +666,8 @@ class BreakageServiceImplTest {
         private List<Status> defaultShortStatusList;
         private List<Priority> defaultPriorityList;
         private PageRequest defaultPageRequest;
+        private String defaultDirection;
+        private String defaultExecutor;
 
         @BeforeEach
         void setUp() {
@@ -673,6 +675,8 @@ class BreakageServiceImplTest {
             pageSize = 10;
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
+            defaultDirection = Sort.Direction.DESC.name();
+            defaultExecutor = "ALL";
 
             defaultStatusList = new ArrayList<>();
             defaultStatusList.add(Status.NEW);
@@ -733,7 +737,7 @@ class BreakageServiceImplTest {
                 ).thenReturn(page);
 
                 AppPage appPage =
-                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
@@ -758,7 +762,7 @@ class BreakageServiceImplTest {
                 ).thenReturn(page);
 
                 AppPage appPage =
-                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
@@ -786,7 +790,7 @@ class BreakageServiceImplTest {
                 ).thenReturn(page);
 
                 AppPage appPage =
-                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                        breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 false, true, true, true,
                                 true, true, true,
                                 true, true, true,
@@ -849,7 +853,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -874,7 +878,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -925,7 +929,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -950,7 +954,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -1007,7 +1011,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -1032,7 +1036,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -1083,7 +1087,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -1108,7 +1112,7 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
@@ -1160,7 +1164,7 @@ class BreakageServiceImplTest {
                     ).thenReturn(page);
 
                     AppPage appPage =
-                            breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                            breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                     true, true, true, true,
                                     true, true, true,
                                     true, true, true,
@@ -1184,7 +1188,7 @@ class BreakageServiceImplTest {
                     ).thenReturn(page);
 
                     AppPage appPage =
-                            breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                            breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                     true, true, true, true,
                                     true, true, true,
                                     true, true, true,
@@ -1239,11 +1243,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        "ALL", true, null,
+                                        defaultExecutor, true, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1264,11 +1268,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        "ALL", true, BREAKAGE_TEST_SEARCH_TEXT,
+                                        defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1315,11 +1319,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        null, false, null,
+                                        defaultExecutor, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1339,11 +1343,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        null, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1375,11 +1379,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         false, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        null, false, null,
+                                        defaultExecutor, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(Collections.emptyList(), appPage.content());
@@ -1401,11 +1405,11 @@ class BreakageServiceImplTest {
                         ).thenReturn(page);
 
                         AppPage appPage =
-                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, "DESC",
+                                breakageService.getAllBreakages(pageSize, pageIndex, defaultSortBy, defaultDirection,
                                         true, true, true, true,
                                         true, true, true, true,
                                         false, true,
-                                        null, false, null,
+                                        defaultExecutor, false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(Collections.emptyList(), appPage.content());

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import ru.kraser.technical_helper.breakage_server.service.BreakageService;
 import ru.kraser.technical_helper.common_module.dto.api.ApiResponse;
@@ -863,7 +864,7 @@ class BreakageControllerTest {
             pageSize = 10;
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
-            defaultDirection = "DESC";
+            defaultDirection = Sort.Direction.DESC.name();
             defaultExecutor = "ALL";
         }
 

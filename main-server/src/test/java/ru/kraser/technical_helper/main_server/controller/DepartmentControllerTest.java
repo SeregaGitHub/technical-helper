@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 
 import static org.mockito.Mockito.when;
 import static ru.kraser.technical_helper.common_module.util.Constant.*;
-import static ru.kraser.technical_helper.main_server.util.Constant.*;
+import static ru.kraser.technical_helper.common_module.util.ConstantForTests.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
