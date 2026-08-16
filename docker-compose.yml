@@ -3,6 +3,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        HOST_SERVER_IP: "158.160.221.34"
       dockerfile: Dockerfile
     image: th-frontend:1.1.0
     restart: on-failure
@@ -34,7 +36,7 @@ services:
       - main-server
       - breakage-server
     environment:
-      HOST_SERVER_IP: 158.160.177.159
+      HOST_SERVER_IP: 158.160.221.34
       TZ: Europe/Moscow
     networks:
       - network

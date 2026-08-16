@@ -49,6 +49,8 @@ build-job:
 
 test-job:
   stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH != "add-docker-compose-settings"        # NEEDS TO BE DELETE
   extends: .maven_docker_2375
   interruptible: true
   script:
@@ -77,6 +79,7 @@ package-job:
     - build-job
   only:
     - main
+    - add-docker-compose-settings        # NEEDS TO BE DELETE
 
 deploy-job:
   stage: deploy
@@ -92,3 +95,4 @@ deploy-job:
     - package-job
   only:
     - main
+    - add-docker-compose-settings        # NEEDS TO BE DELETE
