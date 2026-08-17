@@ -77,7 +77,6 @@ package-job:
     - build-job
   only:
     - main
-    - add-docker-compose-settings    # NEEDS TO BE DELETE
 
 deploy-job:
   stage: deploy
@@ -93,4 +92,3 @@ deploy-job:
     - package-job
   only:
     - main
-    - add-docker-compose-settings    # NEEDS TO BE DELETE
