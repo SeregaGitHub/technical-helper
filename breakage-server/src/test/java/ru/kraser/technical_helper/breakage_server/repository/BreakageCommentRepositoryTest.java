@@ -117,7 +117,7 @@ class BreakageCommentRepositoryTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            testBreakage = breakageRepository.saveAndFlush(toSaveBreakage);
+            testBreakage = breakageRepository.save(toSaveBreakage);
         }
 
         @BeforeEach
@@ -187,7 +187,7 @@ class BreakageCommentRepositoryTest {
         @Modifying(clearAutomatically = true)
         void whenUpdateBreakageCommentThenReturnOne() {
 
-            BreakageComment savedBreakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+            BreakageComment savedBreakageComment = breakageCommentRepository.save(toSaveBreakageComment);
             LocalDateTime afterNow = now.plusMinutes(1);
 
             int response = breakageCommentRepository.updateBreakageComment(
@@ -224,7 +224,7 @@ class BreakageCommentRepositoryTest {
         @Transactional
         void whenGetAllBreakageCommentsThenReturnListOfComments() {
 
-            breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+            breakageCommentRepository.save(toSaveBreakageComment);
 
             List<BreakageCommentBackendDto> list =
                     breakageCommentRepository.getAllBreakageComments(testBreakage.getId());

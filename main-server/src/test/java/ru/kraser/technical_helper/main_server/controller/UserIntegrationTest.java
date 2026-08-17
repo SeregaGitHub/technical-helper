@@ -178,9 +178,9 @@ class UserIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            enabledTechnicianUser = userRepository.saveAndFlush(toSaveEnabledTechnicianUser);
-            notEnabledTechnicianUser = userRepository.saveAndFlush(toSaveNotEnabledTechnicianUser);
-            enabledEmployeeUser = userRepository.saveAndFlush(toSaveEnabledEmployeeUser);
+            enabledTechnicianUser = userRepository.save(toSaveEnabledTechnicianUser);
+            notEnabledTechnicianUser = userRepository.save(toSaveNotEnabledTechnicianUser);
+            enabledEmployeeUser = userRepository.save(toSaveEnabledEmployeeUser);
         }
 
         @Nested

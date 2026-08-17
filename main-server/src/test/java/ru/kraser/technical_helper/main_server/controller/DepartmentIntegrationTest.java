@@ -160,8 +160,8 @@ public class DepartmentIntegrationTest {
 
             createDepartmentDto = new CreateDepartmentDto(DEPARTMENT_TEST_NEW_NAME);
 
-            enabledDepartment = departmentRepository.saveAndFlush(department);
-            notEnabledDepartment = departmentRepository.saveAndFlush(toSaveNotEnabledDepartment);
+            enabledDepartment = departmentRepository.save(department);
+            notEnabledDepartment = departmentRepository.save(toSaveNotEnabledDepartment);
         }
 
         @Nested

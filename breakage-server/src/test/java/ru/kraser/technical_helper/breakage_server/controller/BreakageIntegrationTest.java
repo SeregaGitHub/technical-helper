@@ -183,8 +183,8 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentDepartment = departmentRepository.saveAndFlush(toSaveEmployeeCurrentDepartment);
-            employeeOtherDepartment = departmentRepository.saveAndFlush(toSaveEmployeeOtherDepartment);
+            employeeCurrentDepartment = departmentRepository.save(toSaveEmployeeCurrentDepartment);
+            employeeOtherDepartment = departmentRepository.save(toSaveEmployeeOtherDepartment);
 
             User toSaveEmployeeUser = User.builder()
                     .username(USER_TEST_NAME)
@@ -234,10 +234,10 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentUser = userRepository.saveAndFlush(toSaveEmployeeUser);
-            employeeSameCurrentUser = userRepository.saveAndFlush(toSaveEmployeeSameUser);
-            employeeOtherUser = userRepository.saveAndFlush(toSaveEmployeeOtherUser);
-            technicianUser = userRepository.saveAndFlush(toSaveTechnicianUser);
+            employeeCurrentUser = userRepository.save(toSaveEmployeeUser);
+            employeeSameCurrentUser = userRepository.save(toSaveEmployeeSameUser);
+            employeeOtherUser = userRepository.save(toSaveEmployeeOtherUser);
+            technicianUser = userRepository.save(toSaveTechnicianUser);
 
             Breakage toSaveEmployeeBreakage = Breakage.builder()
                     .department(employeeCurrentDepartment)
@@ -255,7 +255,7 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            employeeCurrentBreakage = breakageRepository.saveAndFlush(toSaveEmployeeBreakage);
+            employeeCurrentBreakage = breakageRepository.save(toSaveEmployeeBreakage);
 
             BreakageComment toSaveBreakageComment = BreakageComment.builder()
                     .breakage(employeeCurrentBreakage)
@@ -266,7 +266,7 @@ class BreakageIntegrationTest {
                     .lastUpdatedDate(now)
                     .build();
 
-            breakageComment = breakageCommentRepository.saveAndFlush(toSaveBreakageComment);
+            breakageComment = breakageCommentRepository.save(toSaveBreakageComment);
 
             expectedBreakageEmployeeDto = BreakageEmployeeDto.builder()
                     .id(employeeCurrentBreakage.getId())
@@ -676,7 +676,7 @@ class BreakageIntegrationTest {
                     breakage.setDeadline(now);
                     breakage.setLastUpdatedBy(defaultAdminUser.getId());
                     breakage.setLastUpdatedDate(afterNow);
-                    breakageRepository.saveAndFlush(breakage);
+                    breakageRepository.save(breakage);
 
                     updateBreakageStatusDto = new UpdateBreakageStatusDto(Status.PAUSED);
 
@@ -1164,7 +1164,7 @@ class BreakageIntegrationTest {
                     breakage.setDeadline(appointedDeadline);
                     breakage.setLastUpdatedBy(defaultAdminUser.getId());
 
-                    breakageRepository.saveAndFlush(breakage);
+                    breakageRepository.save(breakage);
 
                     String responseMessage =
                             "Исполнитель заявки на неисправность и срок исполнения были успешно удалены.";
@@ -1486,7 +1486,6 @@ class BreakageIntegrationTest {
             private Integer pageIndex;
             private String defaultSortBy;
             private String defaultDirection;
-            private String defaultExecutor;
 
             @BeforeEach
             void setUp() {
@@ -1495,7 +1494,6 @@ class BreakageIntegrationTest {
                 pageIndex = 0;
                 defaultSortBy = "lastUpdatedDate";
                 defaultDirection = Sort.Direction.DESC.name();
-                defaultExecutor = "ALL";
             }
 
             @Nested
@@ -1526,7 +1524,7 @@ class BreakageIntegrationTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(true))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", (String) null))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1598,7 +1596,7 @@ class BreakageIntegrationTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(true))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", (String) null))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1670,7 +1668,7 @@ class BreakageIntegrationTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(true))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1742,7 +1740,7 @@ class BreakageIntegrationTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(true))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", (String) null))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1820,9 +1818,9 @@ class BreakageIntegrationTest {
                             .build();
 
                     deadlineAppointedToMeBreakage =
-                            breakageRepository.saveAndFlush(toSaveDeadlineAppointedToMeBreakage);
+                            breakageRepository.save(toSaveDeadlineAppointedToMeBreakage);
                     deadlineAppointedToOthersBreakage =
-                            breakageRepository.saveAndFlush(toSaveDeadlineAppointedToOtherBreakage);
+                            breakageRepository.save(toSaveDeadlineAppointedToOtherBreakage);
 
                     deadlineAppointedToMeBreakageTechDto = BreakageTechDto.builder()
                             .id(deadlineAppointedToMeBreakage.getId())
@@ -2685,7 +2683,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(true))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2739,7 +2737,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(true))
                                             .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2797,7 +2795,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2851,7 +2849,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2921,7 +2919,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3010,7 +3008,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(false))
                                             .param("priorityLow", String.valueOf(false))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3088,7 +3086,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(true))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3142,7 +3140,7 @@ class BreakageIntegrationTest {
                                             .param("priorityHigh", String.valueOf(true))
                                             .param("priorityMedium", String.valueOf(false))
                                             .param("priorityLow", String.valueOf(true))
-                                            .param("breakageExecutor", defaultExecutor)
+                                            .param("breakageExecutor", Executor.ALL.name())
                                             .param("deadline", String.valueOf(false))
                                             .param("searchText", (String) null))
                                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -91,7 +91,7 @@ class UserRepositoryTest {
                     0,
                     0);
 
-            enabledTechnicianUser = userRepository.saveAndFlush(
+            enabledTechnicianUser = userRepository.save(
                     User.builder()
                             .username(USER_TECHNICIAN_TEST_NAME)
                             .password(USER_TEST_PASSWORD)
@@ -105,7 +105,7 @@ class UserRepositoryTest {
                             .build()
             );
 
-            notEnabledTechnicianUser = userRepository.saveAndFlush(
+            notEnabledTechnicianUser = userRepository.save(
                     User.builder()
                             .username(USER_TEST_OTHER_NAME)
                             .password(USER_TEST_PASSWORD)
@@ -119,7 +119,7 @@ class UserRepositoryTest {
                             .build()
             );
 
-            employeeDepartment = departmentRepository.saveAndFlush(
+            employeeDepartment = departmentRepository.save(
                     Department.builder()
                             .name(DEPARTMENT_TEST_NAME)
                             .enabled(true)
@@ -130,7 +130,7 @@ class UserRepositoryTest {
                             .build()
             );
 
-            enabledEmployeeUser = userRepository.saveAndFlush(
+            enabledEmployeeUser = userRepository.save(
                     User.builder()
                             .username(USER_TEST_NAME)
                             .password(USER_TEST_PASSWORD)
@@ -471,7 +471,7 @@ class UserRepositoryTest {
                 User userAdm = userRepository.findById(defaultAdminUser.getId()).get();
                 userAdm.setEnabled(false);
 
-                userRepository.saveAndFlush(userAdm);
+                userRepository.save(userAdm);
 
                 Optional<User> optional =
                         userRepository.findTop1ByRoleAndEnabledTrue(Role.ADMIN);
