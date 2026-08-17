@@ -1060,7 +1060,6 @@ class BreakageControllerWebMvcTest {
         private Integer pageIndex;
         private String defaultSortBy;
         private String defaultDirection;
-        private String defaultExecutor;
 
         @BeforeEach
         void setUp() {
@@ -1069,7 +1068,6 @@ class BreakageControllerWebMvcTest {
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
             defaultDirection = Sort.Direction.DESC.name();
-            defaultExecutor = "ALL";
         }
 
         @Nested
@@ -1121,7 +1119,7 @@ class BreakageControllerWebMvcTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeAppPage);
@@ -1147,7 +1145,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", defaultExecutor)
+                                .param("breakageExecutor", Executor.ALL.name())
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", (String) null))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1194,7 +1192,7 @@ class BreakageControllerWebMvcTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
             }
@@ -1208,7 +1206,7 @@ class BreakageControllerWebMvcTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeAppPage);
@@ -1234,7 +1232,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", defaultExecutor)
+                                .param("breakageExecutor", Executor.ALL.name())
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1281,7 +1279,7 @@ class BreakageControllerWebMvcTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
             }
@@ -1309,7 +1307,7 @@ class BreakageControllerWebMvcTest {
                                 false, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeEmptyAppPage);
@@ -1335,7 +1333,7 @@ class BreakageControllerWebMvcTest {
                                 .param("priorityHigh", String.valueOf(true))
                                 .param("priorityMedium", String.valueOf(true))
                                 .param("priorityLow", String.valueOf(true))
-                                .param("breakageExecutor", defaultExecutor)
+                                .param("breakageExecutor", Executor.ALL.name())
                                 .param("deadline", String.valueOf(false))
                                 .param("searchText", (String) null))
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1363,7 +1361,7 @@ class BreakageControllerWebMvcTest {
                                 false, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
             }
@@ -2672,7 +2670,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianEmptyAppPage);
@@ -2698,7 +2696,7 @@ class BreakageControllerWebMvcTest {
                                         .param("priorityHigh", String.valueOf(true))
                                         .param("priorityMedium", String.valueOf(true))
                                         .param("priorityLow", String.valueOf(true))
-                                        .param("breakageExecutor", defaultExecutor)
+                                        .param("breakageExecutor", Executor.ALL.name())
                                         .param("deadline", String.valueOf(true))
                                         .param("searchText", (String) null))
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2737,7 +2735,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 );
                     }
@@ -2751,7 +2749,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -2777,7 +2775,7 @@ class BreakageControllerWebMvcTest {
                                         .param("priorityHigh", String.valueOf(true))
                                         .param("priorityMedium", String.valueOf(true))
                                         .param("priorityLow", String.valueOf(true))
-                                        .param("breakageExecutor", defaultExecutor)
+                                        .param("breakageExecutor", Executor.ALL.name())
                                         .param("deadline", String.valueOf(true))
                                         .param("searchText", (String) null))
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2838,7 +2836,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 );
                     }
@@ -2852,7 +2850,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -2878,7 +2876,7 @@ class BreakageControllerWebMvcTest {
                                         .param("priorityHigh", String.valueOf(true))
                                         .param("priorityMedium", String.valueOf(true))
                                         .param("priorityLow", String.valueOf(true))
-                                        .param("breakageExecutor", defaultExecutor)
+                                        .param("breakageExecutor", Executor.ALL.name())
                                         .param("deadline", String.valueOf(true))
                                         .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -2939,7 +2937,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 );
                     }
@@ -2992,7 +2990,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -3018,7 +3016,7 @@ class BreakageControllerWebMvcTest {
                                         .param("priorityHigh", String.valueOf(true))
                                         .param("priorityMedium", String.valueOf(true))
                                         .param("priorityLow", String.valueOf(true))
-                                        .param("breakageExecutor", defaultExecutor)
+                                        .param("breakageExecutor", Executor.ALL.name())
                                         .param("deadline", String.valueOf(false))
                                         .param("searchText", (String) null))
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3079,7 +3077,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 );
                     }
@@ -3093,7 +3091,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -3119,7 +3117,7 @@ class BreakageControllerWebMvcTest {
                                         .param("priorityHigh", String.valueOf(true))
                                         .param("priorityMedium", String.valueOf(true))
                                         .param("priorityLow", String.valueOf(true))
-                                        .param("breakageExecutor", defaultExecutor)
+                                        .param("breakageExecutor", Executor.ALL.name())
                                         .param("deadline", String.valueOf(false))
                                         .param("searchText", BREAKAGE_TEST_SEARCH_TEXT))
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3180,7 +3178,7 @@ class BreakageControllerWebMvcTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 );
                     }
@@ -3221,7 +3219,7 @@ class BreakageControllerWebMvcTest {
                                     false, true, true, true,
                                     true, true, true,
                                     true, true, true,
-                                    defaultExecutor, false, null,
+                                    Executor.ALL.name(), false, null,
                                     Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                             )
                     ).thenReturn(technicianEmptyAppPage);
@@ -3247,7 +3245,7 @@ class BreakageControllerWebMvcTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(true))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", (String) null))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3286,7 +3284,7 @@ class BreakageControllerWebMvcTest {
                                     false, true, true, true,
                                     true, true, true, true,
                                     true, true,
-                                    defaultExecutor, false, null,
+                                    Executor.ALL.name(), false, null,
                                     Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                             );
                 }
@@ -3300,7 +3298,7 @@ class BreakageControllerWebMvcTest {
                                     true, true, true, true,
                                     true, true, true, true,
                                     false, true,
-                                    defaultExecutor, false, null,
+                                    Executor.ALL.name(), false, null,
                                     Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                             )
                     ).thenReturn(technicianEmptyAppPage);
@@ -3326,7 +3324,7 @@ class BreakageControllerWebMvcTest {
                                     .param("priorityHigh", String.valueOf(true))
                                     .param("priorityMedium", String.valueOf(false))
                                     .param("priorityLow", String.valueOf(true))
-                                    .param("breakageExecutor", defaultExecutor)
+                                    .param("breakageExecutor", Executor.ALL.name())
                                     .param("deadline", String.valueOf(false))
                                     .param("searchText", (String) null))
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -3365,7 +3363,7 @@ class BreakageControllerWebMvcTest {
                                     true, true, true, true,
                                     true, true, true, true,
                                     false, true,
-                                    defaultExecutor, false, null,
+                                    Executor.ALL.name(), false, null,
                                     Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                             );
                 }

@@ -667,7 +667,6 @@ class BreakageServiceImplTest {
         private List<Priority> defaultPriorityList;
         private PageRequest defaultPageRequest;
         private String defaultDirection;
-        private String defaultExecutor;
 
         @BeforeEach
         void setUp() {
@@ -676,7 +675,6 @@ class BreakageServiceImplTest {
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
             defaultDirection = Sort.Direction.DESC.name();
-            defaultExecutor = "ALL";
 
             defaultStatusList = new ArrayList<>();
             defaultStatusList.add(Status.NEW);
@@ -1247,7 +1245,7 @@ class BreakageServiceImplTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1272,7 +1270,7 @@ class BreakageServiceImplTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1323,7 +1321,7 @@ class BreakageServiceImplTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1347,7 +1345,7 @@ class BreakageServiceImplTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(content, appPage.content());
@@ -1383,7 +1381,7 @@ class BreakageServiceImplTest {
                                         false, true, true, true,
                                         true, true, true, true,
                                         true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(Collections.emptyList(), appPage.content());
@@ -1409,7 +1407,7 @@ class BreakageServiceImplTest {
                                         true, true, true, true,
                                         true, true, true, true,
                                         false, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEFAULT_ADMIN_DEPARTMENT_ID, USER_TEST_ID);
 
                         assertEquals(Collections.emptyList(), appPage.content());

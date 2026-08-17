@@ -856,7 +856,6 @@ class BreakageControllerTest {
         private Integer pageIndex;
         private String defaultSortBy;
         private String defaultDirection;
-        private String defaultExecutor;
 
         @BeforeEach
         void setUp() {
@@ -865,7 +864,6 @@ class BreakageControllerTest {
             pageIndex = 0;
             defaultSortBy = "lastUpdatedDate";
             defaultDirection = Sort.Direction.DESC.name();
-            defaultExecutor = "ALL";
         }
 
         @Nested
@@ -915,7 +913,7 @@ class BreakageControllerTest {
                                 pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 true, true, true, true, true,
                                 true, true, true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeAppPage);
@@ -924,7 +922,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         true, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, null,
+                        Executor.ALL.name(), false, null,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
 
@@ -934,7 +932,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         true, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, null,
+                        Executor.ALL.name(), false, null,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
             }
@@ -946,7 +944,7 @@ class BreakageControllerTest {
                                 pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 true, true, true, true, true,
                                 true, true, true, true, true,
-                                defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeAppPage);
@@ -955,7 +953,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         true, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
 
@@ -965,7 +963,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         true, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
             }
@@ -991,7 +989,7 @@ class BreakageControllerTest {
                                 pageSize, pageIndex, defaultSortBy, defaultDirection,
                                 false, true, true, true, true,
                                 true, true, true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                         )
                 ).thenReturn(employeeEmptyAppPage);
@@ -1000,7 +998,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         false, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, null,
+                        Executor.ALL.name(), false, null,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
 
@@ -1010,7 +1008,7 @@ class BreakageControllerTest {
                         pageSize, pageIndex, defaultSortBy, defaultDirection,
                         false, true, true, true, true,
                         true, true, true, true, true,
-                        defaultExecutor, false, null,
+                        Executor.ALL.name(), false, null,
                         Role.EMPLOYEE, DEPARTMENT_TEST_ID, USER_TEST_ID
                 );
             }
@@ -1627,7 +1625,7 @@ class BreakageControllerTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, true, null,
+                                        Executor.ALL.name(), true, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -1637,7 +1635,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, true, null,
+                                Executor.ALL.name(), true, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1648,7 +1646,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, true, null,
+                                Executor.ALL.name(), true, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
@@ -1661,7 +1659,7 @@ class BreakageControllerTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -1671,7 +1669,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1682,7 +1680,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, true, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), true, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
@@ -1734,7 +1732,7 @@ class BreakageControllerTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -1744,7 +1742,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1755,7 +1753,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
@@ -1768,7 +1766,7 @@ class BreakageControllerTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                        Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianAppPage);
@@ -1778,7 +1776,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1789,7 +1787,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, BREAKAGE_TEST_SEARCH_TEXT,
+                                Executor.ALL.name(), false, BREAKAGE_TEST_SEARCH_TEXT,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
@@ -1828,7 +1826,7 @@ class BreakageControllerTest {
                                         false, true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianEmptyAppPage);
@@ -1838,7 +1836,7 @@ class BreakageControllerTest {
                                 false, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1849,7 +1847,7 @@ class BreakageControllerTest {
                                 false, true, true, true,
                                 true, true, true,
                                 true, true, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
@@ -1862,7 +1860,7 @@ class BreakageControllerTest {
                                         true, true, true, true,
                                         true, true, true,
                                         true, false, true,
-                                        defaultExecutor, false, null,
+                                        Executor.ALL.name(), false, null,
                                         Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                                 )
                         ).thenReturn(technicianEmptyAppPage);
@@ -1872,7 +1870,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, false, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
 
@@ -1883,7 +1881,7 @@ class BreakageControllerTest {
                                 true, true, true, true,
                                 true, true, true,
                                 true, false, true,
-                                defaultExecutor, false, null,
+                                Executor.ALL.name(), false, null,
                                 Role.TECHNICIAN, DEPARTMENT_TEST_ID, USER_TEST_ID
                         );
                     }
