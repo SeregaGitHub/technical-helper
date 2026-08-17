@@ -57,7 +57,6 @@ class BreakageRepositoryTest {
     private LocalDateTime now;
     private User defaultAdminUser;
     private Department defaultAdminDepartment;
-    private Breakage testBreakage;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
@@ -91,16 +90,13 @@ class BreakageRepositoryTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class WhenBreakageRepositoryDataModifyingMethodsAreInvoked {
 
+        private Breakage appointedBreakage;
+        private Breakage noAppointedBreakage;
+
+        private LocalDateTime afterNow;
+
         @BeforeAll
         void beforeAll() {
-
-            defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
-            defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
-        }
-
-        @BeforeEach
-        @SneakyThrows
-        void setUp() {
 
             now = LocalDateTime.of(
                     2025,
@@ -110,7 +106,28 @@ class BreakageRepositoryTest {
                     0,
                     0);
 
-            testBreakage = Breakage.builder()
+            afterNow = now.plusHours(1);
+
+            defaultAdminDepartment = departmentRepository.findById(DEFAULT_ADMIN_DEPARTMENT_ID).get();
+            defaultAdminUser = userRepository.findById(DEFAULT_ADMIN_USER_ID).get();
+
+            appointedBreakage = breakageRepository.save(Breakage.builder()
+                    .department(defaultAdminDepartment)
+                    .room(BREAKAGE_TEST_ROOM)
+                    .breakageTopic(BREAKAGE_TEST_TOPIC)
+                    .breakageText(BREAKAGE_TEST_TEXT)
+                    .status(Status.NEW)
+                    .priority(Priority.MEDIUM)
+                    .executor(defaultAdminUser)
+                    .executorAppointedBy(defaultAdminUser)
+                    .deadline(now)
+                    .createdBy(defaultAdminUser.getId())
+                    .createdDate(now)
+                    .lastUpdatedBy(defaultAdminUser.getId())
+                    .lastUpdatedDate(now)
+                    .build());
+
+            noAppointedBreakage = breakageRepository.save(Breakage.builder()
                     .department(defaultAdminDepartment)
                     .room(BREAKAGE_TEST_ROOM)
                     .breakageTopic(BREAKAGE_TEST_TOPIC)
@@ -124,12 +141,35 @@ class BreakageRepositoryTest {
                     .createdDate(now)
                     .lastUpdatedBy(defaultAdminUser.getId())
                     .lastUpdatedDate(now)
-                    .build();
+                    .build());
         }
 
         @Nested
         @Transactional
         class WhenBreakageCreating {
+
+            private Breakage testBreakage;
+
+            @BeforeEach
+            @SneakyThrows
+            void setUp() {
+
+                testBreakage = Breakage.builder()
+                        .department(defaultAdminDepartment)
+                        .room(BREAKAGE_TEST_ROOM)
+                        .breakageTopic(BREAKAGE_TEST_TOPIC)
+                        .breakageText(BREAKAGE_TEST_TEXT)
+                        .status(Status.NEW)
+                        .priority(Priority.MEDIUM)
+                        .executor(null)
+                        .executorAppointedBy(null)
+                        .deadline(null)
+                        .createdBy(defaultAdminUser.getId())
+                        .createdDate(now)
+                        .lastUpdatedBy(defaultAdminUser.getId())
+                        .lastUpdatedDate(now)
+                        .build();
+            }
 
             @Test
             void whenCreateBreakageWithNoExecutorThenReturnBreakage() {
@@ -202,30 +242,19 @@ class BreakageRepositoryTest {
         @Transactional
         class WhenBreakageStatusOrPriorityUpdating {
 
-            private Breakage savedBreakage;
-            private LocalDateTime afterNow;
-
-            @BeforeEach
-            void setUp() {
-
-                afterNow = now.plusHours(1);
-            }
-
             @Test
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakageStatusThenReturnOne() {
 
-                savedBreakage = breakageRepository.save(testBreakage);
-
                 int response = breakageRepository.updateBreakageStatus(
-                        savedBreakage.getId(),
+                        noAppointedBreakage.getId(),
                         Status.CANCELLED,
                         defaultAdminUser.getId(),
                         afterNow
                 );
 
                 entityManager.clear();
-                Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+                Breakage updatedBreakage = breakageRepository.findById(noAppointedBreakage.getId()).get();
 
                 assertThat(response).isEqualTo(1);
                 assertThat(updatedBreakage.getStatus()).isEqualTo(Status.CANCELLED);
@@ -235,21 +264,15 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakageStatusAndResetExecutorThenReturnOne() {
 
-                testBreakage.setExecutor(defaultAdminUser);
-                testBreakage.setExecutorAppointedBy(defaultAdminUser);
-                testBreakage.setDeadline(now);
-
-                savedBreakage = breakageRepository.save(testBreakage);
-
                 int response = breakageRepository.updateBreakageStatusAndResetExecutor(
-                        savedBreakage.getId(),
+                        appointedBreakage.getId(),
                         Status.PAUSED,
                         defaultAdminUser.getId(),
                         afterNow
                 );
 
                 entityManager.clear();
-                Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+                Breakage updatedBreakage = breakageRepository.findById(appointedBreakage.getId()).get();
 
                 assertThat(response).isEqualTo(1);
                 assertThat(updatedBreakage.getExecutor()).isNull();
@@ -261,17 +284,15 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenUpdateBreakagePriorityThenReturnOne() {
 
-                savedBreakage = breakageRepository.save(testBreakage);
-
                 int response = breakageRepository.updateBreakagePriority(
-                        savedBreakage.getId(),
+                        noAppointedBreakage.getId(),
                         Priority.HIGH,
                         defaultAdminUser.getId(),
                         afterNow
                 );
 
                 entityManager.clear();
-                Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+                Breakage updatedBreakage = breakageRepository.findById(noAppointedBreakage.getId()).get();
 
                 assertThat(response).isEqualTo(1);
                 assertThat(updatedBreakage.getPriority()).isEqualTo(Priority.HIGH);
@@ -282,23 +303,12 @@ class BreakageRepositoryTest {
         @Transactional
         class WhenBreakageExecutorAddingOrDropping {
 
-            private Breakage savedBreakage;
-            private LocalDateTime afterNow;
-
-            @BeforeEach
-            void setUp() {
-
-                afterNow = now.plusHours(1);
-            }
-
             @Test
             @Modifying(clearAutomatically = true)
             void whenAddBreakageExecutorThenReturnOne() {
 
-                savedBreakage = breakageRepository.save(testBreakage);
-
                 int response = breakageRepository.addBreakageExecutor(
-                        savedBreakage.getId(),
+                        noAppointedBreakage.getId(),
                         defaultAdminUser.getId(),
                         afterNow,
                         defaultAdminUser.getId(),
@@ -306,7 +316,7 @@ class BreakageRepositoryTest {
                 );
 
                 entityManager.clear();
-                Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+                Breakage updatedBreakage = breakageRepository.findById(noAppointedBreakage.getId()).get();
 
                 assertThat(response).isEqualTo(1);
                 assertThat(updatedBreakage.getExecutor().getId()).isEqualTo(defaultAdminUser.getId());
@@ -318,20 +328,14 @@ class BreakageRepositoryTest {
             @Modifying(clearAutomatically = true)
             void whenDropBreakageExecutorThenReturnOne() {
 
-                testBreakage.setExecutor(defaultAdminUser);
-                testBreakage.setExecutorAppointedBy(defaultAdminUser);
-                testBreakage.setDeadline(afterNow);
-
-                savedBreakage = breakageRepository.save(testBreakage);
-
                 int response = breakageRepository.dropBreakageExecutor(
-                        savedBreakage.getId(),
+                        appointedBreakage.getId(),
                         defaultAdminUser.getId(),
                         afterNow
                 );
 
                 entityManager.clear();
-                Breakage updatedBreakage = breakageRepository.findById(savedBreakage.getId()).get();
+                Breakage updatedBreakage = breakageRepository.findById(appointedBreakage.getId()).get();
 
                 assertThat(response).isEqualTo(1);
                 assertThat(updatedBreakage.getExecutor()).isNull();
@@ -377,6 +381,7 @@ class BreakageRepositoryTest {
                     13,
                     0,
                     0);
+
             beforeLdt = ldt.minusDays(1);
 
             Department emplDepartment = Department.builder()
